@@ -1,0 +1,20 @@
+spring:
+  #  sql:
+  #    init:
+  #      data-locations:
+  #      mode: always
+  #      encoding: UTF-8
+  datasource:
+    password: 2H#@(#Jksj@kkwje
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: eighteen-admin
+    url: jdbc:mysql://localhost:3307/eighteen-be?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
+  jpa:
+    hibernate:
+      ddl-auto: create
+      # sql init 으로 인한 에러 방지 ->https://wildeveloperetrain.tistory.com/228
+      # defer-datasource-initialization: true
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
