@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.3'
     id 'io.spring.dependency-management' version '1.1.4'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'com.palantir.docker-compose' version '0.33.0'
 }
 
 group = 'com.st'
@@ -33,6 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // QueryDSL
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
@@ -42,6 +44,7 @@ dependencies {
     // ETC
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'io.lettuce:lettuce-core'
 
     // Database
     runtimeOnly 'com.h2database:h2'
