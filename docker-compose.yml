@@ -7,6 +7,32 @@ networks:
     driver: bridge
 
 services:
+  setup:
+    profiles:
+      - setup
+    build:
+      context: elk/setup/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    init: true
+    volumes:
+      - ./elk/setup/entrypoint.sh:/entrypoint.sh:ro,Z
+      - ./elk/setup/lib.sh:/lib.sh:ro,Z
+      - ./elk/setup/roles:/roles:ro,Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      METRICBEAT_INTERNAL_PASSWORD: ${METRICBEAT_INTERNAL_PASSWORD:-}
+      FILEBEAT_INTERNAL_PASSWORD: ${FILEBEAT_INTERNAL_PASSWORD:-}
+      HEARTBEAT_INTERNAL_PASSWORD: ${HEARTBEAT_INTERNAL_PASSWORD:-}
+      MONITORING_INTERNAL_PASSWORD: ${MONITORING_INTERNAL_PASSWORD:-}
+      BEATS_SYSTEM_PASSWORD: ${BEATS_SYSTEM_PASSWORD:-}
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
   mysql:
     image: "mysql:8.0.36"
     container_name: eighteen-be-mysql
@@ -138,7 +164,7 @@ services:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
     volumes:
       - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
-      - ./elk/elasticsearch:/usr/share/elasticsearch/data:Z
+      - elasticsearch:/usr/share/elasticsearch/data:Z
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -148,7 +174,7 @@ services:
       # Bootstrap password.
       # Used to initialize the keystore during the initial startup of
       # Elasticsearch. Ignored on subsequent runs.
-      ELASTIC_PASSWORD: when!_you_h@ave_faults,do_n#ot_fear_to_aba%ndon_them
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
@@ -171,7 +197,7 @@ services:
       - "9600:9600"
     environment:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
-      LOGSTASH_INTERNAL_PASSWORD: when!_you_h@ave_faults,do_n#ot_fear_to_aba%ndon_them
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
     networks:
       - elk
     depends_on:
@@ -188,7 +214,7 @@ services:
     ports:
       - "5601:5601"
     environment:
-      KIBANA_SYSTEM_PASSWORD: when!_you_h@ave_faults,do_n#ot_fear_to_aba%ndon_them
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
     networks:
       - elk
     depends_on:
@@ -200,3 +226,4 @@ volumes:
   redis-master-data:
   redis-slave-1-data:
   redis-slave-2-data:
+  elasticsearch:
