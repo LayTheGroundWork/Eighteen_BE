@@ -3,10 +3,5 @@
 ## https://github.com/elastic/logstash/blob/main/docker/data/logstash/config/logstash-full.yml
 #
 http.host: 0.0.0.0
-xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
 
-## X-Pack security credentials
-#
-xpack.monitoring.enabled: true
-xpack.monitoring.elasticsearch.username: logstash_internal
-xpack.monitoring.elasticsearch.password: when!_you_h@ave_faults,do_n#ot_fear_to_aba%ndon_them
+node.name: logstash
