@@ -1,5 +1,19 @@
 # Eighteen_BE
 
+## docker-compose 실행 방법
+
+1. `docker-compose.yml` 파일이 있는 디렉토리로 이동합니다.
+2. 다음 명령어를 실행합니다.
+```shell
+docker-compose up -d setup
+docker-compose up
+```
+3. `docker-compose.yml` 파일에 정의된 서비스들이 실행됩니다.
+4. 서비스를 종료하려면 다음 명령어를 실행합니다.
+```shell
+docker-compose down
+```
+
 ## Eighteen: 소셜 플랫폼 소개
 
 Eighteen은 청소년들에게 소속감을 제공하고, 주목받고 싶은 욕구를 충족시키는 소셜 플랫폼입니다. 사용자들은 자신의 개성과 성취를 공유함으로써 소셜 미디어 상에서 인기를 높일 수 있습니다.
