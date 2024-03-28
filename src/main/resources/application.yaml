@@ -1,2 +1,23 @@
-spring.application.name: Eighteen_BE
-server.port: 8080
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    consumer:
+      group-id: Eighteen_BE
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      max-poll-records: 500
+      heartbeat-interval: 3000
+      session-timeout-ms: 10000
+      enable-auto-commit: false
+      fetch-min-size: 1048576
+      fetch-max-wait: 500
+      auto-commit-interval: 1000
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 3
+  application:
+    name: Eighteen_BE
+server:
+  port: 8080
