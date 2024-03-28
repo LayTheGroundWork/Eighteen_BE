@@ -22,6 +22,8 @@ public class TestController {
     
     @GetMapping("/test")
     public ResponseEntity test() {
+        //임의 충돌
+        int temp = 0;
         
         //임의 충돌
         int temp2 = 0;
