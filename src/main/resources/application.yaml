@@ -1,2 +1,5 @@
-spring.application.name: Eighteen_BE
-server.port: 8080
+spring:
+  application:
+    name: Eighteen_BE
+server:
+  port: 8080
