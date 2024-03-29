@@ -1,4 +1,4 @@
-package com.st.eighteen_be.config.basetime;
+package com.st.eighteen_be.common.basetime;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
