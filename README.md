@@ -5,17 +5,28 @@
 1. `docker-compose.yml` 파일이 있는 디렉토리로 이동합니다.
 2. 다음 명령어를 실행합니다. - elk 관련 setup
     ```shell
-    docker-compose up -d setup
+    docker-compose up -d setup 
     ```
 3. 다음 명령어를 실행합니다. - elk 관련 서비스 실행 - redis 관련 서비스 실행
     ```shell
     docker-compose up -d
     ```
-4. `docker-compose.yml` 파일에 정의된 서비스들이 실행됩니다.
+
+4. 다음 명령어를 실행합니다 - kafka 관련 서비스 실행
+
+    ```shell
+    docker-compose -f docker-compose-kafka.yml up -d
+    ```
+   
 5. 서비스를 종료하려면 다음 명령어를 실행합니다.
     ```shell
     docker-compose down
     ```
+   
+   - 카프카 종료
+   ```shell
+    docker-compose -f docker-compose-kafka.yml down
+   ```
 
 ## Eighteen: 소셜 플랫폼 소개
 
@@ -33,21 +44,27 @@ Eighteen은 청소년들이 사회적 상호작용을 통해 성장하고 발전
 ## 기술 스택
 
 ### 프로그래밍 언어 및 버전
+
 - Java 17
 
 ### 프레임워크
+
 - Spring Boot 3.2.3
 
 ### 빌드 도구
+
 - Gradle 7.x
 
 ### ORM
+
 - Spring Data JPA
 - QueryDSL 5.0
 
 ### 데이터베이스
+
 - H2 1.4.x
 - MySQL 8.0.x
 
 ### 개발 환경
+
 - IDE: IntelliJ IDEA
