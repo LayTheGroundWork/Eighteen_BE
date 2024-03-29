@@ -55,6 +55,8 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     volumes:
       - kafka2-data:/var/lib/kafka/data
+    networks:
+        - kafka-net
 
   kafka3:
     image: confluentinc/cp-kafka:7.6.0
@@ -79,6 +81,8 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     volumes:
       - kafka3-data:/var/lib/kafka/data
+    networks:
+        - kafka-net
 
 volumes:
   kafka1-data:
