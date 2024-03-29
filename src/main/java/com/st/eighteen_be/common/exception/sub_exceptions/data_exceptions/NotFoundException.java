@@ -1,7 +1,7 @@
-package com.st.eighteen_be.config.exception.sub_exceptions.data_exceptions;
+package com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions;
 
-import com.st.eighteen_be.config.exception.ErrorCode;
-import com.st.eighteen_be.config.exception.base_exceptions.CustomeRuntimeException;
+import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.base_exceptions.CustomeRuntimeException;
 import lombok.Getter;
 
 /**

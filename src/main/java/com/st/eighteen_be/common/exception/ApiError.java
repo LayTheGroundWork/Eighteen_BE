@@ -1,4 +1,4 @@
-package com.st.eighteen_be.config.exception;
+package com.st.eighteen_be.common.exception;
 
 import org.springframework.http.HttpStatus;
 

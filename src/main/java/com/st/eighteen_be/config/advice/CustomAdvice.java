@@ -1,7 +1,7 @@
 package com.st.eighteen_be.config.advice;
 
-import com.st.eighteen_be.config.exception.ApiError;
-import com.st.eighteen_be.config.exception.base_exceptions.CustomeRuntimeException;
+import com.st.eighteen_be.common.exception.ApiError;
+import com.st.eighteen_be.common.exception.base_exceptions.CustomeRuntimeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

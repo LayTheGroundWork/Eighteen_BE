@@ -1,4 +1,4 @@
-package com.st.eighteen_be.config.exception;
+package com.st.eighteen_be.common.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
