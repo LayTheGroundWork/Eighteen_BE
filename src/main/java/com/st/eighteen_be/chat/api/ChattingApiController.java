@@ -1,8 +1,8 @@
 package com.st.eighteen_be.chat.api;
 
+import com.st.eighteen_be.chat.constant.KafkaConst;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.service.kafka.ChattingProducer;
-import com.st.eighteen_be.chat.utility.ChatUtilityMaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -33,6 +33,6 @@ public class ChattingApiController {
         log.info("chatroomId : {}", chatroomId);
         log.info("chatMessage.message() = " + chatMessage.message());
         
-        chattingProducer.send(ChatUtilityMaker.createChatTopic(chatroomId), chatMessage);
+        chattingProducer.send(KafkaConst.CHAT_TOPIC + chatroomId, chatMessage);
     }
 }
