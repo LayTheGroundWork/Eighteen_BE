@@ -1,5 +1,6 @@
 package com.st.eighteen_be.chat.model.entity;
 
+import com.st.eighteen_be.chat.model.vo.ChatroomInfo;
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,18 +29,20 @@ public class ChatMessageEntity extends BaseEntity {
     @Column(name = "MESSAGE", nullable = false)
     private String message;
     
-    @Column(name = "CHATROOM_ID", nullable = false)
-    private Long chatroomId;
-    
-    @Column(name = "CHATROOM_NAME", nullable = false)
-    private String chatroomName;
-    
-    @Column(name = "CHATROOM_TYPE", nullable = false)
-    private ChatroomType chatroomType;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "roomId", column = @Column(name = "ROOM_ID", nullable = false)),
+            @AttributeOverride(name = "chatroomName", column = @Column(name = "ROOM_NAME", nullable = false)),
+            @AttributeOverride(name = "chatroomType", column = @Column(name = "ROOM_TYPE", nullable = false))
+    })
+    private ChatroomInfo chatroomInfo;
     
     @Builder
-    private ChatMessageEntity(Long id, String sender) {
+    private ChatMessageEntity(Long id, String sender, String receiver, String message, ChatroomInfo chatroomInfo) {
         this.id = id;
         this.sender = sender;
+        this.receiver = receiver;
+        this.message = message;
+        this.chatroomInfo = chatroomInfo;
     }
 }

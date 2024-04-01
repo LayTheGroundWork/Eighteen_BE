@@ -17,7 +17,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
     //커스텀 에러코드 정의부분
-    TEST_ERROR(HttpStatus.NOT_FOUND, "테스트 에러");
+    TEST_ERROR(HttpStatus.NOT_FOUND, "테스트 에러"),
+    NOT_FOUND_CHATROOM_TYPE(HttpStatus.NOT_FOUND, "채팅방 타입을 찾을 수 없습니다."),
+    ;
     
     private final HttpStatus status;
     private final String message;

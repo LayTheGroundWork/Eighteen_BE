@@ -1,6 +1,8 @@
 package com.st.eighteen_be.chat.api;
 
-import com.st.eighteen_be.chat.model.entity.ChatMessageEntityRequestDTO;
+import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
+import com.st.eighteen_be.chat.service.kafka.ChattingProducer;
+import com.st.eighteen_be.chat.utility.ChatUtilityMaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -24,12 +26,13 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class ChattingApiController {
     private final SimpMessagingTemplate messagingTemplate;
+    private final ChattingProducer chattingProducer;
     
     @MessageMapping("/chat/{chatroomId}/message") // /pub/chat/message
-    public void sendMessage(@DestinationVariable String chatroomId, ChatMessageEntityRequestDTO chatMessage) {
+    public void sendMessage(@DestinationVariable String chatroomId, ChatMessageRequestDTO chatMessage) {
         log.info("chatroomId : {}", chatroomId);
-        log.info("sender : {}", chatMessage.sender());
+        log.info("chatMessage.message() = " + chatMessage.message());
         
-        messagingTemplate.convertAndSendToUser(chatMessage.sender(), "/sub/chat/room/" + chatroomId, chatMessage);
+        chattingProducer.send(ChatUtilityMaker.createChatTopic(chatroomId), chatMessage);
     }
 }
