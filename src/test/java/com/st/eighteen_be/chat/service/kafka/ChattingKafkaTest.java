@@ -12,13 +12,16 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -30,12 +33,17 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(SpringExtension.class)
 @Testcontainers
 public class ChattingKafkaTest {
     
     @Container
     private KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0")).withKraft()
             .withExposedPorts(9093);
+    
+    @Container
+    private MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.4.3"))
+            .withExposedPorts(27017);
     
     private KafkaTemplate<String, ChatMessageRequestDTO> kafkaTemplate;
     
@@ -74,8 +82,8 @@ public class ChattingKafkaTest {
     }
     
     @Test
-    @DisplayName("메시지 전송 성공")
-    void When_SendMessage_Expect_Success() {
+    @DisplayName("메시지 전송 성공 - 컨슈머 정상 동작 테스트")
+    void When_SendMessageUntilConsumerReceive_Expect_Success() {
         // when
         chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
         
@@ -86,5 +94,15 @@ public class ChattingKafkaTest {
         assertThat(record.value().sender()).isEqualTo(messageDto.sender());
         assertThat(record.value().message()).isEqualTo(messageDto.message());
         assertThat(record.value().receiver()).isEqualTo(messageDto.receiver());
+    }
+    
+    @Test
+    @DisplayName("메시지 전송 성공 - MongoDB 정상 조회 테스트")
+    void When_SendMessageUntilMongoDBReceive_Expect_Success() {
+        // when
+        chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
+        
+        // then
+        // MongoDB 조회 로직 추가
     }
 }
