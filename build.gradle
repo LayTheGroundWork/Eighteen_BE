@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongo'
 
     //Kafka
     implementation 'org.springframework.kafka:spring-kafka'
@@ -51,7 +52,7 @@ dependencies {
     implementation 'io.lettuce:lettuce-core'
 
     // Database
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2:1.4.200'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //LOG
@@ -67,6 +68,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:4.5.1'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.testcontainers:mongodb'
     testImplementation 'org.testcontainers:junit-jupiter'
 }
 

@@ -9,6 +9,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: eighteen-admin
     url: jdbc:mysql://localhost:3307/eighteen-be?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/eighteen-be?retryWrites=true
+      password: 2(kkjj22902#(*@@@J2
+      username: eighteen-admin
+
   jpa:
     hibernate:
       ddl-auto: create
