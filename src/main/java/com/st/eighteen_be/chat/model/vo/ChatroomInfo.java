@@ -3,11 +3,12 @@ package com.st.eighteen_be.chat.model.vo;
 import com.st.eighteen_be.common.converter.ChatroomConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * packageName    : com.st.eighteen_be.chat.model.vo
@@ -20,14 +21,14 @@ import lombok.NoArgsConstructor;
  * -----------------------------------------------------------
  * 2024-04-01        ipeac       최초 생성
  */
-@Embeddable
+@Document(collection = "CHATROOM_INFO")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatroomInfo {
-    @Column(name = "CHATROOM_ID", nullable = false)
+    @Field(name = "CHATROOM_ID")
     private Long roomId;
     
-    @Column(name = "CHATROOM_NAME", nullable = false)
+    @Field(name = "CHATROOM_NAME")
     private String chatroomName;
     
     @Convert(converter = ChatroomConverter.class)

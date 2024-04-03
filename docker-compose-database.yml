@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: "mysql:8.0.36"
+    container_name: eighteen-be-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 3J@#(mksj@kkwje!@#
+      MYSQL_DATABASE: eighteen-be
+      MYSQL_USER: eighteen-admin
+      MYSQL_PASSWORD: 2H#@(#Jksj@kkwje
+      # 문자 인코딩 설정
+      MYSQL_CHARSET: 'utf8mb4'
+      MYSQL_COLLATION: 'utf8mb4_unicode_ci'
+    command: --lower_case_table_names=1  --character-set-server=utf8mb4
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  mongo-db:
+    image: "mongo:7"
+    container_name: eighteen-be-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: eighteen-admin
+      MONGO_INITDB_ROOT_PASSWORD: 2(kkjj22902#(*@@@J2
+      MONGO_INITDB_DATABASE: eighteen-be
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+volumes:
+  mysql-data:
+  mongo-data:

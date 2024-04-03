@@ -1,5 +1,6 @@
 package com.st.eighteen_be.config.kafka;
 
+import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -35,7 +36,7 @@ public class KafkaProducerConfig {
     private String bootstrapServers;
     
     @Bean
-    public ProducerFactory<String, Object> producerFactory() {
+    public ProducerFactory<String, ChatMessageRequestDTO> producerFactory() {
         log.info("producerFactory Started ! ========");
         log.info("producerFactory.bootstrapServers : " + bootstrapServers);
         
@@ -58,7 +59,7 @@ public class KafkaProducerConfig {
     }
     
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate() {
+    public KafkaTemplate<String, ChatMessageRequestDTO> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }
