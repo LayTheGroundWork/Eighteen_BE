@@ -7,18 +7,19 @@ networks:
 services:
   kafka1:
     image: confluentinc/cp-kafka:7.6.0
-    container_name: eighteen-be-kafka1
+    container_name: kafka1
     hostname: kafka1
     ports:
-      - "9092:9092"
+      - "39092:39092"
     environment:
       KAFKA_NODE_ID: 1
       CLUSTER_ID: "DB16jWdZR4e48KrmhLD2pw"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka1:9092"
-      KAFKA_PROCESS_ROLES: "broker,controller" # 브로커와 컨트롤러 역할 모두 수행
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_LISTENERS: BROKER://kafka1:19092,EXTERNAL://kafka1:39092,CONTROLLER://kafka1:9093
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka1:19092,EXTERNAL://kafka1:39092
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_PROCESS_ROLES: 'controller,broker'
       KAFKA_LOG_DIRS: "/var/lib/kafka/data"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093,3@kafka3:9093"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
@@ -35,17 +36,18 @@ services:
   kafka2:
     image: confluentinc/cp-kafka:7.6.0
     hostname: kafka2
-    container_name: eighteen-be-kafka2
+    container_name: eighteen_be-kafka2
     ports:
-      - "9093:9092"
+      - "39093:39092"
     environment:
       KAFKA_NODE_ID: 2
       CLUSTER_ID: "DB16jWdZR4e48KrmhLD2pw"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka2:9092"
-      KAFKA_PROCESS_ROLES: "broker,controller"
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_LISTENERS: BROKER://kafka2:19093,EXTERNAL://kafka2:39093,CONTROLLER://kafka2:9093
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka2:19093,EXTERNAL://kafka2:39093
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_PROCESS_ROLES: 'controller,broker'
       KAFKA_LOG_DIRS: "/var/lib/kafka/data"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093,3@kafka3:9093"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
@@ -56,22 +58,23 @@ services:
     volumes:
       - kafka2-data:/var/lib/kafka/data
     networks:
-        - kafka-net
+      - kafka-net
 
   kafka3:
     image: confluentinc/cp-kafka:7.6.0
     hostname: kafka3
-    container_name: eighteen-be-kafka3
+    container_name: eighteen_be-kafka3
     ports:
-      - "9094:9092"
+      - "39094:39092"
     environment:
       KAFKA_NODE_ID: 3
       CLUSTER_ID: "DB16jWdZR4e48KrmhLD2pw"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka3:9092"
-      KAFKA_PROCESS_ROLES: "broker,controller"
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_LISTENERS: BROKER://kafka3:19094,EXTERNAL://kafka3:39094,CONTROLLER://kafka3:9093
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka3:19094,EXTERNAL://kafka3:39094
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_PROCESS_ROLES: 'controller,broker'
       KAFKA_LOG_DIRS: "/var/lib/kafka/data"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093,3@kafka3:9093"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
@@ -82,7 +85,7 @@ services:
     volumes:
       - kafka3-data:/var/lib/kafka/data
     networks:
-        - kafka-net
+      - kafka-net
 
 volumes:
   kafka1-data:
