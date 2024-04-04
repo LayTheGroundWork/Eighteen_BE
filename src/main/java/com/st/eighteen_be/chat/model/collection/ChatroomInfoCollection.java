@@ -1,12 +1,15 @@
-package com.st.eighteen_be.chat.model.vo;
+package com.st.eighteen_be.chat.model.collection;
 
+import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.common.converter.ChatroomConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -22,10 +25,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * 2024-04-01        ipeac       최초 생성
  */
 @Document(collection = "CHATROOM_INFO")
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatroomInfo {
-    @Field(name = "CHATROOM_ID")
+@Getter
+public class ChatroomInfoCollection {
+    @Id
+    @Field(name = "ROOM_ID")
     private Long roomId;
     
     @Field(name = "CHATROOM_NAME")
@@ -35,10 +39,14 @@ public class ChatroomInfo {
     @Column(name = "CHATROOM_TYPE", nullable = false)
     private ChatroomType chatroomType;
     
+    @DBRef
+    private ChatMessageCollection chatMessageCollection;
+    
     @Builder
-    private ChatroomInfo(Long roomId, String chatroomName, ChatroomType chatroomType) {
+    private ChatroomInfoCollection(Long roomId, String chatroomName, ChatroomType chatroomType, ChatMessageCollection chatMessageCollection) {
         this.roomId = roomId;
         this.chatroomName = chatroomName;
         this.chatroomType = chatroomType;
+        this.chatMessageCollection = chatMessageCollection;
     }
 }

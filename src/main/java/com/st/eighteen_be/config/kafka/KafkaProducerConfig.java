@@ -7,7 +7,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -28,7 +27,6 @@ import java.util.Map;
  * 2024-04-01        ipeac       최초 생성
  */
 @Configuration
-@EnableKafka
 @Slf4j
 public class KafkaProducerConfig {
     
@@ -38,7 +36,7 @@ public class KafkaProducerConfig {
     @Bean
     public ProducerFactory<String, ChatMessageRequestDTO> producerFactory() {
         log.info("producerFactory Started ! ========");
-        log.info("producerFactory.bootstrapServers : " + bootstrapServers);
+        log.info("producerFactory.bootstrapServers : {}", bootstrapServers);
         
         Map<String, Object> configProps = new HashMap<>();
         

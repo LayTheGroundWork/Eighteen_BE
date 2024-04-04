@@ -1,6 +1,5 @@
-package com.st.eighteen_be.chat.model.entity;
+package com.st.eighteen_be.chat.model.collection;
 
-import com.st.eighteen_be.chat.model.vo.ChatroomInfo;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,14 +27,11 @@ public class ChatMessageCollection {
     @Field(value = "MESSAGE")
     private String message;
     
-    private ChatroomInfo chatroomInfo;
-    
     @Builder
-    private ChatMessageCollection(Long id, String sender, String receiver, String message, ChatroomInfo chatroomInfo) {
+    private ChatMessageCollection(Long id, String sender, String receiver, String message) {
         this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
-        this.chatroomInfo = chatroomInfo;
     }
 }

@@ -38,7 +38,7 @@ public class KafkaConsumerConfig {
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
         log.info("consumerFactory Started ! ========");
-        log.info("consumerFactory.bootstrapServers :" + bootstrapServers);
+        log.info("consumerFactory.bootstrapServers :{}", bootstrapServers);
         
         Map<String, Object> configProps = new HashMap<>();
         
