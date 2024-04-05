@@ -3,13 +3,19 @@
 ## docker-compose 실행 방법
 
 1. `docker-compose.yml` 파일이 있는 디렉토리로 이동합니다.
-2. 다음 명령어를 실행합니다. - elk 관련 setup
+
+2. 다음 명령어를 실행합니다. - database 관련 서비스 실행
     ```shell
-    docker-compose up -d setup 
+    docker-compose -f docker-compose-database.yml up -d
     ```
-3. 다음 명령어를 실행합니다. - elk 관련 서비스 실행 - redis 관련 서비스 실행
+
+3. 다음 명령어를 실행합니다. - elk 관련 서비스 실행
+   ```shell
+   docker-compose -f docker-compose-elk.yml up -d setup
+   ```
+
     ```shell
-    docker-compose up -d
+    docker-compose -f docker-compose-elk.yml up -d
     ```
 
 4. 다음 명령어를 실행합니다 - kafka 관련 서비스 실행
@@ -17,16 +23,20 @@
     ```shell
     docker-compose -f docker-compose-kafka.yml up -d
     ```
-   
-5. 서비스를 종료하려면 다음 명령어를 실행합니다.
+
+5. 다음 명령어를 실행합니다 - Redis 관련 서비스 실행
+
     ```shell
-    docker-compose down
+    docker-compose -f docker-compose-redis.yml up -d
     ```
-   
-   - 카프카 종료
-   ```shell
-    docker-compose -f docker-compose-kafka.yml down
-   ```
+
+6. 서비스를 종료하려면 다음 명령어를 실행합니다.
+    ```shell
+    docker-compose -f docker-compose-database.yml down -v
+    docker-compose -f docker-compose-elk.yml down -v
+    docker-compose -f docker-compose-kafka.yml down -v
+    docker-compose -f docker-compose-redis.yml down -v
+    ```
 
 ## Eighteen: 소셜 플랫폼 소개
 

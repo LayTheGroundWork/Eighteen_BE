@@ -1,7 +1,9 @@
 package com.st.eighteen_be.chat.service.kafka;
 
 import com.st.eighteen_be.chat.constant.KafkaConst;
+import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
+import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -12,28 +14,26 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.time.Duration;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-@ExtendWith(SpringExtension.class)
+
 @Testcontainers
 public class ChattingKafkaTest {
     
@@ -42,8 +42,11 @@ public class ChattingKafkaTest {
             .withExposedPorts(9093);
     
     @Container
-    private MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.4.3"))
+    private MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:7"))
             .withExposedPorts(27017);
+    
+    @Autowired
+    private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
     
     private KafkaTemplate<String, ChatMessageRequestDTO> kafkaTemplate;
     
@@ -102,7 +105,15 @@ public class ChattingKafkaTest {
         // when
         chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
         
+        await().atMost(Duration.ofSeconds(10)).until(() -> chatroomInfoCollectionRepository.findById(messageDto.roomId()).isPresent());
+        
         // then
         // MongoDB 조회 로직 추가
+        Optional<ChatroomInfoCollection> actualMessage = chatroomInfoCollectionRepository.findById(messageDto.roomId());
+        assertThat(actualMessage).isPresent();
+        assertThat(actualMessage.get().getRoomId()).isEqualTo(messageDto.roomId());
+        assertThat(actualMessage.get().getChatMessageCollection().getSender()).isEqualTo(messageDto.sender());
+        assertThat(actualMessage.get().getChatMessageCollection().getMessage()).isEqualTo(messageDto.message());
+        assertThat(actualMessage.get().getChatMessageCollection().getReceiver()).isEqualTo(messageDto.receiver());
     }
 }
