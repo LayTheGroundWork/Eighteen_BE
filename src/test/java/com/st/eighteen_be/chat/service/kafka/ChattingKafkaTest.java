@@ -4,6 +4,7 @@ import com.st.eighteen_be.chat.constant.KafkaConst;
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -22,7 +23,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -33,17 +33,13 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-
+@ServiceWithMongoDBTest
 @Testcontainers
 public class ChattingKafkaTest {
     
     @Container
     private KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0")).withKraft()
             .withExposedPorts(9093);
-    
-    @Container
-    private MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:7"))
-            .withExposedPorts(27017);
     
     @Autowired
     private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;

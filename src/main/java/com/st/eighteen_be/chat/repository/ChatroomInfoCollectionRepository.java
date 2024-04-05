@@ -2,7 +2,6 @@ package com.st.eighteen_be.chat.repository;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 /**
  * packageName    : com.st.eighteen_be.chat.repository
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Repository;
  * -----------------------------------------------------------
  * 24. 4. 5.        ipeac       최초 생성
  */
-@Repository
 public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, Long> {
 
 }

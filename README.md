@@ -32,10 +32,7 @@
 
 6. 서비스를 종료하려면 다음 명령어를 실행합니다.
     ```shell
-    docker-compose -f docker-compose-database.yml down -v
-    docker-compose -f docker-compose-elk.yml down -v
-    docker-compose -f docker-compose-kafka.yml down -v
-    docker-compose -f docker-compose-redis.yml down -v
+   docker-compose -p eighteen_be down
     ```
 
 ## Eighteen: 소셜 플랫폼 소개
