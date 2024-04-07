@@ -13,6 +13,9 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * packageName    : com.st.eighteen_be.chat.model.vo
  * fileName       : ChatroomInfo
@@ -30,7 +33,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ChatroomInfoCollection {
     @Id
     @Field(name = "ROOM_ID")
-    private Long roomId;
+    private String roomId;
     
     @Field(name = "CHATROOM_NAME")
     private String chatroomName;
@@ -39,14 +42,26 @@ public class ChatroomInfoCollection {
     @Column(name = "CHATROOM_TYPE", nullable = false)
     private ChatroomType chatroomType;
     
-    @DBRef
-    private ChatMessageCollection chatMessageCollection;
+    @DBRef(lazy = true)
+    private List<ChatMessageCollection> chatMessageCollections = new ArrayList<>();
     
     @Builder
-    private ChatroomInfoCollection(Long roomId, String chatroomName, ChatroomType chatroomType, ChatMessageCollection chatMessageCollection) {
+    private ChatroomInfoCollection(String roomId, String chatroomName, ChatroomType chatroomType, List<ChatMessageCollection> chatMessageCollections) {
         this.roomId = roomId;
         this.chatroomName = chatroomName;
         this.chatroomType = chatroomType;
-        this.chatMessageCollection = chatMessageCollection;
+        this.chatMessageCollections = new ArrayList<>();
+    }
+    
+    public static ChatroomInfoCollection of(String roomId, String chatroomName, ChatroomType chatroomType) {
+        return ChatroomInfoCollection.builder()
+                .roomId(roomId)
+                .chatroomName(chatroomName)
+                .chatroomType(chatroomType)
+                .build();
+    }
+    
+    public void addChatMessage(ChatMessageCollection chatMessage) {
+        this.chatMessageCollections.add(chatMessage);
     }
 }

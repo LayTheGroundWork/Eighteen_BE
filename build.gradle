@@ -53,7 +53,8 @@ dependencies {
 
     // Database
     testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.6'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //LOG

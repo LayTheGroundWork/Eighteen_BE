@@ -1,8 +1,7 @@
 spring:
   data:
     mongodb:
-      host: localhost
-      port: 47017
+      uri: mongodb://localhost:27017/test
       database: test
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL;DATABASE_TO_UPPER=false

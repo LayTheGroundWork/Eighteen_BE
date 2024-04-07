@@ -14,6 +14,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * -----------------------------------------------------------
  * 24. 4. 5.        ipeac       최초 생성
  */
-public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, Long> {
+public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String> {
 
 }

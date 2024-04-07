@@ -3,6 +3,7 @@ package com.st.eighteen_be.common.annotation;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,5 +16,6 @@ import java.lang.annotation.Target;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @DataMongoTest
 @ActiveProfiles("test")
+@TestPropertySource(properties = "de.flapdoodle.mongodb.embedded.version=7.0.8")
 public @interface ServiceWithMongoDBTest {
 }
