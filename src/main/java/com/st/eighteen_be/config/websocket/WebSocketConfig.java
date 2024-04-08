@@ -24,10 +24,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        log.info("registerStompEndpoints : /stomp/chat, port:8080");
+        log.info("registerStompEndpoints : /chat, port:8080");
         
         //클라이언트가 웹소켓 서버에 연결할 엔드포인트를 정의한다.
-        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*");
     }
     
     @Override

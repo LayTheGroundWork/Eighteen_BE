@@ -14,10 +14,4 @@ package com.st.eighteen_be.chat.constant;
 public class KafkaConst {
     public static final String CHAT_TOPIC = "chatroom-";
     public static final String CHAT_CONSUMER_GROUP_ID = "eighteen-be-chat-consumer-group";
-    
-    public static final int KAFKA_PORT = 9092;
-    
-    public static final int KAFKA_TEST_PORT = 9093;
-    
-    public static final String KAFKA_CONTAINER_IMAGE_NAME = "confluentinc/cp-kafka:7.6.0";
 }

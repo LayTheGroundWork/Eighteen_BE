@@ -54,6 +54,7 @@ public class KafkaConsumerConfig {
         configProps.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);
         configProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
         configProps.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 10000);
+        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         
         return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(), new JsonDeserializer<>(Object.class));
     }

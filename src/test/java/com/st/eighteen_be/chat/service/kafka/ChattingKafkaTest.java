@@ -96,7 +96,7 @@ public class ChattingKafkaTest {
     }
     
     @Test
-    @DisplayName("메시지 전송 성공 - 컨슈머 정상 동작 테스트")
+    @DisplayName("메시지 전송 성공 - 컨슈머 정상 동작 테스트 - DB 정상 저장 테스트")
     void When_SendMessageUntilConsumerReceiveAndSaveMongoDB_Expect_Success() {
         // when
         chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
