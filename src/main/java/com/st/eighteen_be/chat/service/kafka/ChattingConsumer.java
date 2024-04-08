@@ -46,7 +46,7 @@ public class ChattingConsumer {
         
         chatMessageCollectionRepository.save(chatMessage);
         
-        ChatroomInfoCollection chatroomInfo = chatroomInfoCollectionRepository.findById(messageDto.roomId())
+        ChatroomInfoCollection chatroomInfo = chatroomInfoCollectionRepository.findByRoomId(messageDto.roomId())
                 .orElseGet(() -> ChatroomInfoCollection.of(messageDto.roomId(), messageDto.sender(), ChatroomType.PRIVATE));
         
         // 채팅방에 새 메시지 추가

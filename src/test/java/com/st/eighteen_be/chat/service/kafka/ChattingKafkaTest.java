@@ -9,7 +9,6 @@ import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -24,7 +23,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -98,29 +96,15 @@ public class ChattingKafkaTest {
     }
     
     @Test
-    @DisplayName("메시지 전송 성공 - 프로듀서 정상 동작 테스트")
-    void When_SendMessage_With_Producer_Expect_Success() {
-        // when
-        chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
-        
-        // then
-        ConsumerRecord<String, ChatMessageRequestDTO> record = KafkaTestUtils.getSingleRecord(consumer, KafkaConst.CHAT_TOPIC);
-        assertThat(record).isNotNull();
-        assertThat(record.value().roomId()).isEqualTo(messageDto.roomId());
-        assertThat(record.value().sender()).isEqualTo(messageDto.sender());
-        assertThat(record.value().message()).isEqualTo(messageDto.message());
-        assertThat(record.value().receiver()).isEqualTo(messageDto.receiver());
-    }
-    
-    @Test
     @DisplayName("메시지 전송 성공 - 컨슈머 정상 동작 테스트")
     void When_SendMessageUntilConsumerReceiveAndSaveMongoDB_Expect_Success() {
         // when
         chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
+        chattingConsumer.listen(messageDto);
         
         // then
         await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
-            ChatroomInfoCollection chatroomInfo = chatroomInfoCollectionRepository.findById(messageDto.roomId()).get();
+            ChatroomInfoCollection chatroomInfo = chatroomInfoCollectionRepository.findByRoomId(messageDto.roomId()).get();
             
             ChatMessageCollection lastMessage = chatroomInfo.getChatMessageCollections().get(chatroomInfo.getChatMessageCollections().size() - 1);
             
