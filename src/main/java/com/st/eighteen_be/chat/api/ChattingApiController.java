@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -28,8 +27,7 @@ import org.springframework.stereotype.Controller;
 public class ChattingApiController {
     private final ChattingProducer chattingProducer;
     
-    @MessageMapping("/chat/{chatroomId}/message") // /pub/chat/message
-    @SendTo("/sub/chat/{chatroomId}/message") // /sub/chat/message
+    @MessageMapping("/chat/{chatroomId}/message") // /pub/chat/{chatroomId}/message
     public void sendMessage(@DestinationVariable(value = "chatroomId") Long chatroomId, @Valid ChatMessageRequestDTO chatMessage) {
         log.info("chatroomId : {}", chatroomId);
         log.info("chatMessage.message() = {}", chatMessage.message());

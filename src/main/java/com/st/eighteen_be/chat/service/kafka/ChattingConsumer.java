@@ -35,7 +35,7 @@ public class ChattingConsumer {
     public void listen(ChatMessageRequestDTO messageDto) {
         log.info("ChattingConsumer.listen : roomId={}, sender={}, receiver={}, message={}: ", messageDto.roomId(), messageDto.sender(), messageDto.receiver(), messageDto.message());
         
-        messagingTemplate.convertAndSendToUser(messageDto.receiver(), "/sub/chat/room/" + messageDto.roomId(), messageDto);
+        messagingTemplate.convertAndSend("/sub/chat/" + messageDto.roomId(), messageDto);
         
         chatMessageService.processMessage(messageDto);
     }
