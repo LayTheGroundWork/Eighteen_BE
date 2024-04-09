@@ -52,6 +52,7 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 1048576);
         configProps.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 5000);
         configProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 3000);
+        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         
         return new DefaultKafkaProducerFactory<>(configProps);
     }

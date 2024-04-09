@@ -4,7 +4,9 @@ import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record ChatMessageRequestDTO(
         @NotNull
         String roomId,
@@ -26,6 +28,7 @@ public record ChatMessageRequestDTO(
 ) {
     public ChatMessageCollection toCollection() {
         return ChatMessageCollection.builder()
+                .roomId(roomId())
                 .sender(sender())
                 .receiver(receiver())
                 .message(message())

@@ -16,6 +16,9 @@ public class ChatMessageCollection extends BaseDocument {
     @Id
     private String id;
     
+    @Field(value = "ROOM_ID")
+    private String roomId;
+    
     //TODO 회원 존재하지 않기에 임시 String 처리
     @Field(value = "SENDER")
     private String sender;
@@ -28,16 +31,18 @@ public class ChatMessageCollection extends BaseDocument {
     private String message;
     
     @Builder
-    private ChatMessageCollection(String id, String sender, String receiver, String message) {
+    private ChatMessageCollection(String id, String roomId, String sender, String receiver, String message) {
         this.id = id;
+        this.roomId = roomId;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
     }
     
-    public static ChatMessageCollection of(String sender, String receiver, String message) {
+    public static ChatMessageCollection of(String roomId, String sender, String receiver, String message) {
         return ChatMessageCollection.builder()
                 .sender(sender)
+                .roomId(roomId)
                 .receiver(receiver)
                 .message(message)
                 .build();
