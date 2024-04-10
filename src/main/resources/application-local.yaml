@@ -21,8 +21,6 @@ spring:
       ddl-auto: create
       # sql init 으로 인한 에러 방지 ->https://wildeveloperetrain.tistory.com/228
       # defer-datasource-initialization: true
-  kafka:
-    bootstrap-servers: 0.0.0.0:39092
 decorator:
   datasource:
     p6spy:

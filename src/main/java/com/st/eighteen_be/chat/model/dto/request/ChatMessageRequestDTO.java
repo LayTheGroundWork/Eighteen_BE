@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-@Builder
 public record ChatMessageRequestDTO(
         @NotNull
         String roomId,
@@ -26,6 +25,10 @@ public record ChatMessageRequestDTO(
         @NotBlank(message = "receiver can`t be blank")
         String receiver
 ) {
+    @Builder
+    public ChatMessageRequestDTO {
+    }
+    
     public ChatMessageCollection toCollection() {
         return ChatMessageCollection.builder()
                 .roomId(roomId())
