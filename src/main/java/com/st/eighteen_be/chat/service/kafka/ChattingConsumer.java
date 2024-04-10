@@ -2,7 +2,7 @@ package com.st.eighteen_be.chat.service.kafka;
 
 import com.st.eighteen_be.chat.constant.KafkaConst;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
-import com.st.eighteen_be.chat.service.ChatMessageService;
+import com.st.eighteen_be.chat.service.impl.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

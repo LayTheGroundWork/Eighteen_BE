@@ -36,7 +36,7 @@ public class ChatMessageServiceTest {
     @Autowired
     private MongoTemplate mongoTemplate;
     
-    private ChatMessageServiceImpl chatMessageService;
+    private ChatMessageService chatMessageService;
     
     @Autowired
     private ChatMessageCollectionRepository chatMessageCollectionRepository;
@@ -50,7 +50,7 @@ public class ChatMessageServiceTest {
     @BeforeEach
     void setUp() {
         // Given
-        chatMessageService = new ChatMessageServiceImpl(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
+        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
         
         chatroomInfoCollection = ChatroomInfoCollection.builder()
                 .roomId("1")

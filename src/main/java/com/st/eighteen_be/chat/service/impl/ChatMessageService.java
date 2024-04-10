@@ -6,7 +6,6 @@ import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
-import com.st.eighteen_be.chat.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +15,11 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ChatMessageServiceImpl implements ChatMessageService {
+public class ChatMessageService {
     
     private final ChatMessageCollectionRepository chatMessageCollectionRepository;
     private final ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
     
-    @Override
     @Transactional(readOnly = false)
     public void processMessage(ChatMessageRequestDTO messageDto) {
         ChatMessageCollection chatMessage = messageDto.toCollection();
