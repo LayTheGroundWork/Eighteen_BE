@@ -27,6 +27,14 @@ import org.springframework.stereotype.Controller;
 public class ChattingApiController {
     private final ChattingProducer chattingProducer;
     
+    @MessageMapping("/chat/{postNo}/{memberNo}/enter") // /pub/chat/{postNo}/{memberNo}/create
+    public void enterChatroom(@DestinationVariable(value = "postNo") Long postNo, @DestinationVariable(value = "memberNo") Long memberNo) {
+        log.info("postNo : {}", postNo);
+        log.info("memberNo : {}", memberNo);
+        
+        
+    }
+    
     @MessageMapping("/chat/{chatroomId}/message") // /pub/chat/{chatroomId}/message
     public void sendMessage(@DestinationVariable(value = "chatroomId") Long chatroomId, @Valid ChatMessageRequestDTO chatMessage) {
         log.info("chatroomId : {}", chatroomId);

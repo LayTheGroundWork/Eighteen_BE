@@ -6,11 +6,11 @@ import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,13 +24,11 @@ public class ChatMessageService {
     public void processMessage(ChatMessageRequestDTO messageDto) {
         ChatMessageCollection chatMessage = messageDto.toCollection();
         
-        Optional<ChatroomInfoCollection> foundRoom = chatroomInfoCollectionRepository.findByRoomId(messageDto.roomId());
-        
-        if (foundRoom.isEmpty()) {
-            createNewChatroom(messageDto.roomId());
-        }
-        
-        addMessage(chatMessage);
+        chatroomInfoCollectionRepository.findByRoomId(messageDto.roomId())
+                .ifPresentOrElse(
+                        chatroomInfo -> addMessage(chatMessage),
+                        () -> throw new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM_TYPE);
+                );
     }
     
     private void createNewChatroom(String roomId) {

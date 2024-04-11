@@ -31,19 +31,29 @@ public class ChatroomInfoCollection {
     @Field(name = "ROOM_ID")
     private String roomId;
     
+    @Field(name = "POST_NO")
+    private Long postNo;
+    
+    @Field(name = "USER_NO")
+    private Long memberNo;
+    
     @Convert(converter = ChatroomConverter.class)
     @Column(name = "CHATROOM_TYPE", nullable = false)
     private ChatroomType chatroomType;
     
     @Builder
-    private ChatroomInfoCollection(String roomId, ChatroomType chatroomType) {
+    private ChatroomInfoCollection(String roomId, Long postNo, Long memberNo, ChatroomType chatroomType) {
         this.roomId = roomId;
+        this.postNo = postNo;
+        this.memberNo = memberNo;
         this.chatroomType = chatroomType;
     }
     
-    public static ChatroomInfoCollection of(String roomId, ChatroomType chatroomType) {
+    public static ChatroomInfoCollection of(String roomId, Long postNo, Long memberNo, ChatroomType chatroomType) {
         return ChatroomInfoCollection.builder()
                 .roomId(roomId)
+                .postNo(postNo)
+                .memberNo(memberNo)
                 .chatroomType(chatroomType)
                 .build();
     }
