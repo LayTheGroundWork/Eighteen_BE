@@ -5,7 +5,13 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   application:
     name: Eighteen_BE
-  kafka:
+
+    profiles:
+      active: test
+
+kafka:
     bootstrap-servers: 0.0.0.0:39092
 server:
   port: 8080
+
+

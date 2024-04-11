@@ -20,10 +20,10 @@ public enum ErrorCode {
     TEST_ERROR(HttpStatus.NOT_FOUND, "테스트 에러"),
     NOT_FOUND_CHATROOM_TYPE(HttpStatus.NOT_FOUND, "채팅방 타입을 찾을 수 없습니다."),
     ;
-    
+
     private final HttpStatus status;
     private final String message;
-    
+
     ErrorCode(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
