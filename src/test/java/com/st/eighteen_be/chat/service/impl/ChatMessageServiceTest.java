@@ -12,8 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -32,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * 24. 4. 9.        ipeac       최초 생성
  */
 @ServiceWithMongoDBTest
-@ExtendWith(MockitoExtension.class)
 public class ChatMessageServiceTest {
     
     @Autowired
@@ -42,6 +39,7 @@ public class ChatMessageServiceTest {
     
     @Autowired
     private ChatMessageCollectionRepository chatMessageCollectionRepository;
+    
     @Autowired
     private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
     

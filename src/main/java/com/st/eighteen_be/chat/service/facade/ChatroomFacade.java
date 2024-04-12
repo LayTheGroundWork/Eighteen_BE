@@ -33,6 +33,9 @@ public class ChatroomFacade {
     
     @Transactional(readOnly = false)
     public List<ChatMessageResponseDTO> getOrCreateChatroom(EnterChatRoomRequestDTO enterChatRoomRequestDTO) {
+        log.info("getOrCreateChatroom.postNo() = {}", enterChatRoomRequestDTO.postNo());
+        log.info("getOrCreateChatroom.memberNo() = {}", enterChatRoomRequestDTO.memberNo());
+        
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(enterChatRoomRequestDTO.postNo(), enterChatRoomRequestDTO.memberNo())
                 .orElseGet(() -> chatroomService.createChatroom(enterChatRoomRequestDTO.postNo(), enterChatRoomRequestDTO.memberNo()));
         

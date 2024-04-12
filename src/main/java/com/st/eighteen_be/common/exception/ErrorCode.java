@@ -18,11 +18,13 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     //커스텀 에러코드 정의부분
     TEST_ERROR(HttpStatus.NOT_FOUND, "테스트 에러"),
+    
+    //chat
     NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "해당하는 채팅방을 찾을 수 없습니다."),
+    NOT_FOUND_CHAT_MESSAGE(HttpStatus.NOT_FOUND, "해당하는 채팅 메시지를 찾을 수 없습니다."),
     
     //common
-    NOT_NULL(HttpStatus.BAD_REQUEST, "필수 값이 누락되었습니다."),
-    ;
+    NOT_NULL(HttpStatus.BAD_REQUEST, "필수 값이 누락되었습니다.");
     
     private final HttpStatus status;
     private final String message;

@@ -53,7 +53,11 @@ public class ChatMessageService {
         
         Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
         
-        return chatMessageCollectionRepository.findByRoomIdAndCreatedAtBefore(roomId, lastMessageTime, pageable);
+        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findByRoomIdAndCreatedAtBefore(roomId, lastMessageTime, pageable);
+        
+        return foundChatMessages.stream()
+                .map(ChatMessageCollection::toResponseDTO)
+                .toList();
     }
     
     private void addMessage(ChatMessageCollection chatMessage) {
