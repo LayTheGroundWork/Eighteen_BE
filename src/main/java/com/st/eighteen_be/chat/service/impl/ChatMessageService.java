@@ -1,9 +1,7 @@
 package com.st.eighteen_be.chat.service.impl;
 
 import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
-import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
-import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.common.exception.ErrorCode;
@@ -27,12 +25,10 @@ public class ChatMessageService {
         chatroomInfoCollectionRepository.findByRoomId(messageDto.roomId())
                 .ifPresentOrElse(
                         chatroomInfo -> addMessage(chatMessage),
-                        () -> throw new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM_TYPE);
+                        () -> {
+                            throw new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM);
+                        }
                 );
-    }
-    
-    private void createNewChatroom(String roomId) {
-        chatroomInfoCollectionRepository.save(ChatroomInfoCollection.of(roomId, ChatroomType.PRIVATE));
     }
     
     private void addMessage(ChatMessageCollection chatMessage) {

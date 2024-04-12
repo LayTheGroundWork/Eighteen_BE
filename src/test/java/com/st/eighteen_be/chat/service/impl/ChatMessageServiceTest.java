@@ -7,6 +7,7 @@ import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * packageName    : com.st.eighteen_be.chat.service.impl
@@ -59,30 +61,19 @@ public class ChatMessageServiceTest {
         
         messageDto = ChatMessageRequestDTO.builder()
                 .roomId("1")
-                .sender("sender")
-                .receiver("receiver")
+                .senderNo(1L)
+                .receiverNo(2L)
                 .message("message")
                 .build();
     }
     
     @Test
-    @DisplayName("processMessage -  채팅방이 별도로 존재하지 않는 경우 채팅방을 생성하고 메시지를 전송함을 테스트")
-    void When_processMessage_IfChatroomNotExist_Expect_CreateChatroomAndSendMessage() {
-        // When
-        chatMessageService.processMessage(messageDto);
-        
-        // Then
-        ChatroomInfoCollection foundChatroom = chatroomInfoCollectionRepository.findByRoomId("1").get();
-        ChatMessageCollection foundChatMessage = chatMessageCollectionRepository.findAll().get(0);
-        
-        assertThat(foundChatroom).isNotNull();
-        assertThat(foundChatroom.getChatroomType()).isEqualTo(ChatroomType.PRIVATE);
-        
-        assertThat(foundChatMessage).isNotNull();
-        assertThat(foundChatMessage.getRoomId()).isEqualTo("1");
-        assertThat(foundChatMessage.getSender()).isEqualTo("sender");
-        assertThat(foundChatMessage.getMessage()).isEqualTo("message");
-        assertThat(foundChatMessage.getReceiver()).isEqualTo("receiver");
+    @DisplayName("processMessage -  채팅방이 별도로 존재하지 않는 경우 NotFoundException 발생")
+    void When_processMessage_IfChatroomNotExist_Expect_NotFoundException() {
+        // When - Then
+        assertThatThrownBy(() -> chatMessageService.processMessage(messageDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당하는 채팅방을 찾을 수 없습니다.");
     }
     
     @Test
@@ -103,9 +94,9 @@ public class ChatMessageServiceTest {
         
         assertThat(foundChatMessage).isNotNull();
         assertThat(foundChatMessage.getRoomId()).isEqualTo("1");
-        assertThat(foundChatMessage.getSender()).isEqualTo("sender");
+        assertThat(foundChatMessage.getSender()).isEqualTo(1L);
         assertThat(foundChatMessage.getMessage()).isEqualTo("message");
-        assertThat(foundChatMessage.getReceiver()).isEqualTo("receiver");
+        assertThat(foundChatMessage.getReceiver()).isEqualTo(2L);
     }
     
     @AfterEach

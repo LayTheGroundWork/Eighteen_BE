@@ -10,20 +10,16 @@ public record ChatMessageRequestDTO(
         @NotNull
         String roomId,
         
-        @NotNull(message = "sender can`t be null")
-        @NotEmpty(message = "sender can`t be empty")
-        @NotBlank(message = "sender can`t be blank")
-        String sender,
+        @NotNull(message = "senderNo can`t be null")
+        Long senderNo,
         
         @NotNull(message = "message can`t be null")
         @NotEmpty(message = "message can`t be empty")
         @NotBlank(message = "message can`t be blank")
         String message,
         
-        @NotNull(message = "receiver can`t be null")
-        @NotEmpty(message = "receiver can`t be empty")
-        @NotBlank(message = "receiver can`t be blank")
-        String receiver
+        @NotNull(message = "receiverNo can`t be null")
+        Long receiverNo
 ) {
     @Builder
     public ChatMessageRequestDTO {
@@ -32,8 +28,8 @@ public record ChatMessageRequestDTO(
     public ChatMessageCollection toCollection() {
         return ChatMessageCollection.builder()
                 .roomId(roomId())
-                .sender(sender())
-                .receiver(receiver())
+                .sender(senderNo())
+                .receiver(receiverNo())
                 .message(message())
                 .build();
     }
