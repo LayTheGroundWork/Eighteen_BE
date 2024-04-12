@@ -3,6 +3,7 @@ package com.st.eighteen_be.common.basetime;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 public class BaseDocument {
+    @Indexed
     @CreatedDate
     private LocalDateTime createdAt;
     
