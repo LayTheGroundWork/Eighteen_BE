@@ -2,7 +2,7 @@ package com.st.eighteen_be.chat.service.impl;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
-import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

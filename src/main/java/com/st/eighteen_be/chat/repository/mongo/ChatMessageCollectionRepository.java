@@ -1,4 +1,4 @@
-package com.st.eighteen_be.chat.repository;
+package com.st.eighteen_be.chat.repository.mongo;
 
 import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
 import org.springframework.data.domain.Pageable;

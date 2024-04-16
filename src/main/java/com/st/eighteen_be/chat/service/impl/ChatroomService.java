@@ -2,7 +2,7 @@ package com.st.eighteen_be.chat.service.impl;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
-import com.st.eighteen_be.chat.repository.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
