@@ -9,39 +9,18 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: eighteen-admin
     url: jdbc:mysql://localhost:3307/eighteen-be?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
+  data:
+    mongodb:
+      uri: mongodb://rootuser:rootpass@localhost:27017/eighteen?retryWrites=false&authSource=admin
+      username: rootuser
+      password: rootpass
+      authentication-database: admin
+
   jpa:
     hibernate:
       ddl-auto: create
       # sql init 으로 인한 에러 방지 ->https://wildeveloperetrain.tistory.com/228
       # defer-datasource-initialization: true
-  kafka:
-    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
-    consumer:
-      group-id: Eighteen_BE
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      max-poll-records: 500
-      heartbeat-interval: 3000
-      enable-auto-commit: false
-      fetch-min-size: 1048576
-      fetch-max-wait: 500
-      auto-commit-interval: 1000
-      properties:
-        session.timeout.ms: 10000
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      retries: 2
-      acks: all
-      compression-type: zstd
-      batch-size: 16384
-      properties:
-        linger.ms: 5
-        buffer.memory: 33554432
-        max.request.size: 1048576
-        max.block.ms: 5000
-        request.timeout.ms: 3000
 decorator:
   datasource:
     p6spy:
