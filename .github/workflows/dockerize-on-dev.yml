@@ -3,7 +3,8 @@ name: Dockerisze on Dev Branch
 on:
   push:
     branches:
-      - dev # workflows work on pushing to dev!
+      - dev # workflows work when push to dev
+      - build/dockerize-dev # workflows work when push to build/dockerize-dev
   pull_request_target:
     branches:
       - dev # workflows work when pr **merge** request to dev
