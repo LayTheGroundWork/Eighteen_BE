@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.3'
     id 'io.spring.dependency-management' version '1.1.4'
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'com.palantir.docker-compose' version '0.33.0'
 }
 
@@ -22,7 +21,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    querydsl.extendsFrom compileClasspath
 }
 
 repositories {
@@ -41,11 +39,12 @@ dependencies {
     //Kafka
     implementation 'org.springframework.kafka:spring-kafka'
 
-    // QueryDSL
-    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-    implementation "com.querydsl:querydsl-core:${queryDslVersion}"
-    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+    // QueryDSL - Qdsl Jakarta.persistence-api -https://github.com/querydsl/querydsl/issues/3233
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+    //java.lang.NoClassDefFoundError 대응
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
 
     // ETC
     compileOnly 'org.projectlombok:lombok'
@@ -76,20 +75,4 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-//querydsl 추가 시작
-def querydslDir = "src/main/generated/querydsl"
-
-querydsl {
-    jpa = true
-    querydslSourcesDir = querydslDir
-}
-
-sourceSets {
-    main.java.srcDir querydslDir
-}
-
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
 }

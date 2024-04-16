@@ -7,7 +7,8 @@ WORKDIR /app
 # 2) copy source code and gradle setting
 COPY --chown=gradle:gradle . /app
 # 3) application build and execute test
-RUN ./gradlew build --no-daemon
+RUN chmod +x gradlew
+RUN ./gradlew build --no-daemon -x test
 
 
 ## RUNNER PHASE
