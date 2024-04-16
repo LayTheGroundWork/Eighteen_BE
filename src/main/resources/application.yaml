@@ -1,8 +1,6 @@
 spring:
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
   application:
     name: Eighteen_BE
   kafka:
