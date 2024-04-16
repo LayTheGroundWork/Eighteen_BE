@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - dev # workflows work on pushing to dev!
+  pull_request_target:
+    branches:
+      - dev # workflows work when pr **merge** request to dev
 
 jobs:
   build-and-push:
