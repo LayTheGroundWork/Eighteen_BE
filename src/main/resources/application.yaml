@@ -1,11 +1,12 @@
 spring:
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
   application:
     name: Eighteen_BE
   kafka:
     bootstrap-servers: 0.0.0.0:39092
+  data:
+    mongodb:
+      auto-index-creation: true
 server:
   port: 8080

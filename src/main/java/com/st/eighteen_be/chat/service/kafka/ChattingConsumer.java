@@ -33,7 +33,7 @@ public class ChattingConsumer {
     @Transactional(readOnly = false)
     @KafkaListener(topics = KafkaConst.CHAT_TOPIC, groupId = KafkaConst.CHAT_CONSUMER_GROUP_ID)
     public void listen(ChatMessageRequestDTO messageDto) {
-        log.info("ChattingConsumer.listen : roomId={}, sender={}, receiver={}, message={}: ", messageDto.roomId(), messageDto.sender(), messageDto.receiver(), messageDto.message());
+        log.info("ChattingConsumer.listen : roomId={}, senderNo={}, receiverNo={}, message={}: ", messageDto.roomId(), messageDto.senderNo(), messageDto.receiverNo(), messageDto.message());
         
         messagingTemplate.convertAndSend("/sub/chat/" + messageDto.roomId(), messageDto);
         

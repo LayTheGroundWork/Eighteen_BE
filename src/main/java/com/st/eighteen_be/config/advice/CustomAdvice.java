@@ -1,13 +1,9 @@
 package com.st.eighteen_be.config.advice;
 
-import com.st.eighteen_be.common.exception.ApiError;
 import com.st.eighteen_be.common.exception.base_exceptions.CustomeRuntimeException;
-import org.springframework.http.ResponseEntity;
+import com.st.eighteen_be.common.response.ApiResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-
-import java.time.LocalDateTime;
 
 /**
  * packageName    : com.st.eighteen_be.config.exception
@@ -24,15 +20,7 @@ import java.time.LocalDateTime;
 public class CustomAdvice {
     
     @ExceptionHandler(CustomeRuntimeException.class)
-    public final ResponseEntity<Object> notFoundExceptionHandler(CustomeRuntimeException e, WebRequest request) {
-        ApiError apiError = new ApiError(
-                e.getErrorCode().getStatus(),
-                e.getErrorCode().getMessage(),
-                e.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
-        
-        return new ResponseEntity<>(apiError, e.getErrorCode().getStatus());
+    public final ApiResponse<Object> notFoundExceptionHandler(CustomeRuntimeException e) {
+        return ApiResponse.fail(e.getErrorCode());
     }
 }

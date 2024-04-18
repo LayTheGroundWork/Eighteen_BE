@@ -39,6 +39,6 @@ public enum ChatroomType {
             }
         }
         
-        throw new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM_TYPE);
+        throw new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM);
     }
 }
