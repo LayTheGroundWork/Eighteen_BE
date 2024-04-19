@@ -1,4 +1,6 @@
 ##
+FROM gradle:8.6-jdk17 AS build
+
 FROM amazoncorretto:17.0.10
 WORKDIR /app
 # build jar copy
