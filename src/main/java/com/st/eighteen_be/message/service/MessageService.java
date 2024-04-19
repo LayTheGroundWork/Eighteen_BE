@@ -1,7 +1,10 @@
 package com.st.eighteen_be.message.service;
 
 
+<<<<<<< HEAD
 import net.nurigo.java_sdk.api.Message;
+=======
+>>>>>>> origin/feat/member
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
