@@ -8,6 +8,8 @@ WORKDIR /app
 COPY --chown=gradle:gradle . /app
 # 3) application build and execute test
 RUN chmod +x gradlew
+RUN ./gradlew clean --no-daemon
+RUN ./gradlew copyPrivate --no-daemon
 RUN ./gradlew build --no-daemon -x test
 
 
