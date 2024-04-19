@@ -40,5 +40,5 @@ out/
 .vscode/
 
 ### AWS ###
-resources/application-sms.yaml
+application-sms.yaml
 
