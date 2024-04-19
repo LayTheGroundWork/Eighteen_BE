@@ -76,3 +76,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.register('copyPrivate', Copy) {
+    copy {
+        from './Eighteen_Be_Setting'
+        include "*.yaml"
+        into 'src/main/resources'
+    }
+}
