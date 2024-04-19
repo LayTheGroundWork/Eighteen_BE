@@ -1,6 +1,6 @@
 package com.st.eighteen_be.member.domain;
 
-import com.st.eighteen_be.common.base.BaseTimeEntity;
+import com.st.eighteen_be.common.basetime.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Member extends BaseTimeEntity {
+public class Member extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")

@@ -1,9 +1,12 @@
 package com.st.eighteen_be.member.domain;
 
-import com.st.eighteen_be.common.base.BaseTimeEntity;
+import com.st.eighteen_be.common.basetime.BaseEntity;
 import com.st.eighteen_be.member.enums.GradeType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class MemberProfile extends BaseTimeEntity {
+public class MemberProfile extends BaseEntity {
 
     @Id
     private Integer id;
