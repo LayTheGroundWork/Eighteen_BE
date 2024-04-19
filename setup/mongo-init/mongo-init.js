@@ -1,22 +1,10 @@
 db.createUser({
-    user: 'eighteen-admin',
-    pwd: 'eighteen-admin-password',
+    user: "rootuser",
+    pwd: "only_i_know_what_i@_have_been_thinking",
     roles: [
         {
-            role: 'readWrite',
-            db: 'eighteen',
-        },
-    ],
+            role: "readWrite",
+            db: "eighteen"
+        }
+    ]
 });
-
-db = new Mongo().getDB("eighteen");
-
-db.createCollection('test', {capped: false});
-
-db.test.insert([
-    {"item": 1},
-    {"item": 2},
-    {"item": 3},
-    {"item": 4},
-    {"item": 5}
-]);

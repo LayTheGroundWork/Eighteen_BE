@@ -1,36 +1,19 @@
 # Eighteen_BE
 
+![개발 서버 CI / CD 현황](https://github.com/LayTheGroundWork/Eighteen_BE/actions/workflows/dockerize-on-dev.yml/badge.svg)
+
 ## docker-compose 실행 방법
 
-1. `docker-compose.yml` 파일이 있는 디렉토리로 이동합니다.
+1. `/gradlew build -x test` 명령어를 실행하여 빌드합니다.( 설정파일 복사 관련 )
 
-2. 다음 명령어를 실행합니다. - database 관련 서비스 실행
+2. `docker-compose.yml` 파일이 있는 디렉토리로 이동합니다.
+
+3. 다음 명령어를 실행합니다. (env 환경에 맞게 설정필)
     ```shell
-    docker-compose -f docker-compose-database.yml up -d
+    docker-compose --env-file .env.local up -d
     ```
 
-3. 다음 명령어를 실행합니다. - elk 관련 서비스 실행
-   ```shell
-   docker-compose -f docker-compose-elk.yml up -d setup
-   ```
-
-    ```shell
-    docker-compose -f docker-compose-elk.yml up -d
-    ```
-
-4. 다음 명령어를 실행합니다 - kafka 관련 서비스 실행
-
-    ```shell
-    docker-compose -f docker-compose-kafka.yml up -d
-    ```
-
-5. 다음 명령어를 실행합니다 - Redis 관련 서비스 실행
-
-    ```shell
-    docker-compose -f docker-compose-redis.yml up -d
-    ```
-
-6. 서비스를 종료하려면 다음 명령어를 실행합니다.
+4. 서비스를 종료하려면 다음 명령어를 실행합니다.
     ```shell
    docker-compose -p eighteen_be down
     ```

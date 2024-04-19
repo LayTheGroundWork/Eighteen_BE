@@ -38,3 +38,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### YAML Settings ###
+/src/main/resources/*.yaml
+
+### Environment ###
+.env.*
