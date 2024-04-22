@@ -63,6 +63,7 @@ dependencies {
     // Database
     testImplementation 'com.h2database:h2:2.1.214'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.4.10'
 
     //LOG
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
