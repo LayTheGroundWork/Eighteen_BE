@@ -60,6 +60,7 @@ dependencies {
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.6'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.4.10'
 
     //LOG
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
