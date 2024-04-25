@@ -46,6 +46,7 @@ dependencies {
     // QueryDSL - Qdsl Jakarta.persistence-api -https://github.com/querydsl/querydsl/issues/3233
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+
     //java.lang.NoClassDefFoundError 대응
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
@@ -56,7 +57,7 @@ dependencies {
     implementation 'io.lettuce:lettuce-core'
 
     // Database
-    testImplementation 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.6'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
