@@ -23,7 +23,7 @@ public class MemberSnsLink extends BaseEntity {
     private String snsLink;
 
     @Builder
-    private MemberSnsLink(MemberProfile member, String snsLink) {
+    public MemberSnsLink(MemberProfile member, String snsLink) {
         this.member = member;
         //== 연관관계 편의 메서드 ==//
         member.getSnsLinks().add(this);
