@@ -23,7 +23,7 @@ public class MemberProfile extends BaseEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private MemberPrivacy memberPrivacy;
 
     // s3 주소
     private String profileImg;
@@ -59,9 +59,9 @@ public class MemberProfile extends BaseEntity {
 
 
     @Builder
-    private MemberProfile(Member member, String profileImg, String nickName, GradeType grade, String introduction, String mbti, Boolean gender){
+    private MemberProfile(MemberPrivacy memberPrivacy, String profileImg, String nickName, GradeType grade, String introduction, String mbti, Boolean gender){
 
-        this.member = member;
+        this.memberPrivacy = memberPrivacy;
         this.profileImg = profileImg;
         this.nickName = nickName;
         this.grade = grade;

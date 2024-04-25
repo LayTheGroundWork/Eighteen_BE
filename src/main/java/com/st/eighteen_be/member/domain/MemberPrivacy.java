@@ -6,14 +6,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Member extends BaseEntity {
+@Table(name = "member")
+public class MemberPrivacy extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -23,18 +25,19 @@ public class Member extends BaseEntity {
 
     private String password;
 
-    private LocalDate birthDay;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime birthDay;
 
-    private String identification;
+    private String certificationNumber;
 
     private String email;
 
     @Builder
-    private Member(String phoneNumber, String password, LocalDate birthDay, String identification, String email) {
+    private MemberPrivacy(String phoneNumber, String password, LocalDateTime birthDay, String certificationNumber, String email) {
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.birthDay = birthDay;
-        this.identification =identification;
+        this.certificationNumber =certificationNumber;
         this.email = email;
     }
 }
