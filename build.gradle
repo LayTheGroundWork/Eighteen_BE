@@ -63,7 +63,7 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Test
+    // Test ////
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.3.1'
@@ -77,10 +77,18 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.register('copyPrivate', Copy) {
+tasks.register('copyYaml', Copy) {
     copy {
         from './Eighteen_Be_Setting'
         include "*.yaml"
         into 'src/main/resources'
+    }
+}
+
+tasks.register('copyEnv', Copy) {
+    copy {
+        from './Eighteen_Be_Docker'
+        include ".env.*"
+        into './'
     }
 }

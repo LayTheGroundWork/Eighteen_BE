@@ -1,0 +1,223 @@
+version: '3.8'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  server:
+    # Configuration for building the docker image for the backend service
+    image: eighteenbe/eighteen:0.0.1
+    container_name: eighteen-be
+    ports:
+      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: always
+    links:
+      - mysql
+      - mongodb
+      - kafka
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+      - redis-sentinel-1
+      - redis-sentinel-2
+    depends_on:
+      - mysql
+      - mongodb
+      - kafka
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+      - redis-sentinel-1
+      - redis-sentinel-2
+    command:
+      - bash
+      - -c
+      - |
+        ./wait-for-it.sh mysql:3306 -s -t 30 -- echo 'MySQL is up' &&
+        ./wait-for-it.sh mongodb:27017 -s -t 30 -- echo 'MongoDB is up' &&
+        ./wait-for-it.sh kafka:9092 -s -t 30 -- echo 'Kafka is up' &&
+        ./wait-for-it.sh redis-master:6379 -s -t 30 -- echo 'Redis is up' &&
+        java -jar /app/eighteen.jar
+    environment:
+      SPRING_PROFILES_ACTIVE: ${ENVIRONMENT}
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3307/eighteen-be?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useLegacyDatetimeCode=false
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      # MongoDB 환경 변수 추가
+      SPRING_DATA_MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@host.docker.internal:27017/${MONGO_INITDB_DATABASE}?retryWrites=false&authSource=admin
+      SPRING_DATA_MONGODB_DATABASE: ${MONGO_INITDB_DATABASE}
+
+    networks:
+      - app-tier
+  mysql:
+    image: "mysql:8.0.36"
+    container_name: eighteen-be-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      # 문자 인코딩 설정
+      MYSQL_CHARSET: 'utf8mb4'
+      MYSQL_COLLATION: 'utf8mb4_unicode_ci'
+    command: --lower_case_table_names=1  --character-set-server=utf8mb4
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - app-tier
+
+  mongodb:
+    image: mongo:7.0.8
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./setup/mongo-init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    networks:
+      - app-tier
+
+  kafka:
+    image: bitnami/kafka:3.6.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_BROKER_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    volumes:
+      - kafka1-data:/bitnami/kafka
+    networks:
+      - app-tier
+
+  redis-master:
+    image: "bitnami/redis:7.2.4"
+    hostname: redis-master
+    container_name: eighteen-be-redis-master
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      - redis-master-data:/bitnami/redis/data:rw
+    command: redis-server --enable-debug-command yes --protected-mode no
+    ports:
+      - "6379:6379"
+    networks:
+      - app-tier
+
+  redis-slave-1:
+    image: "bitnami/redis:7.2.4"
+    hostname: redis-slave-1
+    container_name: eighteen-be-redis-slave-1
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_REPLICATION_MODE=slave
+    ports:
+      - "6479:6379"
+    volumes:
+      - redis-slave-1-data:/bitnami/redis/data:rw
+    depends_on:
+      - redis-master
+    networks:
+      - app-tier
+
+  redis-slave-2:
+    image: "bitnami/redis:7.2.4"
+    hostname: redis-slave-2
+    container_name: eighteen-be-redis-slave-2
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_REPLICATION_MODE=slave
+    ports:
+      - "6579:6379"
+    volumes:
+      - redis-slave-2-data:/bitnami/redis/data:rw
+    depends_on:
+      - redis-master
+      - redis-slave-1
+    networks:
+      - app-tier
+
+  redis-sentinel-1:
+    image: 'bitnami/redis-sentinel:7.2.4'
+    hostname: redis-sentinel-1
+    container_name: eighteen-be-redis-sentinel-1
+    environment:
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    ports:
+      - '26379:26379'
+    networks:
+      - app-tier
+
+  redis-sentinel-2:
+    image: 'bitnami/redis-sentinel:7.2.4'
+    hostname: redis-sentinel-2
+    container_name: eighteen-be-redis-sentinel-2
+    environment:
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    ports:
+      - '26380:26379'
+    networks:
+      - app-tier
+
+  redis-sentinel-3:
+    image: 'bitnami/redis-sentinel:7.2.4'
+    hostname: redis-sentinel-3
+    container_name: eighteen-be-redis-sentinel-3
+    environment:
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    ports:
+      - '26381:26379'
+    networks:
+      - app-tier
+
+volumes:
+  mysql-data:
+  mongo-data:
+  kafka1-data:
+  redis-master-data:
+  redis-slave-1-data:
+  redis-slave-2-data:
