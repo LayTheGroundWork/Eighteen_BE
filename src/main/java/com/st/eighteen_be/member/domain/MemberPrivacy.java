@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name = "member")
+@Table(name = "member", uniqueConstraints = {@UniqueConstraint(columnNames = {"phoneNumber"}, name = "PHONE_NUMBER_UNIQUE")})
+
 public class MemberPrivacy extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
