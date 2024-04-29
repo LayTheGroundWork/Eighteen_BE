@@ -66,14 +66,12 @@ public class ChatroomFacadeTest {
         chatroomFacade = new ChatroomFacade(chatroomService, chatMessageService);
         
         chatroomInfoCollection = ChatroomInfoCollection.builder()
-                .roomId("1")
                 .senderNo(1L)
                 .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
         
         chatMessageCollection = ChatMessageCollection.builder()
-                .roomId("1")
                 .sender(1L)
                 .receiver(2L)
                 .createdAt(LocalDateTime.now().minusDays(1))

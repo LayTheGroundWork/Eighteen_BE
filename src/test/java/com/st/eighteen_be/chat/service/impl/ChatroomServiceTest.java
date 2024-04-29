@@ -4,6 +4,7 @@ import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,6 +83,24 @@ class ChatroomServiceTest {
         assertThat(found).isNotNull();
         assertThat(found.getSenderNo()).isEqualTo(1L);
         assertThat(found.getReceiverNo()).isEqualTo(2L);
+    }
+    
+    @Test
+    @DisplayName("채팅방 생성시 - 송신자와 수신자가 동일한 경우 BadRequestException 발생")
+    void When_CreateChatroom_Then_Exception_BadRequestException() {
+        // When & Then
+        assertThatThrownBy(() -> chatroomService.createChatroom(1L, 1L))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("같은 사용자입니다.");
+    }
+    
+    @Test
+    @DisplayName("채팅방 조회 테스트 - 송신자 수신자 동일한 채팅방 조회시 BadRequestException 발생")
+    void When_GetChatroom_Then_Exception_BadRequestException() {
+        // When & Then
+        assertThatThrownBy(() -> chatroomService.getChatroom(1L, 1L))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("같은 사용자입니다.");
     }
     
     @Test

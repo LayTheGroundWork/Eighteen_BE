@@ -73,7 +73,7 @@ public class ChattingKafkaTest {
         consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Collections.singleton(KafkaConst.CHAT_TOPIC));
         
-        messageDto = new ChatMessageRequestDTO("1", 1L, "message", 2L);
+        messageDto = new ChatMessageRequestDTO(1L, "test message", 2L);
     }
     
     @Test
@@ -85,7 +85,6 @@ public class ChattingKafkaTest {
         // then
         ConsumerRecord<String, ChatMessageRequestDTO> record = KafkaTestUtils.getSingleRecord(consumer, KafkaConst.CHAT_TOPIC);
         assertThat(record).isNotNull();
-        assertThat(record.value().roomId()).isEqualTo(messageDto.roomId());
         assertThat(record.value().senderNo()).isEqualTo(messageDto.senderNo());
         assertThat(record.value().message()).isEqualTo(messageDto.message());
         assertThat(record.value().receiverNo()).isEqualTo(messageDto.receiverNo());

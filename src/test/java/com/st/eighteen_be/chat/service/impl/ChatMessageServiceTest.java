@@ -54,12 +54,12 @@ public class ChatMessageServiceTest {
         chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
         
         chatroomInfoCollection = ChatroomInfoCollection.builder()
-                .roomId("1")
+                .senderNo(1L)
+                .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
         
         messageDto = ChatMessageRequestDTO.builder()
-                .roomId("1")
                 .senderNo(1L)
                 .receiverNo(2L)
                 .message("message")
@@ -85,14 +85,13 @@ public class ChatMessageServiceTest {
         chatMessageService.processMessage(messageDto);
         
         // Then
-        ChatroomInfoCollection foundChatroom = chatroomInfoCollectionRepository.findByRoomId("1").get();
+        ChatroomInfoCollection foundChatroom = chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(1L, 2L).get();
         ChatMessageCollection foundChatMessage = chatMessageCollectionRepository.findAll().get(0);
         
         assertThat(foundChatroom).isNotNull();
         assertThat(foundChatroom.getChatroomType()).isEqualTo(ChatroomType.PRIVATE);
         
         assertThat(foundChatMessage).isNotNull();
-        assertThat(foundChatMessage.getRoomId()).isEqualTo("1");
         assertThat(foundChatMessage.getSender()).isEqualTo(1L);
         assertThat(foundChatMessage.getMessage()).isEqualTo("message");
         assertThat(foundChatMessage.getReceiver()).isEqualTo(2L);
