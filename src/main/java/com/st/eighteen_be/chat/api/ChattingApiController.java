@@ -38,8 +38,8 @@ public class ChattingApiController {
     
     @MessageMapping("/chat/enter") // /pub/chat/enter
     public ApiResponse<List<ChatMessageResponseDTO>> enterChatroom(@Valid @RequestBody EnterChatRoomRequestDTO requestDTO) {
-        log.info("enterChatroom.requestDTO.postNo() = {}", requestDTO.postNo());
-        log.info("enterChatroom.requestDTO.memberNo() = {}", requestDTO.memberNo());
+        log.info("enterChatroom.requestDTO.senderNo() = {}", requestDTO.senderNo());
+        log.info("enterChatroom.requestDTO.receiverNo() = {}", requestDTO.receiverNo());
         log.info("enterChatroom.requestDTO.requestTime() = {}", requestDTO.requestTime());
         
         return ApiResponse.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
