@@ -43,7 +43,7 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        configProps.put(ProducerConfig.RETRIES_CONFIG, 2);
+        configProps.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
         configProps.put(ProducerConfig.ACKS_CONFIG, "all");
         configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "zstd");
         configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
