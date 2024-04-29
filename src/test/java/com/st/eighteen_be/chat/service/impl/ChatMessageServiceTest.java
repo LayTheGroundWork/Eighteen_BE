@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * -----------------------------------------------------------
  * 24. 4. 9.        ipeac       최초 생성
  */
+@DisplayName("ChatMessageService 테스트")
 @ServiceWithMongoDBTest
 public class ChatMessageServiceTest {
     

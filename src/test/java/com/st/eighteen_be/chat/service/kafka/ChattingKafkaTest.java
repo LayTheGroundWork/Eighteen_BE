@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("채팅 카프카 테스트")
 @ServiceWithMongoDBTest
 @Testcontainers
 public class ChattingKafkaTest {

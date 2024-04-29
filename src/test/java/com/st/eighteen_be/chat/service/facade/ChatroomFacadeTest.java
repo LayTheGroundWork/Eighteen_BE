@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * -----------------------------------------------------------
  * 24. 4. 12.        ipeac       최초 생성
  */
+@DisplayName("ChatroomFacade 테스트")
 @ServiceWithMongoDBTest
 public class ChatroomFacadeTest {
     

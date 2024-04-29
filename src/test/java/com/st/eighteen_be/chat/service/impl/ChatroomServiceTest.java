@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * -----------------------------------------------------------
  * 24. 4. 12.        ipeac       최초 생성
  */
+@DisplayName("ChatroomService 테스트")
 @ServiceWithMongoDBTest
 class ChatroomServiceTest {
     @Autowired
@@ -58,8 +59,8 @@ class ChatroomServiceTest {
     }
     
     @Test
-    @DisplayName("채팅방 파라미터 오류 테스트 - postNo가 null or MemberNo가 null")
-    void When_CreateChatroom_Then_Exception_PostNoIsNull() {
+    @DisplayName("채팅방 파라미터 오류 테스트 - 매개변수 null 테스트")
+    void When_CreateChatroom_Then_Exception_NullPointerException() {
         // When & Then
         assertThatThrownBy(() -> chatroomService.createChatroom(null, 1L))
                 .isInstanceOf(NullPointerException.class);
