@@ -66,8 +66,8 @@ public class ChatroomFacadeTest {
         
         chatroomInfoCollection = ChatroomInfoCollection.builder()
                 .roomId("1")
-                .postNo(1L)
-                .memberNo(1L)
+                .senderNo(1L)
+                .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
         
@@ -81,8 +81,8 @@ public class ChatroomFacadeTest {
                 .build();
         
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
-                .postNo(1L)
-                .memberNo(1L)
+                .senderNo(1L)
+                .receiverNo(2L)
                 .requestTime(LocalDateTime.now())
                 .build();
     }

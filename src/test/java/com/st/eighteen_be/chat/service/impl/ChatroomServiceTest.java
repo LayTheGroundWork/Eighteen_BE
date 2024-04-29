@@ -41,20 +41,20 @@ class ChatroomServiceTest {
     void setUp() {
         chatroomService = new ChatroomService(chatroomInfoCollectionRepository);
         
-        savedChatroomInfoCollection = ChatroomInfoCollection.of(1L, 1L, ChatroomType.PRIVATE);
+        savedChatroomInfoCollection = ChatroomInfoCollection.of(1L, 2L, ChatroomType.PRIVATE);
     }
     
     @Test
     @DisplayName("채팅방 정상 생성 테스트 - 올바른 파라미터")
     void When_CreateChatroom_Then_Success() {
         // When
-        chatroomService.createChatroom(1L, 1L);
+        chatroomService.createChatroom(1L, 2L);
         
         // Then
-        ChatroomInfoCollection found = chatroomInfoCollectionRepository.findByPostNoAndMemberNo(1L, 1L).get();
+        ChatroomInfoCollection found = chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(1L, 2L).get();
         assertThat(found).isNotNull();
-        assertThat(found.getPostNo()).isEqualTo(1L);
-        assertThat(found.getMemberNo()).isEqualTo(1L);
+        assertThat(found.getSenderNo()).isEqualTo(1L);
+        assertThat(found.getReceiverNo()).isEqualTo(2L);
     }
     
     @Test
@@ -75,19 +75,19 @@ class ChatroomServiceTest {
         mongoTemplate.save(savedChatroomInfoCollection);
         
         // When
-        ChatroomInfoCollection found = chatroomService.getChatroom(1L, 1L).get();
+        ChatroomInfoCollection found = chatroomService.getChatroom(1L, 2L).get();
         
         // Then
         assertThat(found).isNotNull();
-        assertThat(found.getPostNo()).isEqualTo(1L);
-        assertThat(found.getMemberNo()).isEqualTo(1L);
+        assertThat(found.getSenderNo()).isEqualTo(1L);
+        assertThat(found.getReceiverNo()).isEqualTo(2L);
     }
     
     @Test
     @DisplayName("채팅방이 존재하지 않는 경우 Optional.empty() 반환")
     void When_GetChatroom_Then_Empty() {
         // When
-        var found = chatroomService.getChatroom(1L, 1L);
+        var found = chatroomService.getChatroom(1L, 2L);
         
         // Then
         assertThat(found).isEmpty();
