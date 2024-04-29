@@ -1,4 +1,4 @@
-package com.st.eighteen_be.message.domain.repository;
+package com.st.eighteen_be.message.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
