@@ -42,7 +42,7 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
 
     // coolSMS
-    implementation 'net.nurigo:javaSDK:2.2'
+    implementation 'net.nurigo:sdk:4.3.0'
 
     // QueryDSL - Qdsl Jakarta.persistence-api -https://github.com/querydsl/querydsl/issues/3233
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
