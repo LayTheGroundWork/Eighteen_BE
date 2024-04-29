@@ -4,7 +4,7 @@ import com.st.eighteen_be.common.response.ApiResponse;
 import com.st.eighteen_be.member.domain.MemberPrivacy;
 import com.st.eighteen_be.member.domain.dto.signIn.SignInRequestDto;
 import com.st.eighteen_be.member.service.MemberService;
-import com.st.eighteen_be.sms.service.SmsUtil;
+import com.st.eighteen_be.message.service.SmsUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
