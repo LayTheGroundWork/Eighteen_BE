@@ -1,10 +1,13 @@
 package com.st.eighteen_be.member.service;
 
-import com.st.eighteen_be.member.domain.MemberRepository;
-import com.st.eighteen_be.member.domain.dto.MemberResponseDto;
+import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
+import com.st.eighteen_be.member.domain.MemberPrivacy;
 import com.st.eighteen_be.member.domain.dto.signIn.SignInRequestDto;
-import com.st.eighteen_be.member.domain.dto.signIn.SignInResponseDto;
+import com.st.eighteen_be.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +30,29 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public SignInResponseDto signIn(SignInRequestDto requestDto){
-        // 나중에 개인정보 Table 만들면 거기서 회원 Id를 통해 전화번호 비교하기
+    private final BCryptPasswordEncoder passwordEncoder;
 
-
-        memberRepository.save(requestDto.toEntity());
-        return requestDto;
+    /** 가입 여부 확인 */
+    private boolean phoneNumberCheck(String phoneNumber) {
+        return memberRepository.existsByPhoneNumber(phoneNumber);
     }
 
-    public MemberResponseDto findByPhoneNumber(String phoneNumber){
 
+    public MemberPrivacy save(SignInRequestDto requestDto){
+
+        try{
+            return memberRepository.save(
+                    requestDto.toEntity(passwordEncoder.encode(requestDto.password()))
+            );
+        } catch (DataIntegrityViolationException e){
+            if(e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")){
+                throw new OccupiedException(ErrorCode.EXISTS_MEMBER);
+            } else {
+                throw e;
+            }
+        }
     }
+
+
 
 }
