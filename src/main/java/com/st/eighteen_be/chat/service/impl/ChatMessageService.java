@@ -29,11 +29,11 @@ public class ChatMessageService {
     
     @Transactional(readOnly = false)
     public void processMessage(ChatMessageRequestDTO messageDto) {
-        log.info("========== processMessage ========== senderId : {} roomId : {}", messageDto.senderNo(), messageDto.roomId());
+        log.info("========== processMessage ========== senderNo : {}, receiverNo : {}", messageDto.senderNo(), messageDto.receiverNo());
         
         ChatMessageCollection chatMessage = messageDto.toCollection();
         
-        chatroomInfoCollectionRepository.findByRoomId(messageDto.roomId())
+        chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(chatMessage.getSender(), chatMessage.getReceiver())
                 .ifPresentOrElse(
                         chatroomInfo -> {
                             log.info("========== chatroom found ==========");
@@ -48,12 +48,12 @@ public class ChatMessageService {
                 );
     }
     
-    public List<ChatMessageResponseDTO> findMessagesBeforeTimeInRoom(String roomId, LocalDateTime lastMessageTime) {
-        log.info("========== getMessages  roomId : {} lastMessageTime : {} ==========", roomId, lastMessageTime);
+    public List<ChatMessageResponseDTO> findMessagesBeforeTimeInRoom(Long senderNo, Long receiverNo, LocalDateTime lastMessageTime) {
+        log.info("========== findMessagesBeforeTimeInRoom ========== senderNo : {}, receiverNo : {}, lastMessageTime : {}", senderNo, receiverNo, lastMessageTime);
         
         Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
         
-        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findByRoomIdAndCreatedAtBefore(roomId, lastMessageTime, pageable);
+        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findBySenderAndReceiverAndCreatedAtBefore(senderNo, receiverNo, lastMessageTime, pageable);
         
         return foundChatMessages.stream()
                 .map(ChatMessageCollection::toResponseDTO)

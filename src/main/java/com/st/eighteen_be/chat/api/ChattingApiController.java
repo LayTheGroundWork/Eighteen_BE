@@ -45,9 +45,9 @@ public class ChattingApiController {
         return ApiResponse.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
     }
     
-    @MessageMapping("/chat/{chatroomId}/message") // /pub/chat/{chatroomId}/message
-    public void sendMessage(@DestinationVariable(value = "chatroomId") Long chatroomId, @Valid ChatMessageRequestDTO chatMessage) {
-        log.info("sendMessage.chatroomId : {}", chatroomId);
+    @MessageMapping("/chat/{senderNo}/{receiverNo}/message") // /pub/chat/{chatroomId}/message
+    public void sendMessage(@DestinationVariable(value = "senderNo") Long senderNo, @DestinationVariable(value = "receiverNo") Long receiverNo, @RequestBody ChatMessageRequestDTO chatMessage) {
+        log.info("sendMessage.senderNo() = {}, receiverNo() = {}", senderNo, receiverNo);
         log.info("sendMessage.chatMessage.message() = {}", chatMessage.message());
         
         chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage);

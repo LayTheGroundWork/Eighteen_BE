@@ -39,6 +39,6 @@ public class ChatroomFacade {
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(enterChatRoomRequestDTO.senderNo(), enterChatRoomRequestDTO.receiverNo())
                 .orElseGet(() -> chatroomService.createChatroom(enterChatRoomRequestDTO.senderNo(), enterChatRoomRequestDTO.receiverNo()));
         
-        return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getRoomId(), enterChatRoomRequestDTO.requestTime());
+        return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getSenderNo(), chatroomInfoCollection.getReceiverNo(), enterChatRoomRequestDTO.requestTime());
     }
 }
