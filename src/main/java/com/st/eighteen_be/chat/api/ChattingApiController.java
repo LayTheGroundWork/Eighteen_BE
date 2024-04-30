@@ -38,16 +38,16 @@ public class ChattingApiController {
     
     @MessageMapping("/chat/enter") // /pub/chat/enter
     public ApiResponse<List<ChatMessageResponseDTO>> enterChatroom(@Valid @RequestBody EnterChatRoomRequestDTO requestDTO) {
-        log.info("enterChatroom.requestDTO.postNo() = {}", requestDTO.postNo());
-        log.info("enterChatroom.requestDTO.memberNo() = {}", requestDTO.memberNo());
+        log.info("enterChatroom.requestDTO.senderNo() = {}", requestDTO.senderNo());
+        log.info("enterChatroom.requestDTO.receiverNo() = {}", requestDTO.receiverNo());
         log.info("enterChatroom.requestDTO.requestTime() = {}", requestDTO.requestTime());
         
         return ApiResponse.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
     }
     
-    @MessageMapping("/chat/{chatroomId}/message") // /pub/chat/{chatroomId}/message
-    public void sendMessage(@DestinationVariable(value = "chatroomId") Long chatroomId, @Valid ChatMessageRequestDTO chatMessage) {
-        log.info("sendMessage.chatroomId : {}", chatroomId);
+    @MessageMapping("/chat/{senderNo}/{receiverNo}/message") // /pub/chat/{chatroomId}/message
+    public void sendMessage(@DestinationVariable(value = "senderNo") Long senderNo, @DestinationVariable(value = "receiverNo") Long receiverNo, @RequestBody ChatMessageRequestDTO chatMessage) {
+        log.info("sendMessage.senderNo() = {}, receiverNo() = {}", senderNo, receiverNo);
         log.info("sendMessage.chatMessage.message() = {}", chatMessage.message());
         
         chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage);

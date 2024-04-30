@@ -10,6 +10,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
+
 /**
  * packageName    : com.st.eighteen_be.chat.service.kafka
  * fileName       : ChattingProducer
@@ -33,9 +35,9 @@ public class ChattingConsumer {
     @Transactional(readOnly = false)
     @KafkaListener(topics = KafkaConst.CHAT_TOPIC, groupId = KafkaConst.CHAT_CONSUMER_GROUP_ID)
     public void listen(ChatMessageRequestDTO messageDto) {
-        log.info("ChattingConsumer.listen : roomId={}, senderNo={}, receiverNo={}, message={}: ", messageDto.roomId(), messageDto.senderNo(), messageDto.receiverNo(), messageDto.message());
+        log.info("ChattingConsumer.listen :  senderNo={}, receiverNo={}, message={}: ", messageDto.senderNo(), messageDto.receiverNo(), messageDto.message());
         
-        messagingTemplate.convertAndSend("/sub/chat/" + messageDto.roomId(), messageDto);
+        messagingTemplate.convertAndSend(MessageFormat.format("/sub/chat/{0}/{1}/message", messageDto.senderNo(), messageDto.receiverNo()), messageDto);
         
         chatMessageService.processMessage(messageDto);
     }

@@ -20,9 +20,6 @@ public class ChatMessageCollection extends BaseDocument {
     @Id
     private String id;
     
-    @Field(value = "ROOM_ID")
-    private String roomId;
-    
     //TODO 회원 존재하지 않기에 임시 String 처리
     @Field(value = "SENDER")
     private Long sender;
@@ -34,19 +31,17 @@ public class ChatMessageCollection extends BaseDocument {
     @Field(value = "MESSAGE")
     private String message;
     
-    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, String id, String roomId, Long sender, Long receiver, String message) {
+    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, String id, Long sender, Long receiver, String message) {
         super(createdAt, updatedAt);
         this.id = id;
-        this.roomId = roomId;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
     }
     
-    public static ChatMessageCollection of(String id, String roomId, Long sender, long receiver, String message) {
+    public static ChatMessageCollection of(String id, Long sender, long receiver, String message) {
         return ChatMessageCollection.builder()
                 .id(id)
-                .roomId(roomId)
                 .sender(sender)
                 .receiver(receiver)
                 .message(message)
@@ -57,7 +52,6 @@ public class ChatMessageCollection extends BaseDocument {
         
         return ChatMessageResponseDTO.builder()
                 .id(getId())
-                .roomId(getRoomId())
                 .sender(getSender())
                 .receiver(getReceiver())
                 .message(getMessage())

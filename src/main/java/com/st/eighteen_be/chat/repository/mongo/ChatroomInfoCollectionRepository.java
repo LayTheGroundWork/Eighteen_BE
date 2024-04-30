@@ -17,7 +17,5 @@ import java.util.Optional;
  * 24. 4. 5.        ipeac       최초 생성
  */
 public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String> {
-    Optional<ChatroomInfoCollection> findByRoomId(String roomId);
-    
-    Optional<ChatroomInfoCollection> findByPostNoAndMemberNo(Long postNo, Long memberNo);
+    Optional<ChatroomInfoCollection> findBySenderNoAndReceiverNo(Long senderNo, Long receiverNo);
 }

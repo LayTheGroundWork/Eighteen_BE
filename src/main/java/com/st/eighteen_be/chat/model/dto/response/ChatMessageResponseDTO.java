@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link ChatMessageCollection}
  */
-public record ChatMessageResponseDTO(String id, @NotNull String roomId, @NotNull Long sender, @NotNull Long receiver,
+public record ChatMessageResponseDTO(String id, @NotNull Long sender, @NotNull Long receiver,
                                      @NotNull @NotEmpty String message, @FutureOrPresent LocalDateTime createdAt,
                                      @FutureOrPresent LocalDateTime updatedAt) implements Serializable {
     

@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * -----------------------------------------------------------
  * 24. 4. 12.        ipeac       최초 생성
  */
+@DisplayName("ChatroomFacade 테스트")
 @ServiceWithMongoDBTest
 public class ChatroomFacadeTest {
     
@@ -65,14 +66,12 @@ public class ChatroomFacadeTest {
         chatroomFacade = new ChatroomFacade(chatroomService, chatMessageService);
         
         chatroomInfoCollection = ChatroomInfoCollection.builder()
-                .roomId("1")
-                .postNo(1L)
-                .memberNo(1L)
+                .senderNo(1L)
+                .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
         
         chatMessageCollection = ChatMessageCollection.builder()
-                .roomId("1")
                 .sender(1L)
                 .receiver(2L)
                 .createdAt(LocalDateTime.now().minusDays(1))
@@ -81,8 +80,8 @@ public class ChatroomFacadeTest {
                 .build();
         
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
-                .postNo(1L)
-                .memberNo(1L)
+                .senderNo(1L)
+                .receiverNo(2L)
                 .requestTime(LocalDateTime.now())
                 .build();
     }

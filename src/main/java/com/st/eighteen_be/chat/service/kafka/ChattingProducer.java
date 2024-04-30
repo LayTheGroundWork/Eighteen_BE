@@ -26,7 +26,7 @@ public class ChattingProducer {
     
     public void send(String topic, ChatMessageRequestDTO messageDto) {
         log.info("ChattingProducer.sendTopic : {}", topic);
-        log.info("ChattingProducer.messageContent : roomId={}, senderNo={}, receiverNo={}, message={}: ", messageDto.roomId(), messageDto.senderNo(), messageDto.receiverNo(), messageDto.message());
+        log.info("ChattingProducer.messageContent : senderNo={}, receiverNo={}, message={}: ", messageDto.senderNo(), messageDto.receiverNo(), messageDto.message());
         
         kafkaTemplate.send(topic, messageDto);
     }

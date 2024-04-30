@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 public record ChatMessageRequestDTO(
-        @NotNull
-        String roomId,
-        
         @NotNull(message = "senderNo can`t be null")
         Long senderNo,
         
@@ -27,7 +24,6 @@ public record ChatMessageRequestDTO(
     
     public ChatMessageCollection toCollection() {
         return ChatMessageCollection.builder()
-                .roomId(roomId())
                 .sender(senderNo())
                 .receiver(receiverNo())
                 .message(message())

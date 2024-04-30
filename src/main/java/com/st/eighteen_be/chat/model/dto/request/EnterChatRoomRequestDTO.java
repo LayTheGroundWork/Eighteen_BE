@@ -18,10 +18,10 @@ import java.time.LocalDateTime;
  * 24. 4. 12.        ipeac       최초 생성
  */
 public record EnterChatRoomRequestDTO(
-        @NotNull(message = "postNo is required")
-        Long postNo,
-        @NotNull(message = "memberNo is required")
-        Long memberNo,
+        @NotNull(message = "senderNo is required")
+        Long senderNo,
+        @NotNull(message = "receiverNo is required")
+        Long receiverNo,
         @PastOrPresent(message = "requestTime should be past or present")
         LocalDateTime requestTime
 ) {
