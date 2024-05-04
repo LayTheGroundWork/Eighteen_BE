@@ -2,9 +2,9 @@ package com.st.eighteen_be.member.api;
 
 import com.st.eighteen_be.common.response.ApiResponse;
 import com.st.eighteen_be.member.domain.MemberPrivacy;
+import com.st.eighteen_be.member.domain.dto.LoginRequestDto;
 import com.st.eighteen_be.member.domain.dto.signIn.SignInRequestDto;
 import com.st.eighteen_be.member.service.MemberService;
-import com.st.eighteen_be.message.service.SmsUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberApiController {
 
     private final MemberService memberService;
-    private final SmsUtil smsUtil;
 
     @PostMapping("/signIn")
     public ApiResponse<MemberPrivacy> signIn(@Valid @RequestBody SignInRequestDto requestDto){
@@ -41,11 +40,9 @@ public class MemberApiController {
         return ApiResponse.success(HttpStatus.OK, memberService.save(requestDto));
     }
 
-    @PostMapping("/sms-certification/sends")
-    public ApiResponse<String> sendsCertification(String phoneNumber){
+    @PostMapping("/login")
+    public ApiResponse<MemberPrivacy> login(@Valid @RequestBody LoginRequestDto requestDto) {
 
-        smsUtil.sendOne(phoneNumber, smsUtil.createRandomNumber());
-
-        return ApiResponse.success(HttpStatus.OK, phoneNumber + ": 전송 완료");
+        return ApiResponse.success(HttpStatus.OK, memberService.login(requestDto));
     }
 }
