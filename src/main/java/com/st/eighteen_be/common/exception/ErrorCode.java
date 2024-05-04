@@ -20,6 +20,7 @@ public enum ErrorCode {
     TEST_ERROR(HttpStatus.NOT_FOUND, "테스트 에러"),
     NOT_FOUND_CHATROOM_TYPE(HttpStatus.NOT_FOUND, "채팅방 타입을 찾을 수 없습니다."),
     EXISTS_MEMBER(HttpStatus.CONFLICT, "계정이 존재합니다."),
+    AUTHENTICATION_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized..."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden..."),
 
