@@ -1,13 +1,14 @@
 package com.st.eighteen_be.message.service;
 
-import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
+import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
+import com.st.eighteen_be.message.domain.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.repository.SmsCertification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
-import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,27 +48,27 @@ public class SmsUtil {
     }
 
     // 단일 메시지 발송 예제
-    public SingleMessageSentResponse sendOne(String to, String verificationCode) {
+    public void sendOne(String to, String verificationCode) {
         Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
-        message.setFrom("발신번호 입력");
+        message.setFrom(fromNumber);
         message.setTo(to);
-        message.setText("[Moyiza] 아래의 인증번호를 입력해주세요\n" + verificationCode);
+        message.setText("[A-Teen] 아래의 인증번호를 입력해주세요\n" + verificationCode);
 
-        return this.messageService.sendOne(new SingleMessageSendingRequest(message));
+        this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
     //사용자가 입력한 인증번호가 Redis에 저장된 인증번호와 동일한지 확인
     public void verifySms(SmsCertificationRequestDto requestDto) {
         if (isVerify(requestDto)) {
-            throw new SmsCertificationRequestDto("인증번호가 일치하지 않습니다.");// 수정해야함
+            throw new AuthenticationException(ErrorCode.AUTHENTICATION_NUMBER_MISMATCH);
         }
-        smsCertification.removeSmsCertification(requestDto.getPhone());
+        smsCertification.deleteSmsCertification(requestDto.phoneNumber());
     }
 
     private boolean isVerify(SmsCertificationRequestDto requestDto) {
-        return !(smsCertification.hasKey(requestDto.getPhone()) &&
-                smsCertification.getSmsCertification(requestDto.getPhone())
-                        .equals(requestDto.getCertificationNumber()));
+        return !(smsCertification.hasKey(requestDto.phoneNumber()) &&
+                smsCertification.getSmsCertification(requestDto.phoneNumber())
+                        .equals(requestDto.certificationNumber()));
     }
 }

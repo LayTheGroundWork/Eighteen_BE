@@ -32,6 +32,6 @@ public class SmsCertification {
 
     // Redis에 해당 휴대번호로 저장된 인증번호가 존재하는지 확인
     public boolean hasKey(String phone) {
-        return stringRedisTemplate.hasKey(PREFIX + phone);
+        return Boolean.TRUE.equals(stringRedisTemplate.hasKey(PREFIX + phone));
     }
 }
