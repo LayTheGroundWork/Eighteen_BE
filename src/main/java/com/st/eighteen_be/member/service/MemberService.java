@@ -3,6 +3,7 @@ package com.st.eighteen_be.member.service;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
 import com.st.eighteen_be.member.domain.MemberPrivacy;
+import com.st.eighteen_be.member.domain.dto.LoginRequestDto;
 import com.st.eighteen_be.member.domain.dto.signIn.SignInRequestDto;
 import com.st.eighteen_be.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,6 @@ public class MemberService {
         return memberRepository.existsByPhoneNumber(phoneNumber);
     }
 
-
     public MemberPrivacy save(SignInRequestDto requestDto){
 
         try{
@@ -54,5 +54,10 @@ public class MemberService {
     }
 
 
+    // 수정 필요
+    @Transactional(readOnly = true)
+    public MemberPrivacy login(LoginRequestDto requestDto){
 
+        return memberRepository.findByPhoneNumber(requestDto.phoneNumber()).orElseThrow();
+    }
 }
