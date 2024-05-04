@@ -64,9 +64,13 @@ jobs:
           key: ${{ secrets.DEV_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.DEV_PRJ_DIRECTORY }}
+            git config --global user.email "qkrtkdwns3410@gmail.com"
+            git config --global user.name "qkrtkdwns3410"
+            git config --global url.https://${{ secrets.PAT }}@github.com/.insteadOf https://github.com/
+            git checkout dev
             git submodule update --init --recursive
             git pull
             docker stop eighteen-be
             docker rm eighteen-be
-            docker rmi eighteenbe/eighteen
+            docker rmi eighteenbe/eighteen:0.0.1
             docker-compose --env-file .env.dev up -d

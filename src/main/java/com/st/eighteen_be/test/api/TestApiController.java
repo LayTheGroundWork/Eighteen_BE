@@ -1,6 +1,7 @@
 package com.st.eighteen_be.test.api;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/test")
 public class TestApiController {
     
+    @GetMapping("/test")
     public ResponseEntity<Object> test() {
         return ResponseEntity.ok("test");
     }
