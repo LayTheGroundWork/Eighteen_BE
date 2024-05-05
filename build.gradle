@@ -56,9 +56,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // Database
-    testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.6'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2'
+    testImplementation 'com.h2database:h2:2.1.214'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //LOG
@@ -73,6 +71,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:4.5.1'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.testcontainers:mongodb'
     testImplementation 'org.testcontainers:junit-jupiter'
 }
 
