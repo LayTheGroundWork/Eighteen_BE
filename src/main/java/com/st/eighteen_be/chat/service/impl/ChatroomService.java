@@ -1,6 +1,7 @@
 package com.st.eighteen_be.chat.service.impl;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
+import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.chat.service.helper.ChatUserHelper;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +38,9 @@ public class ChatroomService {
         ChatUserHelper.validNotSameUser(senderNo, receiverNo);
         
         return chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(senderNo, receiverNo);
+    }
+    
+    public List<Object> findAllMyChatrooms(FindChatRoomRequestDTO requestDTO) {
+        return null;
     }
 }

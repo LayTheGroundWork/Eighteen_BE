@@ -1,6 +1,7 @@
 package com.st.eighteen_be.config.repository;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
@@ -16,5 +17,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "com.st.eighteen_be.chat.repository.mongo")
+@EnableMongoAuditing
 public class MongoConfig {
 }

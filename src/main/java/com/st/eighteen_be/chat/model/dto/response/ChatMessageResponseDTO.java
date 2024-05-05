@@ -12,10 +12,14 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link ChatMessageCollection}
  */
-public record ChatMessageResponseDTO(String id, @NotNull Long sender, @NotNull Long receiver,
-                                     @NotNull @NotEmpty String message, @FutureOrPresent LocalDateTime createdAt,
-                                     @FutureOrPresent LocalDateTime updatedAt) implements Serializable {
-    
+public record ChatMessageResponseDTO(
+        String id,
+        @NotNull Long sender,
+        @NotNull Long receiver,
+        @NotNull @NotEmpty String message,
+        @FutureOrPresent LocalDateTime createdAt,
+        @FutureOrPresent LocalDateTime updatedAt
+) implements Serializable {
     @Builder
     public ChatMessageResponseDTO {
     }

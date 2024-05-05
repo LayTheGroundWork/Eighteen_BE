@@ -1,20 +1,24 @@
 package com.st.eighteen_be.chat.model.collection;
 
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
+import com.st.eighteen_be.common.basetime.BaseDocument;
 import com.st.eighteen_be.common.converter.ChatroomConverter;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -34,7 +38,12 @@ import java.util.Objects;
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ChatroomInfoCollection {
+@SuperBuilder
+public class ChatroomInfoCollection extends BaseDocument {
+    @Id
+    @Field(value = "_id", targetType = FieldType.OBJECT_ID)
+    private String id;
+    
     @Field(name = "SENDER_NO")
     private Long senderNo;
     
@@ -45,8 +54,8 @@ public class ChatroomInfoCollection {
     @Column(name = "CHATROOM_TYPE", nullable = false)
     private ChatroomType chatroomType;
     
-    @Builder
-    private ChatroomInfoCollection(Long senderNo, Long receiverNo, ChatroomType chatroomType) {
+    private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, Long senderNo, Long receiverNo, ChatroomType chatroomType) {
+        super(createdAt, updatedAt);
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
         this.chatroomType = chatroomType;
