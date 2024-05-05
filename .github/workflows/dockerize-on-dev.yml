@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - dev # workflows work when push to dev
-  pull_request_target:
-    branches:
-      - dev # workflows work when pr **merge** request to dev
-
 jobs:
   test-build-and-push:
     runs-on: ubuntu-20.04

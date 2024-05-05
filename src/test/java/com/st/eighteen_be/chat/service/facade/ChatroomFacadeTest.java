@@ -116,7 +116,6 @@ public class ChatroomFacadeTest {
         assertThat(actual).isEmpty();
     }
     
-    
     @AfterEach
     void tearDown() {
         for (String collectionName : mongoTemplate.getCollectionNames()) {
