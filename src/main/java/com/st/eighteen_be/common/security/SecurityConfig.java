@@ -40,7 +40,9 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable) // 2번
                 .headers((headerConfig) -> headerConfig.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // 3번
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin","/h2-console/**","/v1/api/member/**").permitAll()
+                        .requestMatchers("/admin","/h2-console/**","/test",
+                                "/v1/api/member/**","/v1/api/message/**")
+                        .permitAll()
                 )
 //                .oauth2Login(oauth2Login ->
 //                        oauth2Login.userInfoEndpoint(userInfoEndpoint ->
