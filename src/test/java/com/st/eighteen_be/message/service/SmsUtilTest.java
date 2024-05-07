@@ -13,6 +13,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @ServiceWithRedisTest
 @ExtendWith(MockitoExtension.class)
 class SmsUtilTest {
@@ -27,29 +29,34 @@ class SmsUtilTest {
 
     private SmsCertificationRequestDto requestDto;
 
+    private final String phone = "01012345678";
+    private final String certificationNumber = "123456";
+
     @BeforeEach
     void setUp() {
         // Given
         smsUtil = new SmsUtil(smsCertification);
 
         requestDto = SmsCertificationRequestDto.builder()
-                .phoneNumber("01012341234")
-                .certificationNumber("1111")
+                .phoneNumber(phone)
+                .certificationNumber(certificationNumber)
                 .build();
+
+        // 테스트 데이터 초기화
+        stringRedisTemplate.delete("sms:" + phone);
     }
 
 
     @Test
-    public void verify() throws Exception {
-        //given
-        String phone = "01012341234";
-        String code = "1111";
+    public void verify() {
 
         //when
-        smsCertification.createSmsCertification(phone,code);
+        smsCertification.createSmsCertification(phone,certificationNumber);
+        String storedCode = stringRedisTemplate.opsForValue().get("sms:" + phone);
 
         //then
-        smsUtil.verifySms(new SmsCertificationRequestDto(phone,code));
+        smsUtil.verifySms(requestDto);
+        assertThat(storedCode).isEqualTo(certificationNumber);
     }
 
     @AfterEach

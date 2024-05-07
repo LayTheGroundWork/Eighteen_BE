@@ -3,6 +3,7 @@ package com.st.eighteen_be.message.api;
 import com.st.eighteen_be.common.response.ApiResponse;
 import com.st.eighteen_be.message.domain.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.service.SmsUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,21 +16,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/api/message/sms-certification")
+@RequestMapping("/v1/api/message")
 public class MessageApiController {
 
     private final SmsUtil smsUtil;
 
     @PostMapping("/sends")
-    public ApiResponse<String> sendSms(@RequestBody SmsCertificationRequestDto requestDto){
+    public ApiResponse<String> sendSms(@Valid @RequestBody SmsCertificationRequestDto requestDto){
 
-        smsUtil.sendOne(requestDto.phoneNumber(), smsUtil.createRandomNumber());
+        smsUtil.sendOne(requestDto.getPhoneNumber(), smsUtil.createRandomNumber());
 
-        return ApiResponse.success(HttpStatus.OK,requestDto.phoneNumber() + ": 전송 완료");
+        return ApiResponse.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
     }
 
     @PostMapping("/confirms")
-    public ApiResponse<String> smsVerification(@RequestBody SmsCertificationRequestDto requestDto) {
+    public ApiResponse<String> smsVerification(@Valid @RequestBody SmsCertificationRequestDto requestDto) {
 
         smsUtil.verifySms(requestDto);
 

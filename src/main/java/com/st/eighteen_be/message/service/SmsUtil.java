@@ -55,6 +55,7 @@ public class SmsUtil {
         message.setTo(to);
         message.setText("[A-Teen] 아래의 인증번호를 입력해주세요\n" + verificationCode);
 
+        smsCertification.createSmsCertification(to,verificationCode);
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
@@ -63,12 +64,12 @@ public class SmsUtil {
         if (isVerify(requestDto)) {
             throw new AuthenticationException(ErrorCode.AUTHENTICATION_NUMBER_MISMATCH);
         }
-        smsCertification.deleteSmsCertification(requestDto.phoneNumber());
+        smsCertification.deleteSmsCertification(requestDto.getPhoneNumber());
     }
 
     private boolean isVerify(SmsCertificationRequestDto requestDto) {
-        return !(smsCertification.hasKey(requestDto.phoneNumber()) &&
-                smsCertification.getSmsCertification(requestDto.phoneNumber())
-                        .equals(requestDto.certificationNumber()));
+        return !(smsCertification.hasKey(requestDto.getPhoneNumber()) &&
+                smsCertification.getSmsCertification(requestDto.getPhoneNumber())
+                        .equals(requestDto.getCertificationNumber()));
     }
 }

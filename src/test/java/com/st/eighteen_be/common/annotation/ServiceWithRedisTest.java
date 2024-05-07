@@ -1,10 +1,10 @@
 package com.st.eighteen_be.common.annotation;
 
 import com.st.eighteen_be.config.redis.RedisConfig;
+import com.st.eighteen_be.message.repository.SmsCertification;
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,10 +16,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @DataRedisTest
 @ActiveProfiles("test")
-@Import({RedisConfig.class}) // Redis 설정 클래스를 여기에 추가하세요.
-@TestPropertySource(properties = {
-        "spring.data.redis.host=localhost",
-        "spring.data.redis.port=6379"
-})
+@Import({RedisConfig.class, SmsCertification.class}) // Redis 설정 클래스를 여기에 추가하세요.
 public @interface ServiceWithRedisTest {
 }
