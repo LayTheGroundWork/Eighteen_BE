@@ -29,11 +29,11 @@ public class ChatMessageService {
     
     @Transactional(readOnly = false)
     public void processMessage(ChatMessageRequestDTO messageDto) {
-        log.info("========== processMessage ========== senderNo : {}, receiverNo : {}", messageDto.senderNo(), messageDto.receiverNo());
+        log.info("========== processMessage ========== senderNo : {}, receiverNo : {}", messageDto.getSenderNo(), messageDto.getReceiverNo());
         
         ChatMessageCollection chatMessage = messageDto.toCollection();
         
-        chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(chatMessage.getSender(), chatMessage.getReceiver())
+        chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(chatMessage.getSenderNo(), chatMessage.getReceiverNo())
                 .ifPresentOrElse(
                         chatroomInfo -> {
                             log.info("========== chatroom found ==========");
@@ -53,7 +53,7 @@ public class ChatMessageService {
         
         Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
         
-        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findBySenderAndReceiverAndCreatedAtBefore(senderNo, receiverNo, lastMessageTime, pageable);
+        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findBySenderNoAndReceiverNoAndCreatedAtBefore(senderNo, receiverNo, lastMessageTime, pageable);
         
         return foundChatMessages.stream()
                 .map(ChatMessageCollection::toResponseDTO)

@@ -1,6 +1,6 @@
-package com.st.eighteen_be.chat.repository.querydsl;
+package com.st.eighteen_be.chat.repository.mongo;
 
-import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
+import com.st.eighteen_be.chat.model.dto.response.ChatroomWithLastestMessageDTO;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ import java.util.List;
  * 24. 5. 6.        ipeac       최초 생성
  */
 public interface CustomChatRepository {
-    List<ChatroomInfoCollection> findAllChatroomBySenderNo(Long senderNo);
+    List<ChatroomWithLastestMessageDTO> findAllChatroomBySenderNo(Long senderNo);
 }

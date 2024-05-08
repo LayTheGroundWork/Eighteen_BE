@@ -5,6 +5,7 @@ import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.dto.request.EnterChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.dto.response.ChatMessageResponseDTO;
+import com.st.eighteen_be.chat.model.dto.response.ChatroomWithLastestMessageDTO;
 import com.st.eighteen_be.chat.service.facade.ChatroomFacade;
 import com.st.eighteen_be.chat.service.impl.ChatroomService;
 import com.st.eighteen_be.chat.service.kafka.ChattingProducer;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -40,7 +42,8 @@ public class ChattingApiController {
     private final ChatroomService chatroomService;
     
     @MessageMapping("/chat/all")
-    public ApiResponse<List<Object>> findAllMyChatrooms(@Valid @RequestBody FindChatRoomRequestDTO requestDTO) {
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(@Valid @RequestBody FindChatRoomRequestDTO requestDTO) {
         log.info("findAllMyChatrooms.requestDTO.senderNo() = {}", requestDTO.senderNo());
         
         return ApiResponse.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(requestDTO));
@@ -58,7 +61,7 @@ public class ChattingApiController {
     @MessageMapping("/chat/{senderNo}/{receiverNo}/message") // /pub/chat/{chatroomId}/message
     public void sendMessage(@DestinationVariable(value = "senderNo") Long senderNo, @DestinationVariable(value = "receiverNo") Long receiverNo, @RequestBody ChatMessageRequestDTO chatMessage) {
         log.info("sendMessage.senderNo() = {}, receiverNo() = {}", senderNo, receiverNo);
-        log.info("sendMessage.chatMessage.message() = {}", chatMessage.message());
+        log.info("sendMessage.chatMessage.message() = {}", chatMessage.getMessage());
         
         chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage);
     }

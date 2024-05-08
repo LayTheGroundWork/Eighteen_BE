@@ -72,8 +72,8 @@ public class ChatroomFacadeTest {
                 .build();
         
         chatMessageCollection = ChatMessageCollection.builder()
-                .sender(1L)
-                .receiver(2L)
+                .senderNo(1L)
+                .receiverNo(2L)
                 .createdAt(LocalDateTime.now().minusDays(1))
                 .updatedAt(LocalDateTime.now().minusDays(1))
                 .message("Hello")
@@ -98,8 +98,8 @@ public class ChatroomFacadeTest {
         
         // Then
         assertThat(actual).isNotEmpty();
-        assertThat(actual.get(0).sender()).isEqualTo(1L);
-        assertThat(actual.get(0).receiver()).isEqualTo(2L);
+        assertThat(actual.get(0).senderNo()).isEqualTo(1L);
+        assertThat(actual.get(0).receiverNo()).isEqualTo(2L);
         assertThat(actual.get(0).message()).isEqualTo("Hello");
     }
     

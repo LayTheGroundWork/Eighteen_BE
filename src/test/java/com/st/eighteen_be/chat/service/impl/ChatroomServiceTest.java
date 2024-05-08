@@ -1,6 +1,8 @@
 package com.st.eighteen_be.chat.service.impl;
 
+import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
+import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
@@ -12,8 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 /**
  * packageName    : com.st.eighteen_be.chat.service.impl
@@ -111,6 +116,56 @@ class ChatroomServiceTest {
         
         // Then
         assertThat(found).isEmpty();
+    }
+    
+    @Test
+    @DisplayName("채팅방 전체 목록 조회  - 각 채팅방의  마지막 채팅까지 올바르게 가져와야합니다.")
+    void When_FindAllMyChatrooms_Then_Success() {
+        // Given
+        ChatroomInfoCollection anotherSavedChatroomInfoCollection = ChatroomInfoCollection.of(1L, 3L, ChatroomType.PRIVATE);
+        
+        FindChatRoomRequestDTO requestDTO = FindChatRoomRequestDTO.builder()
+                .senderNo(1L)
+                .build();
+        
+        ChatroomInfoCollection firstChatroomInfo = mongoTemplate.save(savedChatroomInfoCollection);// 1 - 2 채팅방 생성
+        ChatroomInfoCollection secondChatroomInfo = mongoTemplate.save(anotherSavedChatroomInfoCollection);// 1 - 3 채팅방 생성
+        
+        ChatMessageCollection firstChatMessage = ChatMessageCollection.builder()
+                .senderNo(1L)
+                .receiverNo(2L)
+                .chatroomInfoId(firstChatroomInfo.getId())
+                .message("안녕하세요 1-2")
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .build();
+        
+        ChatMessageCollection secondChatMessage = ChatMessageCollection.builder()
+                .senderNo(1L)
+                .receiverNo(3L)
+                .chatroomInfoId(secondChatroomInfo.getId())
+                .message("안녕하세요 1-3")
+                .createdAt(LocalDateTime.now().minusDays(2))
+                .build();
+        
+        //채팅 기록
+        mongoTemplate.save(firstChatMessage);
+        mongoTemplate.save(secondChatMessage);
+        
+        // When
+        var chatrooms = chatroomService.findAllMyChatrooms(requestDTO);
+        
+        // Then
+        assertThat(chatrooms).isNotEmpty();
+        
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(chatrooms.get(0).senderNo()).isEqualTo(1L);
+            softAssertions.assertThat(chatrooms.get(0).receiverNo()).isEqualTo(2L);
+        });
+        
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(chatrooms.get(1).senderNo()).isEqualTo(1L);
+            softAssertions.assertThat(chatrooms.get(1).receiverNo()).isEqualTo(3L);
+        });
     }
     
     @AfterEach

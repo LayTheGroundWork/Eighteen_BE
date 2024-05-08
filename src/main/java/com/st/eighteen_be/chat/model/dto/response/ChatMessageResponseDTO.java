@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
  */
 public record ChatMessageResponseDTO(
         String id,
-        @NotNull Long sender,
-        @NotNull Long receiver,
+        @NotNull Long senderNo,
+        @NotNull Long receiverNo,
         @NotNull @NotEmpty String message,
         @FutureOrPresent LocalDateTime createdAt,
         @FutureOrPresent LocalDateTime updatedAt

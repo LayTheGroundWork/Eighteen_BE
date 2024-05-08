@@ -1,7 +1,6 @@
 package com.st.eighteen_be.chat.repository.mongo;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
-import com.st.eighteen_be.chat.repository.querydsl.CustomChatRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
