@@ -24,7 +24,7 @@ public class MessageApiController {
     @PostMapping("/sends")
     public ApiResponse<String> sendSms(@Valid @RequestBody SmsCertificationRequestDto requestDto){
 
-        smsUtil.sendOne(requestDto.getPhoneNumber(), smsUtil.createRandomNumber());
+        smsUtil.sendOne(requestDto.getPhoneNumber());
 
         return ApiResponse.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
     }
