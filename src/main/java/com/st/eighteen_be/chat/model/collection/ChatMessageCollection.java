@@ -14,41 +14,40 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "CHAT_MESSAGE")
+@Document(collection = "chat_message")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 public class ChatMessageCollection extends BaseDocument {
     @Id
     @Field(value = "_id", targetType = FieldType.OBJECT_ID)
-    private ObjectId id;
-
-    @Field(value = "CHATROOM_INFO_ID", targetType = FieldType.OBJECT_ID)
+    private ObjectId _id;
+    
+    @Field(value = "chatroomInfoId", targetType = FieldType.OBJECT_ID)
     private ObjectId chatroomInfoId;
-
+    
     //TODO 회원 존재하지 않기에 임시 String 처리
-    @Field(value = "SENDER_NO")
+    @Field(value = "senderNo")
     private Long senderNo;
-
+    
     //TODO 회원 존재하지 않기에 임시 String 처리
-    @Field(value = "RECEIVER_NO")
+    @Field(value = "receiverNo")
     private Long receiverNo;
-
-    @Field(value = "MESSAGE")
+    
+    @Field(value = "message")
     private String message;
-
-    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, ObjectId id, ObjectId chatroomInfoId, Long senderNo, Long receiverNo, String message) {
+    
+    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, ObjectId _id, ObjectId chatroomInfoId, Long senderNo, Long receiverNo, String message) {
         super(createdAt, updatedAt);
-        this.id = id;
+        this._id = _id;
         this.chatroomInfoId = chatroomInfoId;
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
         this.message = message;
     }
-
+    
     public ChatMessageResponseDTO toResponseDTO() {
         return ChatMessageResponseDTO.builder()
-                .id(getId())
                 .senderNo(getSenderNo())
                 .receiverNo(getReceiverNo())
                 .message(getMessage())

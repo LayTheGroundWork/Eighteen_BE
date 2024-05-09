@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.bson.types.ObjectId;
 
 @Setter
 @Getter
@@ -22,11 +23,10 @@ public class ChatMessageRequestDTO {
     @NotNull(message = "receiverNo can`t be null")
     private Long receiverNo;
     
-    @NotNull(message = "chatroomInfoId can`t be null")
-    private String chatroomInfoId;
+    private ObjectId chatroomInfoId;
     
     @Builder
-    private ChatMessageRequestDTO(Long senderNo, String message, Long receiverNo, String chatroomInfoId) {
+    private ChatMessageRequestDTO(Long senderNo, String message, Long receiverNo, ObjectId chatroomInfoId) {
         this.senderNo = senderNo;
         this.message = message;
         this.receiverNo = receiverNo;

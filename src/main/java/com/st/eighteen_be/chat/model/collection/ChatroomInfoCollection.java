@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -32,7 +33,7 @@ import java.util.Objects;
  * -----------------------------------------------------------
  * 2024-04-01        ipeac       최초 생성
  */
-@Document(collection = "CHATROOM_INFO")
+@Document(collection = "chatroom_info")
 @CompoundIndexes({
         @CompoundIndex(name = "chatroom_info_idx", def = "{'SENDER_NO': 1, 'RECEIVER_NO': 1}")
 })
@@ -42,16 +43,16 @@ import java.util.Objects;
 public class ChatroomInfoCollection extends BaseDocument {
     @Id
     @Field(value = "_id", targetType = FieldType.OBJECT_ID)
-    private String id;
+    private ObjectId _id;
     
-    @Field(name = "SENDER_NO")
+    @Field(name = "senderNo")
     private Long senderNo;
     
-    @Field(name = "RECEIVER_NO")
+    @Field(name = "receiverNo")
     private Long receiverNo;
     
     @Convert(converter = ChatroomConverter.class)
-    @Column(name = "CHATROOM_TYPE", nullable = false)
+    @Column(name = "chatroomType", nullable = false)
     private ChatroomType chatroomType;
     
     private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, Long senderNo, Long receiverNo, ChatroomType chatroomType) {

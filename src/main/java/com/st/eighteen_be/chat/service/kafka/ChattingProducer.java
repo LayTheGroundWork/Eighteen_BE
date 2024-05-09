@@ -42,6 +42,6 @@ public class ChattingProducer {
         ChatroomInfoCollection foundedChatroom = chatroomService.getChatroom(messageDto.getSenderNo(), messageDto.getReceiverNo())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM));
         
-        messageDto.setChatroomInfoId(foundedChatroom.getId());
+        messageDto.setChatroomInfoId(foundedChatroom.get_id());
     }
 }

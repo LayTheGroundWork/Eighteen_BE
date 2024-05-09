@@ -2,7 +2,7 @@ package com.st.eighteen_be.chat.model.dto.response;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
-import lombok.Builder;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -10,15 +10,26 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link ChatroomInfoCollection}
  */
-public record ChatroomWithLastestMessageDTO(
-        Long senderNo,
-        Long receiverNo,
-        ChatroomType chatroomType,
-        ChatMessageResponseDTO lastestMessage,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) implements Serializable {
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ChatroomWithLastestMessageDTO implements Serializable {
+    private Long senderNo;
+    private Long receiverNo;
+    private ChatroomType chatroomType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String message;
+    private LocalDateTime messageCreatedAt;
+    
     @Builder
-    public ChatroomWithLastestMessageDTO {
+    private ChatroomWithLastestMessageDTO(Long senderNo, Long receiverNo, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, String message, LocalDateTime messageCreatedAt) {
+        this.senderNo = senderNo;
+        this.receiverNo = receiverNo;
+        this.chatroomType = chatroomType;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.message = message;
+        this.messageCreatedAt = messageCreatedAt;
     }
 }

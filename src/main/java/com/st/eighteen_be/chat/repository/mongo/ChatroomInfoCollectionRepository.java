@@ -21,14 +21,41 @@ import java.util.Optional;
  */
 public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String>, CustomChatRepository {
     Optional<ChatroomInfoCollection> findBySenderNoAndReceiverNo(Long senderNo, Long receiverNo);
-
+    
+    /**
+     * FIXME : 자바 쿼리로 변경이 가능하다면 변경하는 것이 좋을 것 같다.
+     * 발신자 번호로 채팅방 목록 조회
+     *
+     * @param senderNo 채팅 송신자 번호
+     * @return
+     */
     @Aggregation(pipeline = {
             "{ $match: { 'senderNo': ?0 } }",
-            "{ $lookup: { from: 'CHAT_MESSAGE', localField: '_id', foreignField: 'chatroomInfoId', as: 'latestMessage' } }",
-            "{ $unwind: { path: '$latestMessage', preserveNullAndEmptyArrays: true } }",
-            "{ $sort: { 'latestMessage.createdAt': -1 } }",
-            "{ $group: { _id: $_id, senderNo: { $first: '$senderNo' }, receiverNo: { $first: '$receiverNo' }, chatroomType: { $first: '$chatroomType' }, createdAt: { $first: '$createdAt' }, updatedAt: { $first: '$updatedAt' }, lastestMessage: { $first: '$latestMessage' } } }",
-            "{ $project: { senderNo: 1, receiverNo: 1, chatroomType: 1, createdAt: 1, updatedAt: 1, 'lastestMessage.message': 1, 'lastestMessage.createdAt': 1 } }"
+            "{ $lookup: { " +
+                    "from: 'chat_message', " +
+                    "let: { 'chatroomInfoId': '$_id' }, " +
+                    "pipeline: [ " +
+                    "{ $match: { $expr: { $eq: ['$chatroomInfoId', '$$chatroomInfoId'] } } }, " +
+                    "{ $sort: { 'createdAt': -1 } }, " +
+                    "{ $limit: 1 }, " +
+                    "{ $project: { 'message': 1, 'createdAt': 1 } }" +
+                    "], " +
+                    "as: 'latestMessage' " +
+                    "} }",
+            "{ $unwind: { " +
+                    "path: '$latestMessage', " +
+                    "preserveNullAndEmptyArrays: true " +
+                    "} }",
+            "{ $project: { " +
+                    "'_id': 1, " +
+                    "'senderNo': 1, " +
+                    "'receiverNo': 1, " +
+                    "'chatroomType': 1, " +
+                    "'createdAt': 1, " +
+                    "'updatedAt': 1, " +
+                    "'message': '$latestMessage.message', " +
+                    "'messageCreatedAt': '$latestMessage.createdAt' " +
+                    "} }"
     })
     List<ChatroomWithLastestMessageDTO> findAllChatroomBySenderNo(Long senderNo);
 }
