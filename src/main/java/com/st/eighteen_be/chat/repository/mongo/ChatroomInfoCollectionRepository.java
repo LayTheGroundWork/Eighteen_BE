@@ -19,7 +19,7 @@ import java.util.Optional;
  * -----------------------------------------------------------
  * 24. 4. 5.        ipeac       최초 생성
  */
-public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String>, CustomChatRepository {
+public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String> {
     Optional<ChatroomInfoCollection> findBySenderNoAndReceiverNo(Long senderNo, Long receiverNo);
     
     /**
