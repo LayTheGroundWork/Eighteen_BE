@@ -5,6 +5,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
  * DTO for {@link ChatMessageCollection}
  */
 public record ChatMessageResponseDTO(
-        String id,
+        ObjectId id,
         @NotNull Long senderNo,
         @NotNull Long receiverNo,
         @NotNull @NotEmpty String message,
