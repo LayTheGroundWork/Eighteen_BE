@@ -98,9 +98,9 @@ public class ChatroomFacadeTest {
         
         // Then
         assertThat(actual).isNotEmpty();
-        assertThat(actual.get(0).senderNo()).isEqualTo(1L);
-        assertThat(actual.get(0).receiverNo()).isEqualTo(2L);
-        assertThat(actual.get(0).message()).isEqualTo("Hello");
+        assertThat(actual.get(0).getSenderNo()).isEqualTo(1L);
+        assertThat(actual.get(0).getReceiverNo()).isEqualTo(2L);
+        assertThat(actual.get(0).getMessage()).isEqualTo("Hello");
     }
     
     @Test
