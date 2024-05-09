@@ -30,32 +30,40 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
      * @return
      */
     @Aggregation(pipeline = {
-            "{ $match: { 'senderNo': ?0 } }",
-            "{ $lookup: { " +
-                    "from: 'chat_message', " +
-                    "let: { 'chatroomInfoId': '$_id' }, " +
-                    "pipeline: [ " +
-                    "{ $match: { $expr: { $eq: ['$chatroomInfoId', '$$chatroomInfoId'] } } }, " +
-                    "{ $sort: { 'createdAt': -1 } }, " +
-                    "{ $limit: 1 }, " +
-                    "{ $project: { 'message': 1, 'createdAt': 1 } }" +
-                    "], " +
-                    "as: 'latestMessage' " +
-                    "} }",
-            "{ $unwind: { " +
-                    "path: '$latestMessage', " +
-                    "preserveNullAndEmptyArrays: true " +
-                    "} }",
-            "{ $project: { " +
-                    "'_id': 1, " +
-                    "'senderNo': 1, " +
-                    "'receiverNo': 1, " +
-                    "'chatroomType': 1, " +
-                    "'createdAt': 1, " +
-                    "'updatedAt': 1, " +
-                    "'message': '$latestMessage.message', " +
-                    "'messageCreatedAt': '$latestMessage.createdAt' " +
-                    "} }"
+            """
+                    { $match: { 'senderNo': ?0 } }
+                    """,
+            """
+                    { $lookup: {
+                        from: 'chat_message',
+                        let: { 'chatroomInfoId': '$_id' },
+                        pipeline: [
+                            { $match: { $expr: { $eq: ['$chatroomInfoId', '$$chatroomInfoId'] } } },
+                            { $sort: { 'createdAt': -1 } },
+                            { $limit: 1 },
+                            { $project: { 'message': 1, 'createdAt': 1 } }
+                        ],
+                        as: 'latestMessage'
+                    } }
+                    """,
+            """
+                    { $unwind: {
+                        path: '$latestMessage',
+                        preserveNullAndEmptyArrays: true
+                    } }
+                    """,
+            """
+                    { $project: {
+                        '_id': 1,
+                        'senderNo': 1,
+                        'receiverNo': 1,
+                        'chatroomType': 1,
+                        'createdAt': 1,
+                        'updatedAt': 1,
+                        'message': '$latestMessage.message',
+                        'messageCreatedAt': '$latestMessage.createdAt'
+                    } }
+                    """
     })
     List<ChatroomWithLastestMessageDTO> findAllChatroomBySenderNo(Long senderNo);
 }
