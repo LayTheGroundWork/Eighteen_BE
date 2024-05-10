@@ -22,23 +22,23 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RedisMessageService {
     private static final String UNREAD_COUNT_REDIS_KEY = "unreadMessageCount:";
-    private final RedisTemplate<String, Object> redisTemplate;
-
+    private RedisTemplate<String, Object> redisTemplate;
+    
     public void incrementUnreadMessageCount(@Nonnull Long receiverNo) {
         log.info("========== incrementUnreadMessageCount ========== receiverNo : {}", receiverNo);
-
+        
         redisTemplate.opsForValue().increment(UNREAD_COUNT_REDIS_KEY + receiverNo);
     }
-
+    
     public void resetUnreadMessageCount(@Nonnull Long receiverNo) {
         log.info("========== resetUnreadMessageCount ========== receiverNo : {}", receiverNo);
-
+        
         redisTemplate.delete(UNREAD_COUNT_REDIS_KEY + receiverNo);
     }
-
+    
     public int getUnreadMessageCount(String chatroomId, Long userNo) {
         log.info("========== getUnreadMessageCount ========== chatroomId : {}, userNo : {}", chatroomId, userNo);
-
+        
         return (int) redisTemplate.opsForValue().get(UNREAD_COUNT_REDIS_KEY + userNo);
     }
 }
