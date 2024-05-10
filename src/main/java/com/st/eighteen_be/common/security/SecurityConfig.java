@@ -29,8 +29,12 @@ public class SecurityConfig {
     //권한 확인을 하지 않는 uri
     private static final String[] PERMIT_ALL_PATTERNS = new String[] {
 
-    };
+            "/h2-console/**", "/test",
 
+            "/v1/api/member/**",
+
+            "/v1/api/message/**",
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -40,9 +44,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable) // 2번
                 .headers((headerConfig) -> headerConfig.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // 3번
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin","/h2-console/**","/test",
-                                "/v1/api/member/**","/v1/api/message/**")
-                        .permitAll()
+                        .requestMatchers(PERMIT_ALL_PATTERNS).permitAll()
                 )
 //                .oauth2Login(oauth2Login ->
 //                        oauth2Login.userInfoEndpoint(userInfoEndpoint ->
