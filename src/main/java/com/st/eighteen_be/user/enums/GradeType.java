@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.enums;
+package com.st.eighteen_be.user.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

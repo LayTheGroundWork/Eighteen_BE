@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.domain;
+package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import jakarta.persistence.*;
@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name = "member", uniqueConstraints = {@UniqueConstraint(columnNames = {"phoneNumber"}, name = "PHONE_NUMBER_UNIQUE")})
+@Table(name = "user", uniqueConstraints = {@UniqueConstraint(columnNames = {"phoneNumber"}, name = "PHONE_NUMBER_UNIQUE")})
 
-public class MemberPrivacy extends BaseEntity {
+public class UserPrivacy extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
+    @Column(name = "user_id")
     private Integer id;
 
     private String phoneNumber;
@@ -34,7 +34,7 @@ public class MemberPrivacy extends BaseEntity {
     private String email;
 
     @Builder
-    private MemberPrivacy(String phoneNumber, String password, LocalDateTime birthDay, String certificationNumber, String email) {
+    private UserPrivacy(String phoneNumber, String password, LocalDateTime birthDay, String certificationNumber, String email) {
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.birthDay = birthDay;

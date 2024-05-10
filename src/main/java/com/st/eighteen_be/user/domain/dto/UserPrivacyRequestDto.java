@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.domain.dto;
+package com.st.eighteen_be.user.domain.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @Getter
-public class MemberPrivacyRequestDto {
+public class UserPrivacyRequestDto {
 
     private String phoneNumber;
 
@@ -19,7 +19,7 @@ public class MemberPrivacyRequestDto {
     private String name;
 
     @Builder
-    private MemberPrivacyRequestDto(String phoneNumber, String password, LocalDate birthDay, String name) {
+    private UserPrivacyRequestDto(String phoneNumber, String password, LocalDate birthDay, String name) {
 
         this.phoneNumber = phoneNumber;
         this.password = password;

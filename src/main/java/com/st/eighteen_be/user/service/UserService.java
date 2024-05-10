@@ -1,11 +1,10 @@
-package com.st.eighteen_be.member.service;
+package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
-import com.st.eighteen_be.member.domain.MemberPrivacy;
-import com.st.eighteen_be.member.domain.dto.LoginRequestDto;
-import com.st.eighteen_be.member.domain.dto.signIn.SignInRequestDto;
-import com.st.eighteen_be.member.repository.MemberRepository;
+import com.st.eighteen_be.user.domain.dto.LoginRequestDto;
+import com.st.eighteen_be.user.domain.dto.signIn.SignInRequestDto;
+import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,37 +26,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class MemberService {
+public class UserService {
 
-    private final MemberRepository memberRepository;
+    private final UserRepository userRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
     /** 가입 여부 확인 */
     private boolean phoneNumberCheck(String phoneNumber) {
-        return memberRepository.existsByPhoneNumber(phoneNumber);
+        return userRepository.existsByPhoneNumber(phoneNumber);
     }
 
-    public MemberPrivacy save(SignInRequestDto requestDto){
+    public void save(SignInRequestDto requestDto){
 
         try{
-            return memberRepository.save(
-                    requestDto.toEntity(passwordEncoder.encode(requestDto.password()))
-            );
+            userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.password())));
+
         } catch (DataIntegrityViolationException e){
             if(e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")){
                 throw new OccupiedException(ErrorCode.EXISTS_MEMBER);
-            } else {
-                throw e;
             }
+            throw e;
         }
     }
 
-
     // 수정 필요
     @Transactional(readOnly = true)
-    public MemberPrivacy login(LoginRequestDto requestDto){
+    public void login(LoginRequestDto requestDto){
 
-        return memberRepository.findByPhoneNumber(requestDto.phoneNumber()).orElseThrow();
+        userRepository.findByPhoneNumber(requestDto.phoneNumber()).orElseThrow();
     }
 }

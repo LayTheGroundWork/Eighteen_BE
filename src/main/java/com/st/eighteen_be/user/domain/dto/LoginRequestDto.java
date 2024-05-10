@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.domain.dto;
+package com.st.eighteen_be.user.domain.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

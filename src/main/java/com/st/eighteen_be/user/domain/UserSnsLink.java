@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.domain;
+package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import jakarta.persistence.*;
@@ -10,23 +10,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class MemberSnsLink extends BaseEntity {
+public class UserSnsLink extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sns_link_id")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private MemberProfile member;
+    @JoinColumn(name = "user_id")
+    private UserProfile user;
 
     private String snsLink;
 
     @Builder
-    public MemberSnsLink(MemberProfile member, String snsLink) {
-        this.member = member;
+    public UserSnsLink(UserProfile user, String snsLink) {
+        this.user = user;
         //== 연관관계 편의 메서드 ==//
-        member.getSnsLinks().add(this);
+        user.getSnsLinks().add(this);
 
         this.snsLink = snsLink;
     }

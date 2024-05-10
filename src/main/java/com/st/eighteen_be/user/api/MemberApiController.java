@@ -1,10 +1,9 @@
-package com.st.eighteen_be.member.api;
+package com.st.eighteen_be.user.api;
 
 import com.st.eighteen_be.common.response.ApiResponse;
-import com.st.eighteen_be.member.domain.MemberPrivacy;
-import com.st.eighteen_be.member.domain.dto.LoginRequestDto;
-import com.st.eighteen_be.member.domain.dto.signIn.SignInRequestDto;
-import com.st.eighteen_be.member.service.MemberService;
+import com.st.eighteen_be.user.domain.dto.LoginRequestDto;
+import com.st.eighteen_be.user.domain.dto.signIn.SignInRequestDto;
+import com.st.eighteen_be.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,17 +31,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/api/member")
 public class MemberApiController {
 
-    private final MemberService memberService;
+    private final UserService userService;
 
     @PostMapping("/signIn")
-    public ApiResponse<MemberPrivacy> signIn(@Valid @RequestBody SignInRequestDto requestDto){
+    public ApiResponse<SignInRequestDto> signIn(@Valid @RequestBody SignInRequestDto requestDto){
 
-        return ApiResponse.success(HttpStatus.OK, memberService.save(requestDto));
+        userService.save(requestDto);
+        return ApiResponse.success(HttpStatus.OK, requestDto);
     }
 
     @PostMapping("/login")
-    public ApiResponse<MemberPrivacy> login(@Valid @RequestBody LoginRequestDto requestDto) {
+    public ApiResponse<LoginRequestDto> login(@Valid @RequestBody LoginRequestDto requestDto) {
 
-        return ApiResponse.success(HttpStatus.OK, memberService.login(requestDto));
+        userService.login(requestDto);
+        return ApiResponse.success(HttpStatus.OK, requestDto);
     }
 }
