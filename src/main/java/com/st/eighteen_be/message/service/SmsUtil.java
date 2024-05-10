@@ -37,9 +37,11 @@ public class SmsUtil {
     }
 
     private String createRandomNumber() {
+        int digits = 6;
         SecureRandom rand = new SecureRandom();
         StringBuilder randomNum = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
+
+        for (int i = 0; i < digits; i++) {
             String random = Integer.toString(rand.nextInt(10));
             randomNum.append(random);
         }
