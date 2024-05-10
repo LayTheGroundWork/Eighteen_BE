@@ -1,7 +1,7 @@
-package com.st.eighteen_be.member.domain;
+package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import com.st.eighteen_be.member.enums.GradeType;
+import com.st.eighteen_be.user.enums.GradeType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,15 +15,15 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class MemberProfile extends BaseEntity {
+public class UserProfile extends BaseEntity {
 
     @Id
     private Integer id;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private MemberPrivacy memberPrivacy;
+    @JoinColumn(name = "user_id")
+    private UserPrivacy userPrivacy;
 
     // s3 주소
     private String profileImg;
@@ -44,8 +44,8 @@ public class MemberProfile extends BaseEntity {
     private Boolean gender;
 
     // SNS 링크 정보 [학생(1) : 주소(N)]
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberSnsLink> snsLinks = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserSnsLink> snsLinks = new ArrayList<>();
 
 
     // 학교 위치 정보 [학교(1) : 학생(N)]
@@ -59,9 +59,9 @@ public class MemberProfile extends BaseEntity {
 
 
     @Builder
-    private MemberProfile(MemberPrivacy memberPrivacy, String profileImg, String nickName, GradeType grade, String introduction, String mbti, Boolean gender){
+    private UserProfile(UserPrivacy userPrivacy, String profileImg, String nickName, GradeType grade, String introduction, String mbti, Boolean gender){
 
-        this.memberPrivacy = memberPrivacy;
+        this.userPrivacy = userPrivacy;
         this.profileImg = profileImg;
         this.nickName = nickName;
         this.grade = grade;
@@ -70,7 +70,7 @@ public class MemberProfile extends BaseEntity {
         this.gender = gender;
     }
 
-    public MemberProfile update(String profileImg, String nickName, GradeType grade, String introduction, String mbti){
+    public UserProfile update(String profileImg, String nickName, GradeType grade, String introduction, String mbti){
         this.profileImg = profileImg;
         this.nickName = nickName;
         this.grade = grade;

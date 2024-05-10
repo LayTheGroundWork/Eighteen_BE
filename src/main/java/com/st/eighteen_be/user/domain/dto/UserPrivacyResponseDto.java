@@ -1,6 +1,6 @@
-package com.st.eighteen_be.member.domain.dto;
+package com.st.eighteen_be.user.domain.dto;
 
-import com.st.eighteen_be.member.domain.MemberPrivacy;
+import com.st.eighteen_be.user.domain.UserPrivacy;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
-public class MemberPrivacyResponseDto {
+public class UserPrivacyResponseDto {
 
     private String phoneNumber;
 
@@ -20,7 +20,7 @@ public class MemberPrivacyResponseDto {
 
     private String email;
 
-    public MemberPrivacyResponseDto(MemberPrivacy entity) {
+    public UserPrivacyResponseDto(UserPrivacy entity) {
         this.phoneNumber = entity.getPhoneNumber();
         this.password = entity.getPassword();
         this.birthDay = entity.getBirthDay();

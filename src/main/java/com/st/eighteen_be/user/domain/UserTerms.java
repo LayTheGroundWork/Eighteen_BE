@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.domain;
+package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import jakarta.persistence.*;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class MemberTerms extends BaseEntity {
+public class UserTerms extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "terms_id")
@@ -29,7 +29,7 @@ public class MemberTerms extends BaseEntity {
     private Boolean d;
 
     @Builder
-    private MemberTerms(Boolean a, Boolean b, Boolean c, Boolean d ){
+    private UserTerms(Boolean a, Boolean b, Boolean c, Boolean d ){
         this.a = a;
         this.b = b;
         this.c = c;

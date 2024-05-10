@@ -1,15 +1,11 @@
-package com.st.eighteen_be.member.domain.dto.signIn;
+package com.st.eighteen_be.user.domain.dto.signIn;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.st.eighteen_be.member.domain.MemberPrivacy;
+import com.st.eighteen_be.user.domain.UserPrivacy;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -52,8 +48,8 @@ public record SignInRequestDto(
         String email
 ) {
 
-    public MemberPrivacy toEntity(String encodePassword) {
-        return MemberPrivacy.builder()
+    public UserPrivacy toEntity(String encodePassword) {
+        return UserPrivacy.builder()
                 .phoneNumber(phoneNumber)
                 .password(encodePassword)
                 .birthDay(birthDay)

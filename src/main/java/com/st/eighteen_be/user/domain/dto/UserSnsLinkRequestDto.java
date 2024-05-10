@@ -1,4 +1,4 @@
-package com.st.eighteen_be.member.domain.dto;
+package com.st.eighteen_be.user.domain.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class MemberSnsLinkRequestDto {
+public class UserSnsLinkRequestDto {
 
     private String snsLink;
 
     @Builder
-    private MemberSnsLinkRequestDto(String snsLink) {
+    private UserSnsLinkRequestDto(String snsLink) {
         this.snsLink = snsLink;
     }
 }
