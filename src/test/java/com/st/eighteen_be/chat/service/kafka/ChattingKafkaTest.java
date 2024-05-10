@@ -1,7 +1,11 @@
 package com.st.eighteen_be.chat.service.kafka;
 
 import com.st.eighteen_be.chat.constant.KafkaConst;
+import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
+import com.st.eighteen_be.chat.model.vo.ChatroomType;
+import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.chat.service.impl.ChatroomService;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -13,6 +17,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -33,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("채팅 카프카 테스트")
 @ServiceWithMongoDBTest
+@ExtendWith(MockitoExtension.class)
 @Testcontainers
 public class ChattingKafkaTest {
     
@@ -40,7 +48,12 @@ public class ChattingKafkaTest {
     private KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0")).withKraft()
             .withExposedPorts(9093);
     
+    @Autowired
+    private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
+    
     private KafkaTemplate<String, ChatMessageRequestDTO> kafkaTemplate;
+    
+    private ChatroomService chatroomService;
     
     private Consumer<String, ChatMessageRequestDTO> consumer;
     
@@ -59,7 +72,10 @@ public class ChattingKafkaTest {
         // ProducerFactory와 KafkaTemplate 생성
         ProducerFactory<String, ChatMessageRequestDTO> producerFactory = new DefaultKafkaProducerFactory<>(configs);
         kafkaTemplate = new KafkaTemplate<>(producerFactory);
-        chattingProducer = new ChattingProducer(kafkaTemplate);
+        
+        chatroomService = new ChatroomService(chatroomInfoCollectionRepository);
+        
+        chattingProducer = new ChattingProducer(kafkaTemplate, chatroomService);
         
         //consumer 설정
         Properties consumerProps = new Properties();
@@ -73,20 +89,29 @@ public class ChattingKafkaTest {
         consumer = new KafkaConsumer<>(consumerProps);
         consumer.subscribe(Collections.singleton(KafkaConst.CHAT_TOPIC));
         
-        messageDto = new ChatMessageRequestDTO(1L, "test message", 2L);
+        messageDto = ChatMessageRequestDTO.builder()
+                .senderNo(1L)
+                .receiverNo(2L)
+                .message("Hello")
+                .build();
     }
     
     @Test
     @DisplayName("메시지 전송 성공 - 프로듀서 - 컨슈머 정상 동작 테스트")
     void When_SendMessage_With_Producer_Expect_Success() {
+        //given
+        //채팅방이 형성되어 있어야함.
+        chatroomInfoCollectionRepository.save(ChatroomInfoCollection.of(1L, 2L, ChatroomType.PRIVATE));
+        
         // when
         chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
         
         // then
         ConsumerRecord<String, ChatMessageRequestDTO> record = KafkaTestUtils.getSingleRecord(consumer, KafkaConst.CHAT_TOPIC);
+        
         assertThat(record).isNotNull();
-        assertThat(record.value().senderNo()).isEqualTo(messageDto.senderNo());
-        assertThat(record.value().message()).isEqualTo(messageDto.message());
-        assertThat(record.value().receiverNo()).isEqualTo(messageDto.receiverNo());
+        assertThat(record.value().getSenderNo()).isEqualTo(messageDto.getSenderNo());
+        assertThat(record.value().getMessage()).isEqualTo(messageDto.getMessage());
+        assertThat(record.value().getReceiverNo()).isEqualTo(messageDto.getReceiverNo());
     }
 }

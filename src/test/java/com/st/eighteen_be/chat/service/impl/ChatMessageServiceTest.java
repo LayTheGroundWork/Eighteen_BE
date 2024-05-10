@@ -92,9 +92,9 @@ public class ChatMessageServiceTest {
         assertThat(foundChatroom.getChatroomType()).isEqualTo(ChatroomType.PRIVATE);
         
         assertThat(foundChatMessage).isNotNull();
-        assertThat(foundChatMessage.getSender()).isEqualTo(1L);
+        assertThat(foundChatMessage.getSenderNo()).isEqualTo(1L);
         assertThat(foundChatMessage.getMessage()).isEqualTo("message");
-        assertThat(foundChatMessage.getReceiver()).isEqualTo(2L);
+        assertThat(foundChatMessage.getReceiverNo()).isEqualTo(2L);
     }
     
     @AfterEach

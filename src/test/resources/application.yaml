@@ -23,3 +23,6 @@ decorator:
   datasource:
     p6spy:
       enable-logging: true
+logging:
+  level:
+    org.springframework.data.mongodb.core: debug

@@ -2,62 +2,57 @@ package com.st.eighteen_be.chat.model.collection;
 
 import com.st.eighteen_be.chat.model.dto.response.ChatMessageResponseDTO;
 import com.st.eighteen_be.common.basetime.BaseDocument;
-import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "CHAT_MESSAGE")
+@Document(collection = "chat_message")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@SuperBuilder //TODO 이걸 사용할 수 밖에 없는건가?.. 생성자에 @Builder 를 사용하고싶은데
+@SuperBuilder
 public class ChatMessageCollection extends BaseDocument {
     @Id
-    private String id;
+    @Field(value = "_id", targetType = FieldType.OBJECT_ID)
+    private ObjectId _id;
+    
+    @Field(value = "chatroomInfoId", targetType = FieldType.OBJECT_ID)
+    private ObjectId chatroomInfoId;
     
     //TODO 회원 존재하지 않기에 임시 String 처리
-    @Field(value = "SENDER")
-    private Long sender;
+    @Field(value = "senderNo")
+    private Long senderNo;
     
     //TODO 회원 존재하지 않기에 임시 String 처리
-    @Field(value = "RECEIVER")
-    private Long receiver;
+    @Field(value = "receiverNo")
+    private Long receiverNo;
     
-    @Field(value = "MESSAGE")
+    @Field(value = "message")
     private String message;
     
-    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, String id, Long sender, Long receiver, String message) {
+    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, ObjectId _id, ObjectId chatroomInfoId, Long senderNo, Long receiverNo, String message) {
         super(createdAt, updatedAt);
-        this.id = id;
-        this.sender = sender;
-        this.receiver = receiver;
+        this._id = _id;
+        this.chatroomInfoId = chatroomInfoId;
+        this.senderNo = senderNo;
+        this.receiverNo = receiverNo;
         this.message = message;
     }
     
-    public static ChatMessageCollection of(String id, Long sender, long receiver, String message) {
-        return ChatMessageCollection.builder()
-                .id(id)
-                .sender(sender)
-                .receiver(receiver)
-                .message(message)
-                .build();
-    }
-    
     public ChatMessageResponseDTO toResponseDTO() {
-        
         return ChatMessageResponseDTO.builder()
-                .id(getId())
-                .sender(getSender())
-                .receiver(getReceiver())
+                .senderNo(getSenderNo())
+                .receiverNo(getReceiverNo())
                 .message(getMessage())
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())
                 .build();
     }
-    
 }

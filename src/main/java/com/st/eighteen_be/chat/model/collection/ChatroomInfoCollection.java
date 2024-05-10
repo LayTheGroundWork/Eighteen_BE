@@ -1,20 +1,25 @@
 package com.st.eighteen_be.chat.model.collection;
 
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
+import com.st.eighteen_be.common.basetime.BaseDocument;
 import com.st.eighteen_be.common.converter.ChatroomConverter;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -28,25 +33,30 @@ import java.util.Objects;
  * -----------------------------------------------------------
  * 2024-04-01        ipeac       최초 생성
  */
-@Document(collection = "CHATROOM_INFO")
+@Document(collection = "chatroom_info")
 @CompoundIndexes({
         @CompoundIndex(name = "chatroom_info_idx", def = "{'SENDER_NO': 1, 'RECEIVER_NO': 1}")
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ChatroomInfoCollection {
-    @Field(name = "SENDER_NO")
+@SuperBuilder
+public class ChatroomInfoCollection extends BaseDocument {
+    @Id
+    @Field(value = "_id", targetType = FieldType.OBJECT_ID)
+    private ObjectId _id;
+    
+    @Field(name = "senderNo")
     private Long senderNo;
     
-    @Field(name = "RECEIVER_NO")
+    @Field(name = "receiverNo")
     private Long receiverNo;
     
     @Convert(converter = ChatroomConverter.class)
-    @Column(name = "CHATROOM_TYPE", nullable = false)
+    @Column(name = "chatroomType", nullable = false)
     private ChatroomType chatroomType;
     
-    @Builder
-    private ChatroomInfoCollection(Long senderNo, Long receiverNo, ChatroomType chatroomType) {
+    private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, Long senderNo, Long receiverNo, ChatroomType chatroomType) {
+        super(createdAt, updatedAt);
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
         this.chatroomType = chatroomType;
