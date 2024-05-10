@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -40,29 +39,30 @@ public class ChattingApiController {
     private final ChattingProducer chattingProducer;
     private final ChatroomFacade chatroomFacade;
     private final ChatroomService chatroomService;
-
-    @MessageMapping("/chat/all")
+    
+    @MessageMapping("/v1/chat/all")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(@Valid @RequestBody FindChatRoomRequestDTO requestDTO) {
         log.info("findAllMyChatrooms.requestDTO.senderNo() = {}", requestDTO.senderNo());
-
+        
         return ApiResponse.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(requestDTO));
     }
-
-    @MessageMapping("/chat/enter") // /pub/chat/enter
+    
+    @MessageMapping("/v1/chat/enter") // /pub/v1/chat/enter
     public ApiResponse<List<ChatMessageResponseDTO>> enterChatroom(@Valid @RequestBody EnterChatRoomRequestDTO requestDTO) {
         log.info("enterChatroom.requestDTO.senderNo() = {}", requestDTO.senderNo());
         log.info("enterChatroom.requestDTO.receiverNo() = {}", requestDTO.receiverNo());
         log.info("enterChatroom.requestDTO.requestTime() = {}", requestDTO.requestTime());
-
+        
         return ApiResponse.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
     }
-
-    @MessageMapping("/chat/{senderNo}/{receiverNo}/message") // /pub/chat/{chatroomId}/message
-    public void sendMessage(@DestinationVariable(value = "senderNo") Long senderNo, @DestinationVariable(value = "receiverNo") Long receiverNo, @RequestBody ChatMessageRequestDTO chatMessage) {
-        log.info("sendMessage.senderNo() = {}, receiverNo() = {}", senderNo, receiverNo);
+    
+    @MessageMapping("/v1/chat/message") // /pub/v1/chat/message
+    public void sendMessage(@RequestBody ChatMessageRequestDTO chatMessage) {
         log.info("sendMessage.chatMessage.message() = {}", chatMessage.getMessage());
-
+        log.info("sendMessage.chatMessage.senderNo() = {}", chatMessage.getSenderNo());
+        log.info("sendMessage.chatMessage.receiverNo() = {}", chatMessage.getReceiverNo());
+        
         chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage);
     }
 }
