@@ -1,4 +1,4 @@
-package com.st.eighteen_be.chat.service.impl;
+package com.st.eighteen_be.chat.service;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
@@ -21,30 +21,30 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ChatroomService {
-    
+
     private final ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
-    
+
     @Transactional(readOnly = false)
     public ChatroomInfoCollection createChatroom(@NonNull final Long senderNo, @NonNull final Long receiverNo) {
         log.info("========== createChatroom ========== senderNo : {}, receiverNo : {}", senderNo, receiverNo);
-        
+
         ChatUserHelper.validNotSameUser(senderNo, receiverNo);
-        
+
         ChatroomInfoCollection newChatroom = ChatroomInfoCollection.of(senderNo, receiverNo, ChatroomType.PRIVATE);
         return chatroomInfoCollectionRepository.save(newChatroom);
     }
-    
+
     public Optional<ChatroomInfoCollection> getChatroom(@NonNull final Long senderNo, @NonNull final Long receiverNo) {
         log.info("========== getChatroom ========== senderNo : {}, receiverNo : {}", senderNo, receiverNo);
-        
+
         ChatUserHelper.validNotSameUser(senderNo, receiverNo);
-        
+
         return chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(senderNo, receiverNo);
     }
-    
+
     public List<ChatroomWithLastestMessageDTO> findAllMyChatrooms(@Valid FindChatRoomRequestDTO requestDTO) {
         log.info("========== findAllMyChatrooms ========== senderNo : {}", requestDTO.senderNo());
-        
+
         return chatroomInfoCollectionRepository.findAllChatroomBySenderNo(requestDTO.senderNo());
     }
 }

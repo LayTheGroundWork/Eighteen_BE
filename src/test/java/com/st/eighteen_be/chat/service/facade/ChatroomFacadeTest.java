@@ -7,8 +7,8 @@ import com.st.eighteen_be.chat.model.dto.response.ChatMessageResponseDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
-import com.st.eighteen_be.chat.service.impl.ChatMessageService;
-import com.st.eighteen_be.chat.service.impl.ChatroomService;
+import com.st.eighteen_be.chat.service.ChatMessageService;
+import com.st.eighteen_be.chat.service.ChatroomService;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,41 +36,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("ChatroomFacade 테스트")
 @ServiceWithMongoDBTest
 public class ChatroomFacadeTest {
-    
+
     @Autowired
     private MongoTemplate mongoTemplate;
-    
+
     private ChatroomFacade chatroomFacade;
-    
+
     private ChatroomService chatroomService;
-    
+
     private ChatMessageService chatMessageService;
-    
+
     @Autowired
     private ChatMessageCollectionRepository chatMessageCollectionRepository;
-    
+
     @Autowired
     private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
-    
+
     private ChatroomInfoCollection chatroomInfoCollection;
-    
+
     private ChatMessageCollection chatMessageCollection;
-    
+
     private EnterChatRoomRequestDTO enterChatRoomRequestDTO;
-    
+
     @BeforeEach
     void setUp() {
         // Given
         chatroomService = new ChatroomService(chatroomInfoCollectionRepository);
         chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
         chatroomFacade = new ChatroomFacade(chatroomService, chatMessageService);
-        
+
         chatroomInfoCollection = ChatroomInfoCollection.builder()
                 .senderNo(1L)
                 .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
-        
+
         chatMessageCollection = ChatMessageCollection.builder()
                 .senderNo(1L)
                 .receiverNo(2L)
@@ -78,44 +78,44 @@ public class ChatroomFacadeTest {
                 .updatedAt(LocalDateTime.now().minusDays(1))
                 .message("Hello")
                 .build();
-        
+
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
                 .senderNo(1L)
                 .receiverNo(2L)
                 .requestTime(LocalDateTime.now())
                 .build();
     }
-    
+
     @Test
     @DisplayName("채팅메시지가 저장된 내역이 있는 경우 메시지 정상 반환")
     void When_findMessagesBeforeTimeInRoom_Expect_EmptyList() {
         //Given
         mongoTemplate.save(chatroomInfoCollection);
         mongoTemplate.save(chatMessageCollection);
-        
+
         // When
         List<ChatMessageResponseDTO> actual = chatroomFacade.getOrCreateChatroom(enterChatRoomRequestDTO);
-        
+
         // Then
         assertThat(actual).isNotEmpty();
         assertThat(actual.get(0).getSenderNo()).isEqualTo(1L);
         assertThat(actual.get(0).getReceiverNo()).isEqualTo(2L);
         assertThat(actual.get(0).getMessage()).isEqualTo("Hello");
     }
-    
+
     @Test
     @DisplayName("채팅메시지가 저장된 내역이 없는 경우 빈 리스트 반환")
     void When_findMessagesBeforeTimeInRoom_Expect_NotEmptyList() {
         //Given
         mongoTemplate.save(chatroomInfoCollection);
-        
+
         // When
         List<ChatMessageResponseDTO> actual = chatroomFacade.getOrCreateChatroom(enterChatRoomRequestDTO);
-        
+
         // Then
         assertThat(actual).isEmpty();
     }
-    
+
     @AfterEach
     void tearDown() {
         for (String collectionName : mongoTemplate.getCollectionNames()) {
