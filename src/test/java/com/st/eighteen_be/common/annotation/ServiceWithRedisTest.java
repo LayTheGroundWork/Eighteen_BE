@@ -1,8 +1,6 @@
 package com.st.eighteen_be.common.annotation;
 
-import com.st.eighteen_be.common.extension.RedisTestContainerExtenstion;
 import com.st.eighteen_be.config.redis.RedisConfig;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,6 +16,5 @@ import java.lang.annotation.Target;
 @ActiveProfiles("test")
 @DataRedisTest
 @Import(RedisConfig.class)
-@ExtendWith(RedisTestContainerExtenstion.class)
 public @interface ServiceWithRedisTest {
 }
