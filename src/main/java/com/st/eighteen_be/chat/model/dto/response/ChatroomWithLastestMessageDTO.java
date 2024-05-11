@@ -19,16 +19,18 @@ public class ChatroomWithLastestMessageDTO implements Serializable {
     private ChatroomType chatroomType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long unreadMessageCount;
     private String message;
     private LocalDateTime messageCreatedAt;
     
     @Builder
-    private ChatroomWithLastestMessageDTO(Long senderNo, Long receiverNo, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, String message, LocalDateTime messageCreatedAt) {
+    private ChatroomWithLastestMessageDTO(Long senderNo, Long receiverNo, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, Long unreadMessageCount, String message, LocalDateTime messageCreatedAt) {
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
         this.chatroomType = chatroomType;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.unreadMessageCount = unreadMessageCount;
         this.message = message;
         this.messageCreatedAt = messageCreatedAt;
     }

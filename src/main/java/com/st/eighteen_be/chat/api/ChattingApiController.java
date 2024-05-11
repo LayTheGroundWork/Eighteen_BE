@@ -43,8 +43,6 @@ public class ChattingApiController {
     public ApiResponse<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(@Valid @RequestBody FindChatRoomRequestDTO requestDTO) {
         log.info("findAllMyChatrooms.requestDTO.senderNo() = {}", requestDTO.senderNo());
         
-        //TODO 읽지 않은 메시지에 대하여 별도 처리 필요합니다.
-        
         return ApiResponse.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(requestDTO));
     }
     
