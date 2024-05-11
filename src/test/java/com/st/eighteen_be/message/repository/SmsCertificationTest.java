@@ -18,7 +18,7 @@ class SmsCertificationTest {
     private StringRedisTemplate stringRedisTemplate;
 
     private final String phone = "01033781934";
-    private final String certificationNumber = "1111";
+    private final String firstCertificationNumber = "1111";
 
     @BeforeEach
     void setUp() {
@@ -28,23 +28,23 @@ class SmsCertificationTest {
 
     @Test
     void testCreateSmsCertification() {
-        smsCertification.createSmsCertification(phone, certificationNumber);
+        smsCertification.createSmsCertification(phone, firstCertificationNumber);
         String storedCertificationNumber = stringRedisTemplate.opsForValue().get("sms:" + phone);
 
-        assertThat(storedCertificationNumber).isEqualTo(certificationNumber);
+        assertThat(storedCertificationNumber).isEqualTo(firstCertificationNumber);
     }
 
     @Test
     void testGetSmsCertification() {
-        stringRedisTemplate.opsForValue().set("sms:" + phone, certificationNumber);
+        stringRedisTemplate.opsForValue().set("sms:" + phone, firstCertificationNumber);
         String fetchedCertificationNumber = smsCertification.getSmsCertification(phone);
 
-        assertThat(fetchedCertificationNumber).isEqualTo(certificationNumber);
+        assertThat(fetchedCertificationNumber).isEqualTo(firstCertificationNumber);
     }
 
     @Test
     void testDeleteSmsCertification() {
-        stringRedisTemplate.opsForValue().set("sms:" + phone, certificationNumber);
+        stringRedisTemplate.opsForValue().set("sms:" + phone, firstCertificationNumber);
         smsCertification.deleteSmsCertification(phone);
 
         assertThat(stringRedisTemplate.hasKey("sms:" + phone)).isFalse();
@@ -52,7 +52,7 @@ class SmsCertificationTest {
 
     @Test
     void testHasKey() {
-        stringRedisTemplate.opsForValue().set("sms:" + phone, certificationNumber);
+        stringRedisTemplate.opsForValue().set("sms:" + phone, firstCertificationNumber);
         boolean exists = smsCertification.hasKey(phone);
 
         assertThat(exists).isTrue();
