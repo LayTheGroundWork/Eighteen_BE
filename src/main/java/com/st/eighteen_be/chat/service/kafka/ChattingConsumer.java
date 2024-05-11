@@ -28,17 +28,17 @@ import java.text.MessageFormat;
 @RequiredArgsConstructor
 @Slf4j
 public class ChattingConsumer {
-
+    
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
-
+    
     @Transactional(readOnly = false)
     @KafkaListener(topics = KafkaConst.CHAT_TOPIC, groupId = KafkaConst.CHAT_CONSUMER_GROUP_ID)
     public void listen(ChatMessageRequestDTO messageDto) {
         log.info("ChattingConsumer.listen :  senderNo={}, receiverNo={}, message={}, chatroomInfo={}: ", messageDto.getSenderNo(), messageDto.getReceiverNo(), messageDto.getMessage(), messageDto.getChatroomInfoId());
-
-        messagingTemplate.convertAndSend(MessageFormat.format("/sub/chat/{0}/{1}/message", messageDto.getSenderNo(), messageDto.getReceiverNo()), messageDto);
-
+        
+        messagingTemplate.convertAndSend(MessageFormat.format("/sub/v1/chat/{0}/{1}/message", messageDto.getSenderNo(), messageDto.getReceiverNo()), messageDto);
+        
         chatMessageService.processMessage(messageDto);
     }
 }
