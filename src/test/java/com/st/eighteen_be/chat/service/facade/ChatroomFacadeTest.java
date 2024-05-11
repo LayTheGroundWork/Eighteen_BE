@@ -9,6 +9,7 @@ import com.st.eighteen_be.chat.repository.mongo.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.chat.service.ChatMessageService;
 import com.st.eighteen_be.chat.service.ChatroomService;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,8 @@ public class ChatroomFacadeTest {
 
     private ChatroomFacade chatroomFacade;
 
+    private RedisMessageService redisMessageService;
+
     private ChatroomService chatroomService;
 
     private ChatMessageService chatMessageService;
@@ -62,7 +65,7 @@ public class ChatroomFacadeTest {
     void setUp() {
         // Given
         chatroomService = new ChatroomService(chatroomInfoCollectionRepository);
-        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
+        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService);
         chatroomFacade = new ChatroomFacade(chatroomService, chatMessageService);
 
         chatroomInfoCollection = ChatroomInfoCollection.builder()

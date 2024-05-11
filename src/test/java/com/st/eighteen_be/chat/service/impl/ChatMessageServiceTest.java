@@ -7,6 +7,7 @@ import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.chat.service.ChatMessageService;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -39,6 +40,8 @@ public class ChatMessageServiceTest {
 
     private ChatMessageService chatMessageService;
 
+    private RedisMessageService redisMessageService;
+
     @Autowired
     private ChatMessageCollectionRepository chatMessageCollectionRepository;
 
@@ -52,7 +55,7 @@ public class ChatMessageServiceTest {
     @BeforeEach
     void setUp() {
         // Given
-        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
+        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService);
 
         chatroomInfoCollection = ChatroomInfoCollection.builder()
                 .senderNo(1L)

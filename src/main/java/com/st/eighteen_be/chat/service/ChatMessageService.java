@@ -5,6 +5,7 @@ import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.dto.response.ChatMessageResponseDTO;
 import com.st.eighteen_be.chat.repository.mongo.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class ChatMessageService {
 
     private final ChatMessageCollectionRepository chatMessageCollectionRepository;
     private final ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
+    private final RedisMessageService redisMessageService;
 
     @Transactional(readOnly = false)
     public void processMessage(ChatMessageRequestDTO messageDto) {
@@ -64,5 +66,7 @@ public class ChatMessageService {
         log.info("========== addMessage ==========");
 
         chatMessageCollectionRepository.save(chatMessage);
+
+        redisMessageService.incrementUnreadMessageCount(chatMessage.getSenderNo(), chatMessage.getReceiverNo());
     }
 }
