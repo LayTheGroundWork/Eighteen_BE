@@ -3,8 +3,10 @@ package com.st.eighteen_be.chat.service.facade;
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.EnterChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.dto.response.ChatMessageResponseDTO;
+import com.st.eighteen_be.chat.model.redishash.UnreadMessageCount;
 import com.st.eighteen_be.chat.service.ChatMessageService;
 import com.st.eighteen_be.chat.service.ChatroomService;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,15 +32,18 @@ import java.util.List;
 public class ChatroomFacade {
     private final ChatroomService chatroomService;
     private final ChatMessageService chatMessageService;
-
+    private final RedisMessageService redisMessageService;
+    
     @Transactional(readOnly = false)
     public List<ChatMessageResponseDTO> getOrCreateChatroom(EnterChatRoomRequestDTO enterChatRoomRequestDTO) {
         log.info("getOrCreateChatroom.senderNo() = {}", enterChatRoomRequestDTO.senderNo());
         log.info("getOrCreateChatroom.receiverNo() = {}", enterChatRoomRequestDTO.receiverNo());
-
+        
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(enterChatRoomRequestDTO.senderNo(), enterChatRoomRequestDTO.receiverNo())
                 .orElseGet(() -> chatroomService.createChatroom(enterChatRoomRequestDTO.senderNo(), enterChatRoomRequestDTO.receiverNo()));
-
+        
+        redisMessageService.resetUnreadMessageCount(UnreadMessageCount.forChatroomEntry(enterChatRoomRequestDTO.receiverNo(), enterChatRoomRequestDTO.senderNo()));
+        
         return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getSenderNo(), chatroomInfoCollection.getReceiverNo(), enterChatRoomRequestDTO.requestTime());
     }
 }
