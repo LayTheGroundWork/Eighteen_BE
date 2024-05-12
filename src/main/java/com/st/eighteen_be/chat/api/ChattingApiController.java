@@ -44,7 +44,7 @@ public class ChattingApiController {
     private final ChattingProducer chattingProducer;
     private final ChatroomFacade chatroomFacade;
     private final ChatroomService chatroomService;
-    
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
@@ -52,29 +52,30 @@ public class ChattingApiController {
     @GetMapping("/api/v1/chat/all")
     public ApiResp<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(@Valid @RequestBody FindChatRoomRequestDTO requestDTO) {
         log.info("findAllMyChatrooms.requestDTO.senderNo() = {}", requestDTO.senderNo());
-        
+
         return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(requestDTO));
     }
-    
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "302", description = "INVALID REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
     @GetMapping("/api/v1/chat/enter")
+    //TODO 발신자 수신자 구조가 아니라, 채팅방 고유 Object_id를 받아서 처리하는 방식으로 변경해야 한다.
     public ApiResp<List<ChatMessageResponseDTO>> enterChatroom(@Valid @RequestBody EnterChatRoomRequestDTO requestDTO) {
         log.info("enterChatroom.requestDTO.senderNo() = {}", requestDTO.senderNo());
         log.info("enterChatroom.requestDTO.receiverNo() = {}", requestDTO.receiverNo());
         log.info("enterChatroom.requestDTO.requestTime() = {}", requestDTO.requestTime());
-        
+
         return ApiResp.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
     }
-    
+
     @MessageMapping("/v1/chat/{senderNo}/{receiverNo}/message") // /pub/chat/{senderNo}/{receiverNo}/message
     public void sendMessage(@DestinationVariable(value = "senderNo") Long senderNo, @DestinationVariable(value = "receiverNo") Long receiverNo, @RequestBody ChatMessageRequestDTO chatMessage) {
         log.info("sendMessage.senderNo() = {}, receiverNo() = {}", senderNo, receiverNo);
         log.info("sendMessage.chatMessage.message() = {}", chatMessage.getMessage());
-        
+
         chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage);
     }
 }
