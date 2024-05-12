@@ -33,17 +33,18 @@ public class ChatroomFacade {
     private final ChatroomService chatroomService;
     private final ChatMessageService chatMessageService;
     private final RedisMessageService redisMessageService;
-    
+
     @Transactional(readOnly = false)
     public List<ChatMessageResponseDTO> getOrCreateChatroom(EnterChatRoomRequestDTO enterChatRoomRequestDTO) {
         log.info("getOrCreateChatroom.senderNo() = {}", enterChatRoomRequestDTO.senderNo());
         log.info("getOrCreateChatroom.receiverNo() = {}", enterChatRoomRequestDTO.receiverNo());
-        
+
+        //TODO 만약 발신자와 수신자의 위치가 변경된다면 채팅방이 아예 새로 생성되는 문제가 발생한다. 이게 올바르지는 않다는 것을 인지하고 있으나, 현재는 이렇게 구현되어 있다.
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(enterChatRoomRequestDTO.senderNo(), enterChatRoomRequestDTO.receiverNo())
                 .orElseGet(() -> chatroomService.createChatroom(enterChatRoomRequestDTO.senderNo(), enterChatRoomRequestDTO.receiverNo()));
-        
+
         redisMessageService.resetUnreadMessageCount(UnreadMessageCount.forChatroomEntry(enterChatRoomRequestDTO.receiverNo(), enterChatRoomRequestDTO.senderNo()));
-        
+
         return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getSenderNo(), chatroomInfoCollection.getReceiverNo(), enterChatRoomRequestDTO.requestTime());
     }
 }
