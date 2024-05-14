@@ -36,17 +36,14 @@ public class ChatroomService {
         return chatroomInfoCollectionRepository.save(newChatroom);
     }
     
-    public Optional<ChatroomInfoCollection> getChatroom(@NonNull final Long senderNo, @NonNull final Long receiverNo) {
-        log.info("========== getChatroom ========== senderNo : {}, receiverNo : {}", senderNo, receiverNo);
+    public Optional<ChatroomInfoCollection> getChatroom(@NonNull final String chatroomInfoId) {
+        log.info("========== getChatroom ========== chatroomInfoId : {}", chatroomInfoId);
         
-        ChatUserHelper.validNotSameUser(senderNo, receiverNo);
-        
-        return chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(senderNo, receiverNo);
+        return chatroomInfoCollectionRepository.findById(chatroomInfoId);
     }
     
     public List<ChatroomWithLastestMessageDTO> findAllMyChatrooms(@Valid FindChatRoomRequestDTO requestDTO) {
         log.info("========== findAllMyChatrooms ========== senderNo : {}", requestDTO.senderNo());
-        
         
         List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(requestDTO.senderNo());
         

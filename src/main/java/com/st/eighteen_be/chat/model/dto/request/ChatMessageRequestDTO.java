@@ -1,7 +1,5 @@
 package com.st.eighteen_be.chat.model.dto.request;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -31,11 +29,10 @@ public class ChatMessageRequestDTO {
     private Long receiverNo;
     
     @Schema(description = "채팅방 정보 ID", example = "60f1b3b3b3b3b3b3b3b3b3b3")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private ObjectId chatroomInfoId;
+    private String chatroomInfoId;
     
     @Builder
-    private ChatMessageRequestDTO(Long senderNo, String message, Long receiverNo, ObjectId chatroomInfoId) {
+    private ChatMessageRequestDTO(Long senderNo, String message, Long receiverNo, String chatroomInfoId) {
         this.senderNo = senderNo;
         this.message = message;
         this.receiverNo = receiverNo;
@@ -47,7 +44,7 @@ public class ChatMessageRequestDTO {
                 .senderNo(senderNo)
                 .receiverNo(receiverNo)
                 .message(message)
-                .chatroomInfoId(chatroomInfoId)
+                .chatroomInfoId(new ObjectId(chatroomInfoId))
                 .build();
     }
 }

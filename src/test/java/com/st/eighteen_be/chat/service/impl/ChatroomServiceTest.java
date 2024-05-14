@@ -76,10 +76,10 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("채팅방 정상 생성 테스트 - 올바른 파라미터")
     void When_CreateChatroom_Then_Success() {
         // When
-        chatroomService.createChatroom(1L, 2L);
+        ChatroomInfoCollection actual = chatroomService.createChatroom(1L, 2L);
         
         // Then
-        ChatroomInfoCollection found = chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(1L, 2L).get();
+        ChatroomInfoCollection found = chatroomInfoCollectionRepository.findById(actual.get_id().toString()).get();
         assertThat(found).isNotNull();
         assertThat(found.getSenderNo()).isEqualTo(1L);
         assertThat(found.getReceiverNo()).isEqualTo(2L);
@@ -100,10 +100,10 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("채팅방 조회 테스트 - 존재하는 채팅방 조회")
     void When_GetChatroom_Then_Success() {
         // Given
-        mongoTemplate.save(savedChatroomInfoCollection);
+        ChatroomInfoCollection saved = mongoTemplate.save(savedChatroomInfoCollection);
         
         // When
-        ChatroomInfoCollection found = chatroomService.getChatroom(1L, 2L).get();
+        ChatroomInfoCollection found = chatroomService.getChatroom(saved.get_id().toString()).get();
         
         // Then
         assertThat(found).isNotNull();
@@ -121,19 +121,10 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
     }
     
     @Test
-    @DisplayName("채팅방 조회 테스트 - 송신자 수신자 동일한 채팅방 조회시 BadRequestException 발생")
-    void When_GetChatroom_Then_Exception_BadRequestException() {
-        // When & Then
-        assertThatThrownBy(() -> chatroomService.getChatroom(1L, 1L))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("같은 사용자입니다.");
-    }
-    
-    @Test
     @DisplayName("채팅방이 존재하지 않는 경우 Optional.empty() 반환")
     void When_GetChatroom_Then_Empty() {
         // When
-        var found = chatroomService.getChatroom(1L, 2L);
+        var found = chatroomService.getChatroom("123456789012345678901234");
         
         // Then
         assertThat(found).isEmpty();

@@ -64,17 +64,18 @@ public class ChatMessageServiceTest {
                 .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
-        
-        messageDto = ChatMessageRequestDTO.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
-                .message("message")
-                .build();
     }
     
     @Test
     @DisplayName("processMessage -  채팅방이 별도로 존재하지 않는 경우 NotFoundException 발생")
     void When_processMessage_IfChatroomNotExist_Expect_NotFoundException() {
+        messageDto = ChatMessageRequestDTO.builder()
+                .senderNo(1L)
+                .receiverNo(2L)
+                .chatroomInfoId("60f1b3b3b3b3b3b3b3b3b3b3")
+                .message("message")
+                .build();
+        
         // When - Then
         assertThatThrownBy(() -> chatMessageService.processMessage(messageDto))
                 .isInstanceOf(NotFoundException.class)
@@ -85,13 +86,20 @@ public class ChatMessageServiceTest {
     @DisplayName("processMessage - 채팅방이 존재한 상태에서 메시지를 전송함을 테스트")
     void When_processMessage_IfChatroomExist_Expect_SendMessage() {
         // Given
-        mongoTemplate.save(chatroomInfoCollection);
+        ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
+        
+        messageDto = ChatMessageRequestDTO.builder()
+                .senderNo(1L)
+                .receiverNo(2L)
+                .chatroomInfoId(saved.get_id().toString())
+                .message("message")
+                .build();
         
         // When
         chatMessageService.processMessage(messageDto);
         
         // Then
-        ChatroomInfoCollection foundChatroom = chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(1L, 2L).get();
+        ChatroomInfoCollection foundChatroom = chatroomInfoCollectionRepository.findById(saved.get_id().toString()).get();
         ChatMessageCollection foundChatMessage = chatMessageCollectionRepository.findAll().get(0);
         
         assertThat(foundChatroom).isNotNull();

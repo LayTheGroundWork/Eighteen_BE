@@ -1,10 +1,7 @@
 package com.st.eighteen_be.chat.service.kafka;
 
-import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.service.ChatroomService;
-import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,23 +22,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class ChattingProducer {
-
+    
     private final KafkaTemplate<String, ChatMessageRequestDTO> kafkaTemplate;
     private final ChatroomService chatroomService;
-
-    public void send(String topic, ChatMessageRequestDTO messageDto) {
+    
+    public void send(String topic, ChatMessageRequestDTO messageDto, String chatroomId) {
         log.info("ChattingProducer.sendTopic : {}", topic);
         log.info("ChattingProducer.messageContent : senderNo={}, receiverNo={}, message={}: ", messageDto.getSenderNo(), messageDto.getReceiverNo(), messageDto.getMessage());
-
-        setChatroomInfo(messageDto);
-
+        
+        messageDto.setChatroomInfoId(chatroomId);
+        
         kafkaTemplate.send(topic, messageDto);
     }
-
-    private void setChatroomInfo(ChatMessageRequestDTO messageDto) {
-        ChatroomInfoCollection foundedChatroom = chatroomService.getChatroom(messageDto.getSenderNo(), messageDto.getReceiverNo())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM));
-
-        messageDto.setChatroomInfoId(foundedChatroom.get_id());
-    }
+    
 }

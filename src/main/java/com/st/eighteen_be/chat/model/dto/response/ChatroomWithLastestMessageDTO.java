@@ -1,9 +1,12 @@
 package com.st.eighteen_be.chat.model.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -16,6 +19,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatroomWithLastestMessageDTO implements Serializable {
+    
+    @JsonSerialize(using = ToStringSerializer.class)
+    @Schema(description = "채팅방 ID", example = "6073f3b4b3b3b3b3b3b3b3b3")
+    private ObjectId _id;
     
     @Schema(description = "발신자 번호", example = "1")
     private Long senderNo;
@@ -42,7 +49,8 @@ public class ChatroomWithLastestMessageDTO implements Serializable {
     private LocalDateTime messageCreatedAt;
     
     @Builder
-    private ChatroomWithLastestMessageDTO(Long senderNo, Long receiverNo, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, Long unreadMessageCount, String message, LocalDateTime messageCreatedAt) {
+    private ChatroomWithLastestMessageDTO(ObjectId _id, Long senderNo, Long receiverNo, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, Long unreadMessageCount, String message, LocalDateTime messageCreatedAt) {
+        this._id = _id;
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
         this.chatroomType = chatroomType;

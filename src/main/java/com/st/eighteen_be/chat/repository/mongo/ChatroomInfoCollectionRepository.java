@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * packageName    : com.st.eighteen_be.chat.repository
@@ -20,8 +19,6 @@ import java.util.Optional;
  * 24. 4. 5.        ipeac       최초 생성
  */
 public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String> {
-    Optional<ChatroomInfoCollection> findBySenderNoAndReceiverNo(Long senderNo, Long receiverNo);
-
     /**
      * FIXME : 자바 쿼리로 변경이 가능하다면 변경하는 것이 좋을 것 같다.
      * 발신자 번호로 채팅방 목록 조회

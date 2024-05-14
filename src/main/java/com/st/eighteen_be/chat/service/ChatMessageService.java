@@ -35,7 +35,7 @@ public class ChatMessageService {
         
         ChatMessageCollection chatMessage = messageDto.toCollection();
         
-        chatroomInfoCollectionRepository.findBySenderNoAndReceiverNo(chatMessage.getSenderNo(), chatMessage.getReceiverNo())
+        chatroomInfoCollectionRepository.findById(chatMessage.getChatroomInfoId().toString())
                 .ifPresentOrElse(
                         chatroomInfo -> {
                             log.info("========== chatroom found ==========");
