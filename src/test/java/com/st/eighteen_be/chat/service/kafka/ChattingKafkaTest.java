@@ -106,10 +106,10 @@ public class ChattingKafkaTest {
     void When_SendMessage_With_Producer_Expect_Success() {
         //given
         //채팅방이 형성되어 있어야함.
-        chatroomInfoCollectionRepository.save(ChatroomInfoCollection.of(1L, 2L, ChatroomType.PRIVATE));
+        ChatroomInfoCollection saved = chatroomInfoCollectionRepository.save(ChatroomInfoCollection.of(1L, 2L, ChatroomType.PRIVATE));
         
         // when
-        chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto);
+        chattingProducer.send(KafkaConst.CHAT_TOPIC, messageDto, saved.get_id().toString());
         
         // then
         ConsumerRecord<String, ChatMessageRequestDTO> record = KafkaTestUtils.getSingleRecord(consumer, KafkaConst.CHAT_TOPIC);

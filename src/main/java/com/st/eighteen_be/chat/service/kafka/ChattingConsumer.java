@@ -37,7 +37,7 @@ public class ChattingConsumer {
     public void listen(ChatMessageRequestDTO messageDto) {
         log.info("ChattingConsumer.listen :  senderNo={}, receiverNo={}, message={}, chatroomInfo={}: ", messageDto.getSenderNo(), messageDto.getReceiverNo(), messageDto.getMessage(), messageDto.getChatroomInfoId());
         
-        messagingTemplate.convertAndSend(MessageFormat.format("/sub/v1/chat/{0}/{1}/message", messageDto.getSenderNo(), messageDto.getReceiverNo()), messageDto);
+        messagingTemplate.convertAndSend(MessageFormat.format("/sub/v1/chat/{0}/message", messageDto.getChatroomInfoId()), messageDto);
         
         chatMessageService.processMessage(messageDto);
     }

@@ -38,6 +38,8 @@ public class RedisMessageService {
         unreadMessageRedisRepository.findById(unreadMessageCount.getId())
                 .ifPresentOrElse(
                         unreadMessage -> {
+                            log.info("========== redisCount updating ========== unreadMessage : {}", unreadMessage.getId());
+                            
                             unreadMessage.incrementCount();
                             unreadMessageRedisRepository.save(unreadMessage);
                         },

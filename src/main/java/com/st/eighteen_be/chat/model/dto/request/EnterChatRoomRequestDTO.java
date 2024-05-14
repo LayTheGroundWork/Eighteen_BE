@@ -20,13 +20,9 @@ import java.time.LocalDateTime;
  */
 @Schema(description = "채팅방 입장 요청 DTO")
 public record EnterChatRoomRequestDTO(
-        @Schema(description = "발신자 번호", example = "1")
-        @NotNull(message = "senderNo is required")
-        Long senderNo,
-        
-        @Schema(description = "수신자 번호", example = "2")
-        @NotNull(message = "receiverNo is required")
-        Long receiverNo,
+        @Schema(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3")
+        @NotNull(message = "chatroomInfoId can`t be null")
+        String chatroomInfoId,
         
         @Schema(description = "요청 시간", example = "2021-04-12T00:00:00")
         @PastOrPresent(message = "requestTime should be past or present")
