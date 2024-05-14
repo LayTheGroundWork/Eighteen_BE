@@ -5,7 +5,8 @@ import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
-import com.st.eighteen_be.chat.service.impl.ChatroomService;
+import com.st.eighteen_be.chat.service.ChatroomService;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -51,6 +53,9 @@ public class ChattingKafkaTest {
     @Autowired
     private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
     
+    @MockBean
+    private RedisMessageService redisMessageService;
+    
     private KafkaTemplate<String, ChatMessageRequestDTO> kafkaTemplate;
     
     private ChatroomService chatroomService;
@@ -73,7 +78,7 @@ public class ChattingKafkaTest {
         ProducerFactory<String, ChatMessageRequestDTO> producerFactory = new DefaultKafkaProducerFactory<>(configs);
         kafkaTemplate = new KafkaTemplate<>(producerFactory);
         
-        chatroomService = new ChatroomService(chatroomInfoCollectionRepository);
+        chatroomService = new ChatroomService(chatroomInfoCollectionRepository, redisMessageService);
         
         chattingProducer = new ChattingProducer(kafkaTemplate, chatroomService);
         

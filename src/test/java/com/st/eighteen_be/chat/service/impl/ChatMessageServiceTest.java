@@ -6,6 +6,8 @@ import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatMessageCollectionRepository;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
+import com.st.eighteen_be.chat.service.ChatMessageService;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +41,9 @@ public class ChatMessageServiceTest {
     
     private ChatMessageService chatMessageService;
     
+    @MockBean
+    private RedisMessageService redisMessageService;
+    
     @Autowired
     private ChatMessageCollectionRepository chatMessageCollectionRepository;
     
@@ -51,7 +57,7 @@ public class ChatMessageServiceTest {
     @BeforeEach
     void setUp() {
         // Given
-        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository);
+        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService);
         
         chatroomInfoCollection = ChatroomInfoCollection.builder()
                 .senderNo(1L)

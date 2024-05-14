@@ -1,4 +1,4 @@
-package com.st.eighteen_be.chat.service.impl;
+package com.st.eighteen_be.chat.service;
 
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
@@ -6,6 +6,7 @@ import com.st.eighteen_be.chat.model.dto.response.ChatroomWithLastestMessageDTO;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
 import com.st.eighteen_be.chat.service.helper.ChatUserHelper;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class ChatroomService {
     
     private final ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
+    private final RedisMessageService redisMessageService;
     
     @Transactional(readOnly = false)
     public ChatroomInfoCollection createChatroom(@NonNull final Long senderNo, @NonNull final Long receiverNo) {
@@ -45,6 +47,16 @@ public class ChatroomService {
     public List<ChatroomWithLastestMessageDTO> findAllMyChatrooms(@Valid FindChatRoomRequestDTO requestDTO) {
         log.info("========== findAllMyChatrooms ========== senderNo : {}", requestDTO.senderNo());
         
-        return chatroomInfoCollectionRepository.findAllChatroomBySenderNo(requestDTO.senderNo());
+        
+        List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(requestDTO.senderNo());
+        
+        for (ChatroomWithLastestMessageDTO chatroomWithLastestMessageDTO : allChatroomBySenderNo) {
+            long unreadMessageCount = redisMessageService.getUnreadMessageCount(chatroomWithLastestMessageDTO.getSenderNo(), chatroomWithLastestMessageDTO.getReceiverNo());
+            chatroomWithLastestMessageDTO.setUnreadMessageCount(unreadMessageCount);
+        }
+        
+        log.info("========== findAllMyChatrooms ========== all readCount was updated");
+        
+        return allChatroomBySenderNo;
     }
 }

@@ -1,5 +1,7 @@
 package com.st.eighteen_be.chat.model.collection;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.common.basetime.BaseDocument;
 import com.st.eighteen_be.common.converter.ChatroomConverter;
@@ -42,6 +44,7 @@ import java.util.Objects;
 @SuperBuilder
 public class ChatroomInfoCollection extends BaseDocument {
     @Id
+    @JsonSerialize(using= ToStringSerializer.class)
     @Field(value = "_id", targetType = FieldType.OBJECT_ID)
     private ObjectId _id;
     

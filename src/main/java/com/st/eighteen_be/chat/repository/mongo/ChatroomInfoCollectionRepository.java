@@ -21,13 +21,13 @@ import java.util.Optional;
  */
 public interface ChatroomInfoCollectionRepository extends MongoRepository<ChatroomInfoCollection, String> {
     Optional<ChatroomInfoCollection> findBySenderNoAndReceiverNo(Long senderNo, Long receiverNo);
-    
+
     /**
      * FIXME : 자바 쿼리로 변경이 가능하다면 변경하는 것이 좋을 것 같다.
      * 발신자 번호로 채팅방 목록 조회
      *
      * @param senderNo 채팅 송신자 번호
-     * @return
+     * @return 채팅방 목록
      */
     @Aggregation(pipeline = {
             """

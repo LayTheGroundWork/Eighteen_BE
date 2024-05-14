@@ -3,16 +3,24 @@ package com.st.eighteen_be.chat.service.impl;
 import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
+import com.st.eighteen_be.chat.model.redishash.UnreadMessageCount;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
-import com.st.eighteen_be.common.annotation.ServiceWithMongoDBTest;
+import com.st.eighteen_be.chat.repository.redis.UnreadMessageRedisRepository;
+import com.st.eighteen_be.chat.service.ChatroomService;
+import com.st.eighteen_be.chat.service.redis.RedisMessageService;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
+import com.st.eighteen_be.common.extension.MongodbTestContainerExtenstion;
+import com.st.eighteen_be.common.extension.RedisTestContainerExtenstion;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
@@ -32,8 +40,10 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
  * 24. 4. 12.        ipeac       최초 생성
  */
 @DisplayName("ChatroomService 테스트")
-@ServiceWithMongoDBTest
-class ChatroomServiceTest {
+@ActiveProfiles("test")
+@ExtendWith({MongodbTestContainerExtenstion.class})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class ChatroomServiceTest extends RedisTestContainerExtenstion {
     
     //로거
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChatroomServiceTest.class);
@@ -43,6 +53,11 @@ class ChatroomServiceTest {
     
     private ChatroomService chatroomService;
     
+    private RedisMessageService redisMessageService;
+    
+    @Autowired
+    private UnreadMessageRedisRepository unreadMessageRedisRepository;
+    
     @Autowired
     private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
     
@@ -50,7 +65,9 @@ class ChatroomServiceTest {
     
     @BeforeEach
     void setUp() {
-        chatroomService = new ChatroomService(chatroomInfoCollectionRepository);
+        redisMessageService = new RedisMessageService(unreadMessageRedisRepository);
+        
+        chatroomService = new ChatroomService(chatroomInfoCollectionRepository, redisMessageService);
         
         savedChatroomInfoCollection = ChatroomInfoCollection.of(1L, 2L, ChatroomType.PRIVATE);
     }
@@ -156,6 +173,10 @@ class ChatroomServiceTest {
         mongoTemplate.save(firstChatMessage);
         mongoTemplate.save(secondChatMessage);
         
+        //redis 에 읽지 않은 메시지 카운트 저장
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(2L, 1L, 5L));
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(3L, 1L, 10L));
+        
         // When
         var chatrooms = chatroomService.findAllMyChatrooms(requestDTO);
         
@@ -170,6 +191,7 @@ class ChatroomServiceTest {
             softAssertions.assertThat(chatrooms.get(0).getSenderNo()).isEqualTo(1L);
             softAssertions.assertThat(chatrooms.get(0).getReceiverNo()).isEqualTo(2L);
             softAssertions.assertThat(chatrooms.get(0).getMessage()).isEqualTo("안녕하세요 1-2");
+            softAssertions.assertThat(chatrooms.get(0).getUnreadMessageCount()).isEqualTo(5L);
             softAssertions.assertThat(chatrooms.get(0).getMessageCreatedAt()).isNotNull();
         });
         
@@ -180,6 +202,7 @@ class ChatroomServiceTest {
             softAssertions.assertThat(chatrooms.get(1).getSenderNo()).isEqualTo(1L);
             softAssertions.assertThat(chatrooms.get(1).getReceiverNo()).isEqualTo(3L);
             softAssertions.assertThat(chatrooms.get(1).getMessage()).isEqualTo("안녕하세요 1-3");
+            softAssertions.assertThat(chatrooms.get(1).getUnreadMessageCount()).isEqualTo(10L);
             softAssertions.assertThat(chatrooms.get(1).getMessageCreatedAt()).isNotNull();
         });
     }

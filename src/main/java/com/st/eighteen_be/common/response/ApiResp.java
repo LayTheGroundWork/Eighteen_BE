@@ -14,13 +14,13 @@ import org.springframework.http.HttpStatus;
  * -----------------------------------------------------------
  * 24. 4. 12.        ipeac       최초 생성
  */
-public record ApiResponse<T>(HttpStatus status, T data, String message) {
+public record ApiResp<T>(HttpStatus status, T data, String message) {
     
-    public static <T> ApiResponse<T> success(HttpStatus status, T data) {
-        return new ApiResponse<>(status, data, null);
+    public static <T> ApiResp<T> success(HttpStatus status, T data) {
+        return new ApiResp<>(status, data, null);
     }
     
-    public static <T> ApiResponse<T> fail(ErrorCode errorCode) {
-        return new ApiResponse<>(errorCode.getStatus(), null, errorCode.getMessage());
+    public static <T> ApiResp<T> fail(ErrorCode errorCode) {
+        return new ApiResp<>(errorCode.getStatus(), null, errorCode.getMessage());
     }
 }
