@@ -16,15 +16,12 @@ public class UserPrivacyResponseDto {
 
     private LocalDateTime birthDay;
 
-    private String certificationNumber;
-
     private String email;
 
     public UserPrivacyResponseDto(UserPrivacy entity) {
         this.phoneNumber = entity.getPhoneNumber();
         this.password = entity.getPassword();
         this.birthDay = entity.getBirthDay();
-        this.certificationNumber = entity.getCertificationNumber();
         this.email = entity.getEmail();
     }
 }

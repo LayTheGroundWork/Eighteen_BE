@@ -7,13 +7,13 @@ spring:
     name: Eighteen_BE
 
   profiles:
-    include: sms
+    include: sms, jwt
     active: test
-
 
   kafka:
     bootstrap-servers: 0.0.0.0:39092
 server:
   port: 8080
+
 
 

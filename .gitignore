@@ -41,4 +41,5 @@ out/
 
 ### AWS ###
 application-sms.yaml
+application-jwt.yaml
 
