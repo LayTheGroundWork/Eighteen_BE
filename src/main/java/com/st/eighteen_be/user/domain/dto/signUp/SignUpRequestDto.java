@@ -1,4 +1,4 @@
-package com.st.eighteen_be.user.domain.dto.signIn;
+package com.st.eighteen_be.user.domain.dto.signUp;
 
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import jakarta.validation.constraints.Email;
@@ -20,16 +20,12 @@ import java.time.LocalDateTime;
  * 2024-04-18        ehgur             최초 생성
  */
 
-public record SignInRequestDto(
+public record SignUpRequestDto(
 
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotNull(message = "전화번호는 필수 입력 값 입니다.")
         @Pattern(regexp = "^01(0|1|[6-9])[0-9]{3,4}[0-9]{4}$")
         String phoneNumber,
-
-        @Pattern(regexp = "[0-9]{0,6}", message = "인증코드는 숫자만 입력 가능합니다.")
-        String certificationNumber,
-
 
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotNull(message = "비밀번호는 필수 입력 값 입니다.")
@@ -37,10 +33,8 @@ public record SignInRequestDto(
                 message = "비밀번호는 영문과 숫자 조합으로 8 ~ 16자리까지 가능합니다.")
          String password,
 
-
         @NotNull(message = "생년월일은 필수 입력 값 입니다.")
         LocalDateTime birthDay,
-
 
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotBlank(message = "이메일은 필수 입력 값 입니다.")
@@ -54,7 +48,6 @@ public record SignInRequestDto(
                 .password(encodePassword)
                 .birthDay(birthDay)
                 .email(email)
-                .certificationNumber(certificationNumber)
                 .build();
     }
 }

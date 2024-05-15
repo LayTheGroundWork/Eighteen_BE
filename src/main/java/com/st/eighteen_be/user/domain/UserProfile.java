@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -28,8 +27,12 @@ public class UserProfile extends BaseEntity {
     // s3 주소
     private String profileImg;
 
-    @Column(length = 50, unique = true)
+    @Column(length = 50)
     private String nickName;
+
+    @Column(length = 50, unique = true)
+    private String certificationId;
+
 
     // 학년 데이터는 수정될 가능성이 현저히 낮기 때문에 Convert를 사용하지 않음
     private GradeType grade;
