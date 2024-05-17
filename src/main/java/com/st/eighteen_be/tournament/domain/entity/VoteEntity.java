@@ -12,7 +12,7 @@ import org.hibernate.annotations.Comment;
 @Getter
 @Entity
 @Table(name = "VOTE", uniqueConstraints = {
-        @UniqueConstraint(name = "vote_unique", columnNames = {"MATCH_NO", "VOTER_ID"})
+        @UniqueConstraint(name = "vote_unique", columnNames = {"GAME_NO", "VOTER_ID"})
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
@@ -23,11 +23,11 @@ public class VoteEntity extends BaseEntity {
     @Column(name = "VOTE_NO")
     private Long voteNo;
     
-    @MapsId("matchNo")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Comment("경기고유번호")
-    @JoinColumn(name = "MATCH_NO", nullable = false)
-    private MatchEntity matchNo;
+    @JoinColumn(name = "GAME_NO", nullable = false)
+    private GameEntity gameNo;
+    
     
     @Size(max = 200)
     @Comment("투표자 유저 아이디")

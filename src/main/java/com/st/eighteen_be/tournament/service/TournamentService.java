@@ -1,4 +1,4 @@
-package com.st.eighteen_be.tournament.api;
+package com.st.eighteen_be.tournament.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

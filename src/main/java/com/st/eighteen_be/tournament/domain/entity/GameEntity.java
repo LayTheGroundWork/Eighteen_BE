@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -13,17 +12,16 @@ import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
-@Table(name = "MATCH")
+@Table(name = "GAME")
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MatchEntity extends BaseEntity {
+public class GameEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("경기고유번호")
-    @Column(name = "MATCH_NO")
-    private Long matchNo;
+    @Column(name = "GAME_NO")
+    private Long gameNo;
     
-    @MapsId("tournamentNo")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Comment("토너먼트고유번호")
     @JoinColumn(name = "TOURNAMENT_NO", nullable = false)
@@ -45,14 +43,4 @@ public class MatchEntity extends BaseEntity {
     @Comment("라운드(16, 8 ,4 , 1)")
     @Column(name = "ROUND", nullable = false)
     private Integer round;
-    
-    @Builder
-    private MatchEntity(BaseEntityBuilder<?, ?> b, Long matchNo, TournamentEntity tournamentNo, String participantId1, String participantId2, Integer round) {
-        super(b);
-        this.matchNo = matchNo;
-        this.tournamentNo = tournamentNo;
-        this.participantId1 = participantId1;
-        this.participantId2 = participantId2;
-        this.round = round;
-    }
 }

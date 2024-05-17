@@ -21,7 +21,6 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Column(name = "PARTICIPANT_NO")
     private Long participantNo;
     
-    @MapsId("tournamentNo")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Comment("토너먼트고유번호")
     @JoinColumn(name = "TOURNAMENT_NO", nullable = false)
