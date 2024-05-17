@@ -1,6 +1,8 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
+import com.st.eighteen_be.common.converter.GameRoundConverter;
+import com.st.eighteen_be.tournament.domain.enums.GameRoundEnums;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -41,6 +43,7 @@ public class GameEntity extends BaseEntity {
     
     @NotNull
     @Comment("라운드(16, 8 ,4 , 1)")
+    @Convert(converter = GameRoundConverter.class)
     @Column(name = "ROUND", nullable = false)
-    private Integer round;
+    private GameRoundEnums round;
 }

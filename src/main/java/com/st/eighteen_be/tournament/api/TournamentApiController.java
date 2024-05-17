@@ -1,7 +1,9 @@
 package com.st.eighteen_be.tournament.api;
 
+import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,4 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/")
 public class TournamentApiController {
     private final TournamentService tournamentService;
+    
+    /**
+     * 분야 시즌
+     * @return ApiResp<Object>
+     */
+    @GetMapping("/v1/tournament/all")
+    public ApiResp<Object> findAllTournament() {
+        tournamentService.test();
+        return ApiResp.success();
+    }
 }
