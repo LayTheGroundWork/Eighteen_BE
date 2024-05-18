@@ -4,6 +4,10 @@ import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.batch.TournamentBatch;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.service.TournamentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,17 +27,17 @@ import java.util.List;
  * -----------------------------------------------------------
  * 24. 5. 15.        ipeac       최초 생성
  */
+@Tag(name = "TournamentApiController", description = "토너먼트 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/")
 public class TournamentApiController {
     private final TournamentService tournamentService;
-
-    /**
-     * 분야별 토너먼트 페이징 조회
-     *
-     * @return ApiResp<Object>
-     */
+    
+    @Operation(summary = "토너먼트 검색", description = "토너먼트를 조건에 맞게 검색하고, 페이징 처리하여 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
     @GetMapping("/v1/tournament/search")
     public ApiResp<List<TournamentSearchResponseDTO>> search(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -43,25 +47,24 @@ public class TournamentApiController {
             @RequestParam(value = "category", required = false) String category
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
-
+        
         List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, category);
-
+        
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }
-
+    
     /**
      * 토너먼트 참여 시작 (배치용)
      * <p>
-     * {@link TournamentBatch#startNewTournaments()} ()}
+     * {@link TournamentBatch#startNewTournaments()} 참고}
      *
      * @return ApiResp<Object>
      */
     @PostMapping("/v1/tournament/start")
     public ApiResp<Object> detail() {
-        tournamentService.test();
         return ApiResp.success(HttpStatus.OK, "test");
     }
-
+    
     /**
      * 토너먼트 종료 (배치용)
      * <p>
@@ -70,13 +73,11 @@ public class TournamentApiController {
      */
     @PostMapping("/v1/tournament/end")
     public ApiResp<Object> end() {
-        tournamentService.test();
         return ApiResp.success(HttpStatus.OK, "test");
     }
-
+    
     @PostMapping("/v1/tournament/vote")
     public ApiResp<Object> vote() {
-        tournamentService.test();
         return ApiResp.success(HttpStatus.OK, "test");
     }
 }

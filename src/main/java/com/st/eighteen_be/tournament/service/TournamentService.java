@@ -28,15 +28,28 @@ import java.util.List;
 public class TournamentService {
     private TournamentEntityRepository tournamentEntityRepository;
     private GameEntityRepository gameEntityRepository;
-
-    public void test() {
-        System.out.println("test");
-    }
-
+    
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, String category) {
-
+        
         return tournamentEntityRepository.findTournamentEntityByCategory(category, pageRequest).stream()
                 .map(TournamentEntity::toTournamentSearchResponseDTO)
                 .toList();
+    }
+    
+    public void startTournament() {
+        //토너먼트를 생성하고
+        TournamentEntity created = TournamentEntity.builder().build();
+        
+        TournamentEntity savedTournament = tournamentEntityRepository.save(created);
+        
+        //토너먼트 참가자를 선정한다. - 선정된 참가자 16명이 될 예정.
+        
+        // 게임을 생성한다. - 게임은 16강만 만들어야함. ( 8 이후에 대해서는 사용자의 선택에 따라 나뉜다 )
+    }
+    
+    public void endLastTournament() {
+        //마지막 토너먼트를 종료시킨다.
+        
+        //승자를 선정한다.
     }
 }

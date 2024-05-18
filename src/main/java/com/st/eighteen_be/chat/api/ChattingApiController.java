@@ -10,6 +10,7 @@ import com.st.eighteen_be.chat.service.ChatroomService;
 import com.st.eighteen_be.chat.service.facade.ChatroomFacade;
 import com.st.eighteen_be.chat.service.kafka.ChattingProducer;
 import com.st.eighteen_be.common.response.ApiResp;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,6 +46,7 @@ public class ChattingApiController {
     private final ChatroomFacade chatroomFacade;
     private final ChatroomService chatroomService;
     
+    @Operation(summary = "내 채팅방 조회", description = "내 채팅방을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
@@ -56,6 +58,7 @@ public class ChattingApiController {
         return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(requestDTO));
     }
     
+    @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다. 없으면 생성하고 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "302", description = "INVALID REQUEST"),
@@ -69,6 +72,7 @@ public class ChattingApiController {
         return ApiResp.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
     }
     
+    @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.", ignoreJsonView = true)
     @MessageMapping("/v1/chat/{chatroom-id}/message") // /pub/chat/{senderNo}/{receiverNo}/message
     public void sendMessage(@DestinationVariable(value = "chatroom-id") String chatroomId, ChatMessageRequestDTO chatMessage) {
         log.info("sendMessage.chatMessage.senderNo() = {} , chatMessage.receiverNo() = {}", chatMessage.getSenderNo(), chatMessage.getReceiverNo());

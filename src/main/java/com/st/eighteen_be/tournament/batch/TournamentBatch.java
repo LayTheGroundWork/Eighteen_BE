@@ -1,16 +1,10 @@
 package com.st.eighteen_be.tournament.batch;
 
-import com.st.eighteen_be.tournament.domain.entity.GameEntity;
-import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
-import com.st.eighteen_be.tournament.repository.GameEntityRepository;
-import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.batch
@@ -27,21 +21,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TournamentBatch {
     private final TournamentService tournamentService;
-
-    private final TournamentEntityRepository tournamentEntityRepository;
-    private final GameEntityRepository gameEntityRepository;
-
+    
     @Async
     @Scheduled(cron = "0 0  9 ? * MON")
     public void startNewTournaments() {
-        tournamentService.test();
+        tournamentService.startTournament();
     }
-
-    public void makeTournament(TournamentEntity tournamentEntity) {
-        tournamentEntityRepository.save(tournamentEntity);
+    
+    @Async
+    // 매주 일요일 오후 12시에 종료
+    @Scheduled(cron = "0 0 12 ? * SUN")
+    public void endTournaments() {
+        tournamentService.endLastTournament();
     }
-
-    public void makeGames(List<GameEntity> games) {
-        gameEntityRepository.saveAll(games);
-    }
+    
 }
