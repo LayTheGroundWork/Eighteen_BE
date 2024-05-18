@@ -1,7 +1,9 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
+import com.st.eighteen_be.common.converter.TournamentCategoryConverter;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

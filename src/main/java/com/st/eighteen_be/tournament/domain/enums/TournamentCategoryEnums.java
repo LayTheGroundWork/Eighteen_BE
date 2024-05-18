@@ -1,4 +1,4 @@
-package com.st.eighteen_be.tournament.domain.entity;
+package com.st.eighteen_be.tournament.domain.enums;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;

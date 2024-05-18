@@ -1,5 +1,6 @@
-package com.st.eighteen_be.tournament.domain.entity;
+package com.st.eighteen_be.common.converter;
 
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
