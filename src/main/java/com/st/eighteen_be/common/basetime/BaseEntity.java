@@ -21,9 +21,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class BaseEntity {
     @CreatedDate
-    @Column(name = "CRAETED_DATE", updatable = false)
+    @Column(name = "CREATED_DATE", updatable = false)
     private LocalDateTime createdDate;
-    
+
     @LastModifiedDate
     @Column(name = "LAST_MODIFIED_DATE")
     private LocalDateTime lastModifiedDate;

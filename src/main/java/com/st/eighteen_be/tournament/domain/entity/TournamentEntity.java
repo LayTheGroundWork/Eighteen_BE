@@ -1,10 +1,8 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -23,10 +21,22 @@ public class TournamentEntity extends BaseEntity {
     @Comment("토너먼트고유번호")
     @Column(name = "TOURNAMENT_NO", nullable = false)
     private Long tournamentNo;
-    
+
     @Size(max = 100)
     @NotNull
     @Comment("카테고리")
+    @Convert(converter = TournamentCategoryConverter.class)
     @Column(name = "CATEGORY", nullable = false, length = 100)
-    private String category;
+    private TournamentCategoryEnums category;
+
+    @Lob
+    @Column(name = "THUMBNAIL_URL")
+    private String thumbnailUrl;
+
+    public TournamentSearchResponseDTO toTournamentSearchResponseDTO() {
+        return TournamentSearchResponseDTO.builder()
+                .tournamentNo(tournamentNo)
+                .tournamentThumbnailUrl(thumbnailUrl)
+                .build();
+    }
 }
