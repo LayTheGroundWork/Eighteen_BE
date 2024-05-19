@@ -1,4 +1,4 @@
-package com.st.eighteen_be.user.domain.dto;
+package com.st.eighteen_be.user.dto;
 
 import lombok.Builder;
 import lombok.Getter;
