@@ -2,7 +2,7 @@ package com.st.eighteen_be.message.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
-import com.st.eighteen_be.message.domain.dto.SmsCertificationRequestDto;
+import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.repository.SmsCertification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

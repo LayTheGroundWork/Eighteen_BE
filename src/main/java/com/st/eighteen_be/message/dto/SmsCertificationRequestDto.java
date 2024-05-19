@@ -1,4 +1,4 @@
-package com.st.eighteen_be.message.domain.dto;
+package com.st.eighteen_be.message.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
