@@ -1,7 +1,7 @@
 package com.st.eighteen_be.message.api;
 
 import com.st.eighteen_be.common.response.ApiResponse;
-import com.st.eighteen_be.message.domain.dto.SmsCertificationRequestDto;
+import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.service.SmsUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/api/message")
+@RequestMapping
 public class MessageApiController {
 
     private final SmsUtil smsUtil;
 
-    @PostMapping("/sends")
+    @PostMapping("/v1/api/message/send")
     public ApiResponse<String> sendSms(@Valid @RequestBody SmsCertificationRequestDto requestDto){
 
         smsUtil.sendOne(requestDto.getPhoneNumber());
@@ -29,7 +29,7 @@ public class MessageApiController {
         return ApiResponse.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
     }
 
-    @PostMapping("/confirms")
+    @PostMapping("/v1/api/message/confirms")
     public ApiResponse<String> smsVerification(@Valid @RequestBody SmsCertificationRequestDto requestDto) {
 
         smsUtil.verifySms(requestDto);
