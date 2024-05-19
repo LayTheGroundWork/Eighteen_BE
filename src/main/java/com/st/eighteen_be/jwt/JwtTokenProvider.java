@@ -1,9 +1,12 @@
 package com.st.eighteen_be.jwt;
 
+import com.st.eighteen_be.token.domain.RefreshToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +14,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -23,58 +29,45 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JwtProvider {
+public class JwtTokenProvider {
 
     private final Key key;
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30L;
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7;
+
+    // Token
+    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30L; // ACCESS 토큰 만료 시간: 30분
+    public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 6; // REFRESH 토큰 만료 시간: 6시간
+
+    // Header
+    public static final String TOKEN_HEADER = "Authorization";
+    public static final String TOKEN_PREFIX = "Bearer-";
     private static final String KEY_ROLE = "auth";
 
     // application-jwt.yaml에서 secret 값 가져와서 key에 저장
-    public JwtProvider(@Value("${jwt.secret}") String secretKey){
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey){
+
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-//    public String generateAccessToken(Authentication authentication) {
-//        return generateToken(authentication, ACCESS_TOKEN_EXPIRE_TIME);
-//    }
-//
-//    // 1. refresh token 발급
-//    public void generateRefreshToken(Authentication authentication, String accessToken) {
-//        String refreshToken = generateToken(authentication, REFRESH_TOKEN_EXPIRE_TIME);
-//        //tokenService.saveOrUpdate(authentication.getName(), refreshToken, accessToken); // redis에 저장
-//    }
-
     // Member 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
-    public Jwt generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication){
+
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        long now = (new Date()).getTime();
 
-        // Access Token 생성 -> (현재시간 + 30분(밀리초))
-        Date accessTokenExpiration = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-        String accessToken = Jwts.builder()
+        var now = new Date();
+        Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
+
+        return Jwts.builder()
                 .subject(authentication.getName())
-                .claim("auth", authorities)
-                .expiration(accessTokenExpiration)
+                .claim(KEY_ROLE, authorities)
+                .issuedAt(new Date())
+                .expiration(expireDate)
                 .signWith(key)
                 .compact();
-
-        // Refresh Token 생성
-        String refreshToken = Jwts.builder()
-                .expiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
-                .signWith(key)
-                .compact();
-
-        return Jwt.builder()
-                .grantType("Bearer")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
     }
 
     // Jwt를 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
@@ -88,16 +81,14 @@ public class JwtProvider {
 
         // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities = getAuthorities(claims);
-//                Arrays.stream(claims.get("auth").toString().split(","))
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication return
         // UserDetails: interface, User: UserDetails 를 구현한 class
-        User principal = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = new User(claims.getSubject(),"",authorities);
+
 
         // TODO: Username 말고 전화번호 또는 이메일로 하게끔
-        return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     private List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
@@ -136,6 +127,34 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+    public void setRefreshTokenAtCookie(RefreshToken refreshToken) {
+        // 쿠키 생성 및 설정
+        Cookie cookie = createRefreshTokenCookie(refreshToken);
+
+        // 현재 HTTP 응답 객체 가져오기
+        HttpServletResponse response = getCurrentHttpResponse();
+
+        // 쿠키를 응답에 추가
+        if (response != null) {
+            response.addCookie(cookie);
+        } else {
+            throw new IllegalStateException("Failed to get the current HTTP response.");
+        }
+    }
+
+    private Cookie createRefreshTokenCookie(RefreshToken refreshToken) {
+        Cookie cookie = new Cookie("RefreshToken", refreshToken.getRefreshToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(refreshToken.getExpiration().intValue());
+        cookie.setPath("/"); // 쿠키의 경로 설정 (필요에 따라 조정 가능)
+        return cookie;
+    }
+
+    private HttpServletResponse getCurrentHttpResponse() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes != null ? attributes.getResponse() : null;
     }
 
 }
