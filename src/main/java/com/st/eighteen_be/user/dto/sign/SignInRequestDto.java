@@ -1,9 +1,9 @@
-package com.st.eighteen_be.user.domain.dto;
+package com.st.eighteen_be.user.dto.sign;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-public record LoginRequestDto(
+public record SignInRequestDto(
 
         @NotNull(message = "전화번호는 필수 입력 값 입니다.")
         @Pattern(regexp = "^01(0|1|[6-9])[0-9]{3,4}[0-9]{4}$")
