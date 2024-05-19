@@ -40,7 +40,8 @@ public enum ErrorCode {
     AUTHENTICATION_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized..."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden..."),
-
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
 
     ;
 
