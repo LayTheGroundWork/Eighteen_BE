@@ -112,6 +112,7 @@ class TournamentServiceTest {
         }
     }
 
+    //TODO 테스트코드 실패함 수정요
     @Test
     @DisplayName("16강 게임을 생성합니다. 16강 게임이 정상 생성되는지 확인한다.")
     void When_createSixteenthRoundGames_Then_createGames() {
