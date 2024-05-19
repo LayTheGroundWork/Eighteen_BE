@@ -2,7 +2,7 @@ package com.st.eighteen_be.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.jwt.JwtAuthenticationFilter;
+import com.st.eighteen_be.jwt.JwtTokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ import java.io.PrintWriter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
 
     //권한 확인을 하지 않는 uri
     private static final String[] PERMIT_ALL_PATTERNS = new String[] {
@@ -54,11 +54,11 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(PERMIT_ALL_PATTERNS).permitAll()
-                        .requestMatchers("/test").hasRole("USER")
+                        .requestMatchers("/test").hasAuthority("USER")
                         .anyRequest().authenticated()
                 )
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
-                .addFilterBefore(jwtAuthenticationFilter,
+                .addFilterBefore(jwtTokenAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class)
 
 //                .oauth2Login(oauth2Login ->
