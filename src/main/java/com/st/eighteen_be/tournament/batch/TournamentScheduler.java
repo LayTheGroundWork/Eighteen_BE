@@ -20,21 +20,20 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class TournamentBatch {
+public class TournamentScheduler {
     private final TournamentService tournamentService;
-
+    
     @Async
     @Scheduled(cron = "0 0  9 ? * MON")
-    public void startNewTournaments() {
+    protected void startNewTournaments() {
         for (TournamentCategoryEnums value : TournamentCategoryEnums.values()) {
             tournamentService.startTournament(value);
         }
     }
-
+    
     @Async
     @Scheduled(cron = "0 0 12 ? * SUN")
-    public void endTournaments() {
+    protected void endTournaments() {
         tournamentService.endLastTournament();
     }
-
 }
