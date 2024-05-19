@@ -1,12 +1,14 @@
-package com.st.eighteen_be.user.domain.dto.signUp;
+package com.st.eighteen_be.user.dto.sign;
 
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * packageName    : com.st.eighteen_be.service.MemberService
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
  * 2024-04-18        ehgur             최초 생성
  */
 
+@Slf4j
 public record SignUpRequestDto(
 
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
@@ -39,15 +42,18 @@ public record SignUpRequestDto(
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotBlank(message = "이메일은 필수 입력 값 입니다.")
         @Email(message = "이메일 형식이 아닙니다.")
-        String email
+        String email,
+
+        List<String> roles
 ) {
 
-    public UserPrivacy toEntity(String encodePassword) {
+    public UserPrivacy toEntity(String encodePassword, List<String> roles) {
         return UserPrivacy.builder()
                 .phoneNumber(phoneNumber)
                 .password(encodePassword)
                 .birthDay(birthDay)
                 .email(email)
+                .roles(roles)
                 .build();
     }
 }
