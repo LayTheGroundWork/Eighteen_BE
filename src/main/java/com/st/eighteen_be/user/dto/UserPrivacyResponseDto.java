@@ -1,4 +1,4 @@
-package com.st.eighteen_be.user.domain.dto;
+package com.st.eighteen_be.user.dto;
 
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import lombok.Getter;

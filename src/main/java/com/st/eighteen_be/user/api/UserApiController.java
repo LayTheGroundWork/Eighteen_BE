@@ -1,14 +1,17 @@
 package com.st.eighteen_be.user.api;
 
 import com.st.eighteen_be.common.response.ApiResponse;
-import com.st.eighteen_be.jwt.Jwt;
+import com.st.eighteen_be.common.security.SecurityUtil;
+import com.st.eighteen_be.jwt.JwtTokenDto;
+import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserPrivacy;
-import com.st.eighteen_be.user.domain.dto.LoginRequestDto;
-import com.st.eighteen_be.user.domain.dto.signUp.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
+import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
 import com.st.eighteen_be.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserApiController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
-    @PostMapping("/v1/api/member/signUp")
+    @PostMapping("/v1/api/member/sign-up")
     public ApiResponse<UserPrivacy> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
 
         UserPrivacy userPrivacy = userService.save(requestDto);
@@ -43,22 +47,23 @@ public class UserApiController {
         return ApiResponse.success(HttpStatus.OK, userPrivacy);
     }
 
-    @PostMapping("/v1/api/member/signIn")
-    public Jwt signIn(@Valid @RequestBody LoginRequestDto requestDto) {
+    @PostMapping("/v1/api/member/sign-in")
+    public JwtTokenDto signIn(@Valid @RequestBody SignInRequestDto requestDto) {
 
         log.info("request phoneNumber = {}, password = {}",
                 requestDto.phoneNumber(), requestDto.password());
 
-        Jwt jwt = userService.signIn(requestDto);
+        JwtTokenDto jwtTokenDto = userService.signIn(requestDto);
 
         log.info("jwt accessToken = {}, refreshToken = {}",
-                jwt.getAccessToken(), jwt.getRefreshToken());
+                jwtTokenDto.getAccessToken(),
+                refreshTokenService.findRefreshTokenById(requestDto.phoneNumber()));
 
-        return jwt;
+        return jwtTokenDto;
     }
 
     @PostMapping("/test")
     public String test() {
-        return "success";
+        return SecurityUtil.getCurrentUsername();
     }
 }

@@ -2,11 +2,13 @@ package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
-import com.st.eighteen_be.jwt.Jwt;
-import com.st.eighteen_be.jwt.JwtProvider;
+import com.st.eighteen_be.jwt.JwtTokenDto;
+import com.st.eighteen_be.jwt.JwtTokenProvider;
+import com.st.eighteen_be.token.domain.RefreshToken;
+import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserPrivacy;
-import com.st.eighteen_be.user.domain.dto.LoginRequestDto;
-import com.st.eighteen_be.user.domain.dto.signUp.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
+import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
 import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * packageName    : com.st.eighteen_be.service
@@ -32,20 +37,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 @Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtProvider jwtProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
-
+    private final RefreshTokenService refreshTokenService;
 
     public UserPrivacy save(SignUpRequestDto requestDto){
+        List<String> roles = new ArrayList<>();
+        roles.add("USER");
 
         try{
-            return userRepository.save(requestDto.toEntity(passwordEncoder.encode(requestDto.password())));
+            return userRepository.save(requestDto.toEntity(
+                    passwordEncoder.encode(requestDto.password()),roles)
+            );
 
         } catch (DataIntegrityViolationException e){
             if(e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")){
@@ -55,21 +64,23 @@ public class UserService {
         }
     }
 
-    // 수정 필요
     @Transactional(readOnly = true)
-    public Jwt signIn(LoginRequestDto requestDto){
+    public JwtTokenDto signIn(SignInRequestDto requestDto){
 
         // 1. phoneNumber + password 를 기반으로 Authentication 객체 생성
         // 이때 authentication 은 인증 여부를 확인하는 authentication 값이 false
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), requestDto.password());
 
-        // 2. 실제 검증 authentication() 메서드를 통해 요청된 User 에 대한 검증 진행
-        // authenticate 메서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByPhoneNumber 메서드 실행
+//         2. 실제 검증 authentication() 메서드를 통해 요청된 User 에 대한 검증 진행
+//         authenticate 메서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByPhoneNumber 메서드 실행
         Authentication authentication =
                 authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // 3. 인증 정보를 기반으로 JWT 생성 후 반환
-        return jwtProvider.generateToken(authentication);
+        RefreshToken refreshToken = refreshTokenService.saveOrUpdate(authentication);
+        String token = jwtTokenProvider.generateToken(authentication);
+        jwtTokenProvider.setRefreshTokenAtCookie(refreshToken);
+
+        return JwtTokenDto.from(token);
     }
 }
