@@ -21,12 +21,15 @@ public enum TournamentCategoryEnums {
     GAME("GAME"),
     MUSIC("MUSIC"),
     MOVIE("MOVIE"),
-    ETC("ETC");
+    ETC("ETC"),
+    ;
 
+    private final String name;
     private final String category;
 
     TournamentCategoryEnums(String category) {
         this.category = category;
+        this.name = this.category;
     }
 
     public static TournamentCategoryEnums findByCategory(String category) {

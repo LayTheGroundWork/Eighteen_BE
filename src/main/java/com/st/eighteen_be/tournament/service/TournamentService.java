@@ -1,14 +1,19 @@
 package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
+import com.st.eighteen_be.tournament.domain.entity.GameEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.repository.GameEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
+import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
+import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,30 +31,45 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TournamentService {
-    private TournamentEntityRepository tournamentEntityRepository;
-    private GameEntityRepository gameEntityRepository;
-    
-    public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, String category) {
-        
+    private final TournamentEntityRepository tournamentEntityRepository;
+    private final GameEntityRepository gameEntityRepository;
+
+    public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, TournamentCategoryEnums category) {
+
         return tournamentEntityRepository.findTournamentEntityByCategory(category, pageRequest).stream()
                 .map(TournamentEntity::toTournamentSearchResponseDTO)
                 .toList();
     }
-    
-    public void startTournament() {
-        //토너먼트를 생성하고
-        TournamentEntity created = TournamentEntity.builder().build();
-        
+
+    @Transactional(readOnly = false)
+    public void startTournament(@Nonnull TournamentCategoryEnums category) {
+        TournamentEntity created = TournamentEntity.createTournamentEntity(category);
+
         TournamentEntity savedTournament = tournamentEntityRepository.save(created);
-        
-        //토너먼트 참가자를 선정한다. - 선정된 참가자 16명이 될 예정.
-        
-        // 게임을 생성한다. - 게임은 16강만 만들어야함. ( 8 이후에 대해서는 사용자의 선택에 따라 나뉜다 )
+
+        //TODO : 토너먼트 참가자를 랜덤으로 선정한다.
+        List<String> users = TournamentHelperService.pickRandomUser();
+
+        createSixteenthRoundGames(savedTournament, users);
     }
-    
+
+    @Transactional(readOnly = false)
+    public void createSixteenthRoundGames(@Nonnull TournamentEntity tournament, @Nonnull List<String> users) {
+        TournamentHelperService.checkSixteenthRoundUserCount(users);
+
+        List<GameEntity> games = new ArrayList<>();
+
+        for (int i = 0; i < users.size(); i += 2) {
+            GameEntity game = GameEntity.createSixteenthRoundGame(tournament, users.get(i), users.get(i + 1));
+            games.add(game);
+        }
+
+        gameEntityRepository.saveAll(games);
+    }
+
     public void endLastTournament() {
         //마지막 토너먼트를 종료시킨다.
-        
+
         //승자를 선정한다.
     }
 }

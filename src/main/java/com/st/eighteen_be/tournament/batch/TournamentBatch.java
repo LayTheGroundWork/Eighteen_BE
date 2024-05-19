@@ -1,5 +1,6 @@
 package com.st.eighteen_be.tournament.batch;
 
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -21,18 +22,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TournamentBatch {
     private final TournamentService tournamentService;
-    
+
     @Async
     @Scheduled(cron = "0 0  9 ? * MON")
     public void startNewTournaments() {
-        tournamentService.startTournament();
+        for (TournamentCategoryEnums value : TournamentCategoryEnums.values()) {
+            tournamentService.startTournament(value);
+        }
     }
-    
+
     @Async
-    // 매주 일요일 오후 12시에 종료
     @Scheduled(cron = "0 0 12 ? * SUN")
     public void endTournaments() {
         tournamentService.endLastTournament();
     }
-    
+
 }

@@ -6,7 +6,7 @@ import org.springframework.data.repository.config.BootstrapMode;
 
 @Configuration
 @EnableJpaRepositories(basePackages = {
-        "com.st.eighteen_be.tournament.domain"
+        "com.st.eighteen_be.tournament.repository",
 }, bootstrapMode = BootstrapMode.DEFERRED
 )
 public class JpaConfig {

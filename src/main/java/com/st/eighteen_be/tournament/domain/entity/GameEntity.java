@@ -23,27 +23,36 @@ public class GameEntity extends BaseEntity {
     @Comment("경기고유번호")
     @Column(name = "GAME_NO")
     private Long gameNo;
-    
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @Comment("토너먼트고유번호")
     @JoinColumn(name = "TOURNAMENT_NO", nullable = false)
-    private TournamentEntity tournamentNo;
-    
+    private TournamentEntity tournamentEntity;
+
     @Size(max = 200)
     @NotNull
     @Comment("참여자 유저 아이디1")
     @Column(name = "PARTICIPANT_ID_1", nullable = false, length = 200)
     private String participantId1;
-    
+
     @Size(max = 200)
     @NotNull
     @Comment("참여자 유저 아이디2")
     @Column(name = "PARTICIPANT_ID_2", nullable = false, length = 200)
     private String participantId2;
-    
+
     @NotNull
     @Comment("라운드(16, 8 ,4 , 1)")
     @Convert(converter = GameRoundConverter.class)
     @Column(name = "ROUND", nullable = false)
     private GameRoundEnums round;
+
+    public static GameEntity createSixteenthRoundGame(TournamentEntity tournamentEntity, String participantId1, String participantId2) {
+        return GameEntity.builder()
+                .tournamentEntity(tournamentEntity)
+                .participantId1(participantId1)
+                .participantId2(participantId2)
+                .round(GameRoundEnums.ROUND_16)
+                .build();
+    }
 }
