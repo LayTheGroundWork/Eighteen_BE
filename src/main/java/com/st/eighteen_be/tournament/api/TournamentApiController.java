@@ -37,6 +37,7 @@ public class TournamentApiController {
     @Operation(summary = "토너먼트 검색", description = "토너먼트를 조건에 맞게 검색하고, 페이징 처리하여 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
     })
     @GetMapping("/v1/tournament/search")
     public ApiResp<List<TournamentSearchResponseDTO>> search(
@@ -53,7 +54,11 @@ public class TournamentApiController {
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }
     
-    @PostMapping("/v1/tournament/vote")
+    @Operation(summary = "토너먼트 투표", description = "토너먼트에 투표합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
+    @PostMapping("/v1/tournament/final/vote")
     public ApiResp<Object> vote() {
         return ApiResp.success(HttpStatus.OK, "test");
     }

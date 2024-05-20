@@ -1,20 +1,17 @@
 package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
-import com.st.eighteen_be.tournament.domain.entity.GameEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
-import com.st.eighteen_be.tournament.repository.GameEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
+import com.st.eighteen_be.tournament.repository.TournamentParticipantEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
-import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +31,7 @@ import java.util.List;
 @Slf4j
 public class TournamentService {
     private final TournamentEntityRepository tournamentEntityRepository;
-    private final GameEntityRepository gameEntityRepository;
+    private final TournamentParticipantEntityRepository tournamentParticipantEntityRepository;
     
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, TournamentCategoryEnums category) {
         log.info("search start category : {}", category);
@@ -45,15 +42,19 @@ public class TournamentService {
     }
     
     @Transactional(readOnly = false)
-    public void startTournament(@Nonnull TournamentCategoryEnums category) {
-        log.info("startTournament start category : {}", category);
+    public void startTournament() {
+        log.info("startTournament start");
         
-        TournamentEntity savedTournament = createNewTournament(category);
+        for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+            startTournamentByCategory(category);
+        }
+    }
+    
+    private void startTournamentByCategory(TournamentCategoryEnums category) {
+        createNewTournament(category);
         
         //TODO : 토너먼트 참가자를 랜덤으로 선정한다.
-        List<String> users = TournamentHelperService.pickRandomUser();
-        
-        createSixteenthRoundGames(savedTournament, users);
+        tournamentParticipantEntityRepository.saveAll(TournamentHelperService.pickRandomUser());
     }
     
     @Transactional(readOnly = false)
@@ -66,35 +67,31 @@ public class TournamentService {
     }
     
     @Transactional(readOnly = false)
-    public void createSixteenthRoundGames(@Nonnull TournamentEntity tournament, @Nonnull List<String> users) {
-        log.info("createSixteenthRoundGames start tournament : {}, users : {}", tournament.getTournamentNo(), users);
+    public void endLastestTournaments() {
+        log.info("endLastestTournaments start");
         
-        List<GameEntity> games = createGames(tournament, users);
-        
-        gameEntityRepository.saveAll(games);
-    }
-    
-    private List<GameEntity> createGames(@Nonnull TournamentEntity tournament, @Nonnull List<String> users) {
-        log.info("createGames start tournament : {}, users : {}", tournament.getTournamentNo(), users);
-        
-        TournamentHelperService.checkSixteenthRoundUserCount(users);
-        
-        List<GameEntity> games = new ArrayList<>();
-        
-        for (int i = 0; i < users.size(); i += 2) {
-            GameEntity game = GameEntity.createSixteenthRoundGame(tournament, users.get(i), users.get(i + 1));
-            games.add(game);
+        for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+            endTournamentByCategory(category);
         }
         
-        log.info("creatGames end games.size() : {}", games.size());
-        
-        return games;
+        //TODO 승자를 선정한다.
     }
     
-    public void endLastTournament() {
-        log.info("endLastTournament start");
-        //마지막 토너먼트를 종료시킨다.
+    private void endTournamentByCategory(TournamentCategoryEnums category) {
+        log.info("endTournamentByCategory start category : {}", category.getCategory());
         
-        //승자를 선정한다.
+        tournamentEntityRepository.findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(category).ifPresent(
+                tournament -> {
+                    tournament.endTournament();
+                    tournamentEntityRepository.save(tournament);
+                    log.info("tournament end success tournamentNo : {}", tournament.getTournamentNo());
+                }
+        );
+    }
+    
+    
+    //토너먼트에 대한 투표자 정보를 가져온다.
+    private void getVoterInfo() {
+        //TODO 투표자 정보를 가져온다.
     }
 }

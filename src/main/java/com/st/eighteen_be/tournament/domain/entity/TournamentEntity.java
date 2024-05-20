@@ -20,34 +20,46 @@ import org.hibernate.annotations.Comment;
 @SuperBuilder
 public class TournamentEntity extends BaseEntity {
     public static final String THUMBNAIL_DEFAULT_URL = "https://ibb.co/f45yQ65";
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("토너먼트고유번호")
     @Column(name = "TOURNAMENT_NO", nullable = false)
     private Long tournamentNo;
-
+    
     @NotNull
     @Comment("카테고리")
     @Convert(converter = TournamentCategoryConverter.class)
     @Column(name = "CATEGORY", nullable = false, length = 100)
     private TournamentCategoryEnums category;
-
+    
     @Lob
     @Builder.Default
     @Column(name = "THUMBNAIL_URL")
     private String thumbnailUrl = THUMBNAIL_DEFAULT_URL;
-
+    
+    @NotNull
+    @Builder.Default
+    @Comment("토너먼트 진행여부")
+    @Column(name = "STATUS", nullable = false)
+    private boolean status = true;
+    
+    public void endTournament() {
+        this.status = false;
+    }
+    
     public static TournamentEntity createTournamentEntity(TournamentCategoryEnums category) {
         return TournamentEntity.builder()
                 .category(category)
+                .status(true)
                 .build();
     }
-
+    
     public TournamentSearchResponseDTO toTournamentSearchResponseDTO() {
         return TournamentSearchResponseDTO.builder()
                 .tournamentNo(tournamentNo)
                 .tournamentThumbnailUrl(thumbnailUrl)
+                .status(status)
                 .build();
     }
 }

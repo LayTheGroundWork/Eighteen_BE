@@ -7,8 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TournamentEntityRepository extends JpaRepository<TournamentEntity, Long> {
-
+    
     List<TournamentEntity> findTournamentEntityByCategory(@Nonnull TournamentCategoryEnums category, Pageable pageable);
+    
+    Optional<TournamentEntity> findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(@Nonnull TournamentCategoryEnums category);
 }

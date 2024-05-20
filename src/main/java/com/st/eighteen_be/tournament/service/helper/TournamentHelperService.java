@@ -2,6 +2,7 @@ package com.st.eighteen_be.tournament.service.helper;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
+import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ import java.util.List;
 @Slf4j
 public final class TournamentHelperService {
     
-    public static List<String> pickRandomUser() {
+    public static List<TournamentParticipantEntity> pickRandomUser() {
         //TODO 랜덤 유저 16명을 뽑는 로직
         return Collections.unmodifiableList(new ArrayList<>());
     }

@@ -21,4 +21,5 @@ import lombok.*;
 public class TournamentSearchResponseDTO {
     private Long tournamentNo;
     private String tournamentThumbnailUrl;
+    private boolean status;
 }
