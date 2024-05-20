@@ -1,6 +1,5 @@
-package com.st.eighteen_be.tournament.batch;
+package com.st.eighteen_be.tournament.scheduler;
 
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -24,6 +22,7 @@ import static org.mockito.Mockito.verify;
  * -----------------------------------------------------------
  * 24. 5. 19.        ipeac       최초 생성
  */
+@DisplayName("토너먼트 배치 테스트")
 @ExtendWith(MockitoExtension.class)
 public class TournamentBatchTest {
     @InjectMocks
@@ -39,16 +38,16 @@ public class TournamentBatchTest {
         tournamentScheduler.startNewTournaments();
         
         //then
-        verify(tournamentService, times(TournamentCategoryEnums.values().length)).startTournament(any());
+        verify(tournamentService, times(1)).startTournament();
     }
     
     @Test
     @DisplayName("endTournaments 스케쥴러 정상 동작 테스트")
-    void When_endTournaments_Then_endLastTournament() {
+    void When_endTournaments_Then_endLastestTournaments() {
         //when
         tournamentScheduler.endTournaments();
         
         //then
-        verify(tournamentService, times(1)).endLastTournament();
+        verify(tournamentService, times(1)).endLastestTournaments();
     }
 }
