@@ -4,12 +4,15 @@ import com.st.eighteen_be.common.annotation.ServiceWithMySQLTest;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
+import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantEntityRepository;
+import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -42,9 +45,12 @@ class TournamentServiceTest {
     @Autowired
     private TournamentParticipantEntityRepository tournamentParticipantEntityRepository;
     
+    @Autowired
+    private VoteEntityRepository voteEntityRepository;
+    
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository);
+        tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository);
     }
     
     @Test
@@ -116,6 +122,60 @@ class TournamentServiceTest {
             List<TournamentEntity> actual = tournamentEntityRepository.findAll();
             
             assertThat(actual).isNotEmpty().hasSize(TournamentCategoryEnums.values().length);
+        }
+    }
+    
+    
+    @Nested
+    @DisplayName("토너먼트 종료 테스트")
+    class EndTournamentTest {
+        @Test
+        @DisplayName("임시")
+        void temp() {
+            // given
+            TournamentEntity tournamentEntity = TournamentEntity.builder()
+                    .category(TournamentCategoryEnums.GAME)
+                    .build();
+            
+            tournamentEntityRepository.save(tournamentEntity);
+            
+            //참여자 추가하기
+            List<TournamentParticipantEntity> tournamentParticipantEntities = List.of(
+                    TournamentParticipantEntity.of("user1"),
+                    TournamentParticipantEntity.of("user2")
+            );
+            
+            tournamentParticipantEntityRepository.saveAll(tournamentParticipantEntities);
+            
+            //투표자들 추가하기
+            VoteEntity voter1 = VoteEntity.builder()
+                    .tournament(tournamentEntity)
+                    .participant(tournamentParticipantEntities.get(0))
+                    .voterId("voter1")
+                    .build();
+            
+            VoteEntity voter2 = VoteEntity.builder()
+                    .tournament(tournamentEntity)
+                    .participant(tournamentParticipantEntities.get(0))
+                    .voterId("voter2")
+                    .build();
+            
+            VoteEntity voter3 = VoteEntity.builder()
+                    .tournament(tournamentEntity)
+                    .participant(tournamentParticipantEntities.get(1))
+                    .voterId("voter3")
+                    .build();
+            
+            voteEntityRepository.saveAll(List.of(voter1, voter2, voter3));
+            
+            // when
+            tournamentService.determineWinner(tournamentEntity);
+            
+            // then
+            List<TournamentEntity> actual = tournamentEntityRepository.findAll();
+            
+            assertThat(actual).isNotEmpty();
+            assertThat(actual.get(0).isStatus()).isFalse();
         }
     }
 }

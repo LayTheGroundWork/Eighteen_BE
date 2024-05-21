@@ -1,10 +1,12 @@
 package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
+import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantEntityRepository;
+import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ import java.util.List;
 public class TournamentService {
     private final TournamentEntityRepository tournamentEntityRepository;
     private final TournamentParticipantEntityRepository tournamentParticipantEntityRepository;
+    private final VoteEntityRepository voteEntityRepository;
     
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, TournamentCategoryEnums category) {
         log.info("search start category : {}", category);
@@ -87,6 +90,13 @@ public class TournamentService {
                     log.info("tournament end success tournamentNo : {}", tournament.getTournamentNo());
                 }
         );
+    }
+    
+    @Transactional(readOnly = false)
+    public List<TournamentVoteResultResponseDTO> determineWinner(TournamentEntity tournament) {
+        log.info("determineWinner start and tournament`s id : {}", tournament.getTournamentNo());
+        
+        return voteEntityRepository.findTournamentVoteResult(tournament.getTournamentNo());
     }
     
     

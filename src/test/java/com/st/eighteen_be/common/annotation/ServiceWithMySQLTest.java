@@ -1,6 +1,7 @@
 package com.st.eighteen_be.common.annotation;
 
 import com.st.eighteen_be.config.audit.JpaAuditingConfig;
+import com.st.eighteen_be.config.querydsl.QuerydslConfig;
 import com.st.eighteen_be.config.repository.JpaConfig;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -16,7 +17,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-@Import({JpaAuditingConfig.class, JpaConfig.class})
+@Import({JpaAuditingConfig.class, JpaConfig.class, QuerydslConfig.class})
 @DataJpaTest
 @ActiveProfiles("test")
 public @interface ServiceWithMySQLTest {

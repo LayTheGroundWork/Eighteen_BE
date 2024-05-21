@@ -11,9 +11,7 @@ import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
-@Table(name = "VOTE", uniqueConstraints = {
-        @UniqueConstraint(name = "vote_unique", columnNames = {"TOURNAMENT_NO", "VOTER_ID"})
-})
+@Table(name = "VOTE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class VoteEntity extends BaseEntity {
