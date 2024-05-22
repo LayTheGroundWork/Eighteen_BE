@@ -15,14 +15,14 @@ import static com.st.eighteen_be.tournament.domain.entity.QVoteEntity.voteEntity
 @Repository
 @RequiredArgsConstructor
 public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
-
+    
     private final JPAQueryFactory qf;
-
+    
     public List<TournamentVoteResultResponseDTO> findTournamentVoteResult(Long tournamentNo) {
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
                 tournamentParticipantEntity.userId,
                 voteEntity.count().as("voteCount"));
-
+        
         return qf.select(dto)
                 .from(voteEntity)
                 .leftJoin(tournamentParticipantEntity)
@@ -31,16 +31,16 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
                 .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant)
                 .fetch();
     }
-
+    
     private static BooleanExpression eqJoinParticipantNo() {
         return voteEntity.participant.participantNo.eq(tournamentParticipantEntity.participantNo);
     }
-
+    
     private static BooleanExpression eqTournamentNo(Long tournamentId) {
         if (tournamentId == null) {
             return null;
         }
-
+        
         return voteEntity.tournament.tournamentNo.eq(tournamentId);
     }
 }
