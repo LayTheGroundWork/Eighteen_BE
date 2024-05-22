@@ -19,22 +19,19 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class TournamentVoteResultResponseDTO {
-    private Long tournamentId;
     private String rankerId;
     private Long rank;
     private Long voteCount;
-    
+
     @Builder
     @QueryProjection
-    public TournamentVoteResultResponseDTO(Long tournamentId, String rankerId, Long voteCount) {
-        this.tournamentId = tournamentId;
+    public TournamentVoteResultResponseDTO(String rankerId, Long voteCount) {
         this.rankerId = rankerId;
         this.voteCount = voteCount;
     }
-    
-    public static TournamentVoteResultResponseDTO of(Long tournamentId, String rankerId, Long voteCount) {
+
+    public static TournamentVoteResultResponseDTO of(String rankerId, Long voteCount) {
         return TournamentVoteResultResponseDTO.builder()
-                .tournamentId(tournamentId)
                 .rankerId(rankerId)
                 .voteCount(voteCount)
                 .build();
