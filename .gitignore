@@ -42,4 +42,4 @@ out/
 ### AWS ###
 application-sms.yaml
 application-jwt.yaml
-
+application-symmetric.yaml
