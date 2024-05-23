@@ -2,8 +2,8 @@ package com.st.eighteen_be.message.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
-import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.repository.SmsCertification;
+import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
@@ -64,16 +64,16 @@ public class SmsUtil {
     }
 
     // 사용자가 입력한 인증번호가 Redis에 저장된 인증번호와 동일한지 확인
-    public void verifySms(SmsCertificationRequestDto requestDto) {
+    public void verifySms(SignInRequestDto requestDto) {
         if (isVerify(requestDto)) {
             throw new AuthenticationException(ErrorCode.AUTHENTICATION_NUMBER_MISMATCH);
         }
-        smsCertification.deleteSmsCertification(requestDto.getPhoneNumber());
+        smsCertification.deleteSmsCertification(requestDto.phoneNumber());
     }
 
-    private boolean isVerify(SmsCertificationRequestDto requestDto) {
-        return !(smsCertification.hasKey(requestDto.getPhoneNumber()) &&
-                smsCertification.getSmsCertification(requestDto.getPhoneNumber())
-                        .equals(requestDto.getCertificationNumber()));
+    private boolean isVerify(SignInRequestDto requestDto) {
+        return !(smsCertification.hasKey(requestDto.phoneNumber()) &&
+                 smsCertification.getSmsCertification(requestDto.phoneNumber())
+                        .equals(requestDto.verificationCode()));
     }
 }
