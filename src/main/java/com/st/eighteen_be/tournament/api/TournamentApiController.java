@@ -33,7 +33,7 @@ import java.util.List;
 @RequestMapping("/api/")
 public class TournamentApiController {
     private final TournamentService tournamentService;
-    
+
     @Operation(summary = "토너먼트 검색", description = "토너먼트를 조건에 맞게 검색하고, 페이징 처리하여 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -48,12 +48,12 @@ public class TournamentApiController {
             @RequestParam(value = "category", required = false) String category
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
-        
+
         List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, TournamentCategoryEnums.findByCategory(category));
-        
+
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }
-    
+
     @Operation(summary = "토너먼트 투표", description = "토너먼트에 투표합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -61,5 +61,27 @@ public class TournamentApiController {
     @PostMapping("/v1/tournament/final/vote")
     public ApiResp<Object> vote() {
         return ApiResp.success(HttpStatus.OK, "test");
+    }
+
+    @Operation(summary = "토너먼트 강제 시작", description = "토너먼트를 강제로 시작합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
+    @PostMapping("/v1/tournament/start")
+    public ApiResp<Object> startTournament() {
+        tournamentService.startTournament();
+
+        return ApiResp.success(HttpStatus.OK, "토너먼트 시작 완료");
+    }
+
+    @Operation(summary = "토너먼트 강제 종료", description = "토너먼트를 강제로 종료합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
+    @PostMapping("/v1/tournament/end")
+    public ApiResp<Object> endTournament() {
+        tournamentService.endLastestTournaments();
+
+        return ApiResp.success(HttpStatus.OK, "토너먼트 종료 완료");
     }
 }
