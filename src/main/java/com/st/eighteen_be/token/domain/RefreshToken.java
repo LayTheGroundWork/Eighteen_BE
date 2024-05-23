@@ -24,7 +24,7 @@ public class RefreshToken {
         return RefreshToken.builder()
                 .id(phoneNumber)
                 .refreshToken(refreshToken)
-                .expiration(expiration / 1000)
+                .expiration(expiration / 1000) // @TimeToLive 는 초 단위로 값을 받음
                 .build();
     }
 
