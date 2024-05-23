@@ -13,74 +13,67 @@ import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-/**
- * packageName    : com.st.eighteen_be.service
- * fileName       : MemberService
- * author         : ehgur
- * date           : 2024-04-15
- * description    :
- * ===========================================================
- * DATE              AUTHOR             NOTE
- * -----------------------------------------------------------
- * 2024-04-15        ehgur             최초 생성
- */
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final EncryptService encryptService;
 
-    public UserPrivacy save(SignUpRequestDto requestDto){
-        List<String> roles = new ArrayList<>();
-        roles.add("USER");
 
-        try{
+    public UserPrivacy save(SignUpRequestDto requestDto) {
+        try {
             return userRepository.save(requestDto.toEntity(
-                    passwordEncoder.encode(requestDto.password()),roles)
+                    encryptService.encryptPhoneNumber(requestDto.phoneNumber()))
             );
-
-        } catch (DataIntegrityViolationException e){
-            if(e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")){
-                throw new OccupiedException(ErrorCode.EXISTS_MEMBER);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")) {
+                throw new OccupiedException(ErrorCode.SIGN_UP_EXISTS_USER);
             }
             throw e;
         }
     }
 
-    @Transactional(readOnly = true)
-    public JwtTokenDto signIn(SignInRequestDto requestDto){
+    @Transactional
+    public JwtTokenDto signIn(SignInRequestDto requestDto) {
 
-        // 1. phoneNumber + password 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 은 인증 여부를 확인하는 authentication 값이 false
+        // 1. phoneNumber와 verificationCode를 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), requestDto.password());
+                //new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), smsUtil.verifySms(requestDto));
+                new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), "");
 
-//         2. 실제 검증 authentication() 메서드를 통해 요청된 User 에 대한 검증 진행
-//         authenticate 메서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByPhoneNumber 메서드 실행
-        Authentication authentication =
-                authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        log.info("UsernamePasswordAuthenticationToken-> {}", authenticationToken);
 
+        // 2. 실제 검증 authentication() 메서드를 통해 요청된 User 에 대한 검증 진행
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
+        log.info("authentication-> {}", authentication);
+
+        // 3. 인증 정보를 기반으로 JWT 토큰 생성
+        JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
+
+        // 4. RefreshToken 저장
         RefreshToken refreshToken = refreshTokenService.saveOrUpdate(authentication);
-        String token = jwtTokenProvider.generateToken(authentication);
         jwtTokenProvider.setRefreshTokenAtCookie(refreshToken);
 
-        return JwtTokenDto.from(token);
+        // 5. 토큰 발급
+        return token;
+    }
+
+    public Optional<UserPrivacy> findByPhoneNumber(String encryptPhoneNumber) {
+        return userRepository.findByPhoneNumber(encryptPhoneNumber);
     }
 }

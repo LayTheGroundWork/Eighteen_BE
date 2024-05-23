@@ -9,11 +9,8 @@ import lombok.Getter;
 public class JwtTokenDto {
     private String grantType;
     private String accessToken;
+    private long accessTokenExpiresIn;
+    private String refreshToken;
 
-    public static JwtTokenDto from(String accessToken) {
-        return JwtTokenDto.builder()
-                .grantType(JwtTokenProvider.TOKEN_PREFIX)
-                .accessToken(accessToken)
-                .build();
-    }
+
 }

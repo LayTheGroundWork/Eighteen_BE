@@ -33,41 +33,53 @@ public class JwtTokenProvider {
 
     private final Key key;
 
-    // Token
-    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30L; // ACCESS 토큰 만료 시간: 30분
-    public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 6; // REFRESH 토큰 만료 시간: 6시간
+    @Value("${jwt.accessTokenExpireTime}")
+    private long accessTokenExpireTime;
 
-    // Header
-    public static final String TOKEN_HEADER = "Authorization";
-    public static final String TOKEN_PREFIX = "Bearer-";
-    private static final String KEY_ROLE = "auth";
+    @Value("${jwt.refreshTokenExpireTime}")
+    private long refreshTokenExpireTime;
+
+    private static final String TOKEN_TYPE = "Bearer-";
+    private static final String AUTHORITIES_KEY = "auth";
 
     // application-jwt.yaml에서 secret 값 가져와서 key에 저장
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey){
-
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // Member 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
-    public String generateToken(Authentication authentication){
+    public JwtTokenDto generateToken(Authentication authentication){
 
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        long now = (new Date()).getTime();
 
-        var now = new Date();
-        Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
-
-        return Jwts.builder()
+        // AccessToken 생성
+        Date accessTokenExpiresIn = new Date(now + accessTokenExpireTime);
+        String accessToken = Jwts.builder()
                 .subject(authentication.getName())
-                .claim(KEY_ROLE, authorities)
-                .issuedAt(new Date())
-                .expiration(expireDate)
+                .claim(AUTHORITIES_KEY, authorities)
+                .expiration(accessTokenExpiresIn)
                 .signWith(key)
                 .compact();
+
+        // RefreshToken 생성
+        String refreshToken = Jwts.builder()
+                .expiration(new Date(now + refreshTokenExpireTime))
+                .signWith(key)
+                .compact();
+
+
+        return JwtTokenDto.builder()
+                .grantType(TOKEN_TYPE)
+                .accessToken(accessToken)
+                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
+                .refreshToken(refreshToken)
+                .build();
     }
 
     // Jwt를 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
@@ -75,7 +87,7 @@ public class JwtTokenProvider {
         // Jwt 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get(KEY_ROLE) == null) {
+        if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
@@ -86,14 +98,12 @@ public class JwtTokenProvider {
         // UserDetails: interface, User: UserDetails 를 구현한 class
         UserDetails principal = new User(claims.getSubject(),"",authorities);
 
-
-        // TODO: Username 말고 전화번호 또는 이메일로 하게끔
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     private List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
         return Collections.singletonList(new SimpleGrantedAuthority(
-                claims.get(KEY_ROLE).toString()));
+                claims.get(AUTHORITIES_KEY).toString()));
     }
 
     // 토큰 정보를 검증하는 메서드

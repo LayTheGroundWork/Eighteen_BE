@@ -31,14 +31,8 @@ public class UserPrivacy extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private String password;
-
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime birthDay;
-
-    private String email;
-
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
@@ -49,6 +43,11 @@ public class UserPrivacy extends BaseEntity implements UserDetails {
         return this.roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return "";
     }
 
     @Override
