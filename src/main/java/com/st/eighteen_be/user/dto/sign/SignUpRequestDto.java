@@ -1,5 +1,6 @@
 package com.st.eighteen_be.user.dto.sign;
 
+import com.st.eighteen_be.user.domain.SchoolLocation;
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,29 +32,29 @@ public record SignUpRequestDto(
         @Pattern(regexp = "^01(0|1|[6-9])[0-9]{3,4}[0-9]{4}$")
         String phoneNumber,
 
-        @NotBlank(message = "공백으로 설정할 수 없습니다.")
-        @NotNull(message = "비밀번호는 필수 입력 값 입니다.")
-        @Pattern(regexp = "^(?=.*\\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{8,16}",
-                message = "비밀번호는 영문과 숫자 조합으로 8 ~ 16자리까지 가능합니다.")
-         String password,
+
+        // 고유 아이디
+//        @NotBlank(message = "공백으로 설정할 수 없습니다.")
+//        @NotNull(message = "식별아이디는 필수 입력 값 입니다.")
+//        String identifierId,
 
         @NotNull(message = "생년월일은 필수 입력 값 입니다.")
-        LocalDateTime birthDay,
+        LocalDateTime birthDay
 
-        @NotBlank(message = "공백으로 설정할 수 없습니다.")
-        @NotBlank(message = "이메일은 필수 입력 값 입니다.")
-        @Email(message = "이메일 형식이 아닙니다.")
-        String email,
+        // 학교
+//        SchoolLocation location
 
-        List<String> roles
+        // 이미지 파일
 ) {
 
-    public UserPrivacy toEntity(String encodePassword, List<String> roles) {
+    public UserPrivacy toEntity(String encryptPhoneNumber) {
+
+        List<String> roles = new ArrayList<>();
+        roles.add("USER");
+
         return UserPrivacy.builder()
-                .phoneNumber(phoneNumber)
-                .password(encodePassword)
+                .phoneNumber(encryptPhoneNumber)
                 .birthDay(birthDay)
-                .email(email)
                 .roles(roles)
                 .build();
     }
