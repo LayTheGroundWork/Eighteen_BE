@@ -29,11 +29,11 @@ public class MessageApiController {
         return ApiResponse.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
     }
 
-    @PostMapping("/v1/api/message/confirms")
-    public ApiResponse<String> smsVerification(@Valid @RequestBody SmsCertificationRequestDto requestDto) {
-
-        smsUtil.verifySms(requestDto);
-
-        return ApiResponse.success(HttpStatus.OK,"인증 완료");
-    }
+//    @PostMapping("/v1/api/message/confirms")
+//    public ApiResponse<String> smsVerification(@Valid @RequestBody SmsCertificationRequestDto requestDto) {
+//
+//        smsUtil.verifySms(requestDto);
+//
+//        return ApiResponse.success(HttpStatus.OK,"인증 완료");
+//    }
 }
