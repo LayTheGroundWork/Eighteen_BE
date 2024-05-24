@@ -49,7 +49,7 @@ public class TournamentApiController {
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
-        List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, TournamentCategoryEnums.findByCategory(category));
+        List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, TournamentCategoryEnums.findByCategoryOrNull(category));
 
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }
@@ -67,7 +67,7 @@ public class TournamentApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
     })
-    @PostMapping("/v1/tournament/start")
+    @PostMapping("/v1/tournament/force-start")
     public ApiResp<Object> startTournament() {
         tournamentService.startTournament();
 
@@ -78,7 +78,7 @@ public class TournamentApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
     })
-    @PostMapping("/v1/tournament/end")
+    @PostMapping("/v1/tournament/force-end")
     public ApiResp<Object> endTournament() {
         tournamentService.endLastestTournaments();
 

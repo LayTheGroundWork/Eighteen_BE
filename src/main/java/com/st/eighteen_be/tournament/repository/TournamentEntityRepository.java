@@ -2,16 +2,12 @@ package com.st.eighteen_be.tournament.repository;
 
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
+import com.st.eighteen_be.tournament.repository.querydsl.TournamentRepsitoryCustom;
 import jakarta.annotation.Nonnull;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface TournamentEntityRepository extends JpaRepository<TournamentEntity, Long> {
-    
-    List<TournamentEntity> findTournamentEntityByCategory(@Nonnull TournamentCategoryEnums category, Pageable pageable);
-    
+public interface TournamentEntityRepository extends JpaRepository<TournamentEntity, Long>, TournamentRepsitoryCustom {
     Optional<TournamentEntity> findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(@Nonnull TournamentCategoryEnums category);
 }

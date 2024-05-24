@@ -41,4 +41,14 @@ public enum TournamentCategoryEnums {
 
         throw new NotFoundException(ErrorCode.NOT_FOUND_CATEGORY);
     }
+
+    public static TournamentCategoryEnums findByCategoryOrNull(String category) {
+        for (TournamentCategoryEnums value : values()) {
+            if (value.getCategory().equals(category)) {
+                return value;
+            }
+        }
+
+        return null;
+    }
 }

@@ -1,0 +1,9 @@
+### 토너먼트 강제 시작
+POST http://{{host}}:{{port}}/api/v1/tournament/force-start
+
+### 토너먼트 강제 종료
+POST http://{{host}}:{{port}}/api/v1/tournament/force-end
+
+### 토너먼트 검색
+GET http://{{host}}:{{port}}/api/v1/tournament/search?size=10&page=0&sort=TOURNAMENT_NO&sortDirection=DESC
+Content-Type: application/json
