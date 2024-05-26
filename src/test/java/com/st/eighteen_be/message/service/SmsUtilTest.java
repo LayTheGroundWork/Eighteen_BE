@@ -1,8 +1,8 @@
 package com.st.eighteen_be.message.service;
 
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
-import com.st.eighteen_be.message.domain.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.repository.SmsCertification;
+import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class SmsUtilTest {
     @Autowired
     private SmsCertification smsCertification;
 
-    private SmsCertificationRequestDto requestDto;
+    private SignInRequestDto requestDto;
 
     private final String phone = "01012345678";
     private final String certificationNumber = "123456";
@@ -37,10 +37,8 @@ class SmsUtilTest {
         // Given
         smsUtil = new SmsUtil(smsCertification);
 
-        requestDto = SmsCertificationRequestDto.builder()
-                .phoneNumber(phone)
-                .certificationNumber(certificationNumber)
-                .build();
+        requestDto = new SignInRequestDto(phone,certificationNumber);
+
 
         // 테스트 데이터 초기화
         stringRedisTemplate.delete("sms:" + phone);
