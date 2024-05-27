@@ -24,10 +24,13 @@ public enum ErrorCode {
     AUTHENTICATION_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized..."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden..."),
+
     TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
+    REFRESH_TOKEN_NOT_VALID(HttpStatus.NOT_FOUND, "Refresh Token이 유효하지 않습니다."),
+    TOKEN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "자격 증명 실패"),
+    TOKEN_FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다"),
 
     ;
-
     private final HttpStatus status;
     private final String message;
 
