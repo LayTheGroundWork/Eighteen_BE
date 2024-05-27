@@ -17,6 +17,6 @@ import java.util.List;
  * -----------------------------------------------------------
  * 24. 5. 22.        ipeac       최초 생성
  */
-public interface TournamentRepsitoryCustom {
+public interface TournamentRepositoryCustom {
     List<TournamentSearchResponseDTO> findTournamentByCategoryAndPaging(TournamentCategoryEnums category, Pageable pageable);
 }

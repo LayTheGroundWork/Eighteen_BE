@@ -26,7 +26,7 @@ import static com.st.eighteen_be.tournament.domain.entity.QTournamentEntity.tour
  */
 @Repository
 @RequiredArgsConstructor
-public class TournamentRepsitoryCustomImpl implements TournamentRepsitoryCustom {
+public class TournamentRepositoryCustomImpl implements TournamentRepositoryCustom {
 
     private final JPAQueryFactory qf;
 
