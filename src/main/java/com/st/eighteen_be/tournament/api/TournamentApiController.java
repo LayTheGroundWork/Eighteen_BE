@@ -5,6 +5,9 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchRespons
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,10 +44,19 @@ public class TournamentApiController {
     })
     @GetMapping("/v1/tournament/search")
     public ApiResp<List<TournamentSearchResponseDTO>> search(
+            @Parameter(description = "페이지 번호", example = "1")
             @RequestParam(value = "page", defaultValue = "1") int page,
+            
+            @Parameter(description = "페이지 크기", example = "10")
             @RequestParam(value = "size", defaultValue = "10") int size,
+            
+            @Parameter(description = "정렬 기준", example = "TOURNAMENT_NO")
             @RequestParam(value = "sort", defaultValue = "TOURNAMENT_NO") String sort,
+            
+            @Parameter(description = "정렬 방향", example = "DESC")
             @RequestParam(value = "sortDirection", defaultValue = "DESC") Sort.Direction sortDirection,
+            
+            @Parameter(description = "카테고리", example = "GAME")
             @RequestParam(value = "category", required = false) String category
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
@@ -54,12 +66,20 @@ public class TournamentApiController {
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }
     
-    @Operation(summary = "토너먼트 투표", description = "토너먼트에 투표합니다.")
+    @Operation(summary = "토너먼트 투표",
+            description = "토너먼트에 투표합니다.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TournamentVoteRequestDTO.class))
+            )
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
     })
     @PostMapping("/v1/tournament/final/vote")
-    public ApiResp<Object> vote() {
+    public ApiResp<Object> vote(@RequestBody List<TournamentVoteRequestDTO> voteRequests) {
+        tournamentService.processVote(voteRequests);
+        
         return ApiResp.success(HttpStatus.OK, "test");
     }
     

@@ -26,6 +26,10 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Column(name = "USER_ID", length = 200)
     private String userId;
     
+    @Comment("토너먼트 참가자 점수")
+    @Column(name = "SCORE")
+    private int score;
+    
     public static TournamentParticipantEntity of(String userId) {
         return TournamentParticipantEntity.builder()
                 .userId(userId)

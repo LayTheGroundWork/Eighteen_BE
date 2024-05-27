@@ -1,6 +1,7 @@
 package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.common.annotation.ServiceWithMySQLTest;
+import com.st.eighteen_be.tournament.api.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
@@ -8,7 +9,7 @@ import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
-import com.st.eighteen_be.tournament.repository.TournamentParticipantEntityRepository;
+import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,7 @@ class TournamentServiceTest {
     private TournamentEntityRepository tournamentEntityRepository;
     
     @Autowired
-    private TournamentParticipantEntityRepository tournamentParticipantEntityRepository;
+    private TournamentParticipantRepository tournamentParticipantEntityRepository;
     
     @Autowired
     private VoteEntityRepository voteEntityRepository;
@@ -286,5 +287,84 @@ class TournamentServiceTest {
         
         private record Result(VoteEntity voter1, VoteEntity voter2, VoteEntity voter3) {
         }
+    }
+    
+    @Nested
+    @DisplayName("토너먼트 투표 테스트")
+    class VoteTournamentTest {
+        @Test
+        @DisplayName("토너먼트 투표시 투표가 정상적으로 처리되는지 확인한다")
+        void When_voteTournament_Then_processVote() {
+            // given
+            TournamentEntity tournamentEntity = TournamentEntity.builder()
+                    .category(TournamentCategoryEnums.GAME)
+                    .build();
+            
+            tournamentEntityRepository.save(tournamentEntity);
+            
+            //유저 16개 추가
+            TournamentParticipantTestResult result = getTournamentParticipantTestResult();
+            
+            tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
+            
+            //16명에 대한 투표 요청 dto 전달 - 반복문으로 처리하고 List 생성
+            List<TournamentVoteRequestDTO> voteRequests = new ArrayList<>();
+            
+            for (int i = 1; i <= 16; i++) {
+                voteRequests.add(TournamentVoteRequestDTO.builder()
+                        .participantId("voter" + i)
+                        .votePoint(i)
+                        .build());
+            }
+            
+            // when
+            tournamentService.processVote(voteRequests);
+            
+            // then
+            List<TournamentParticipantEntity> found = tournamentParticipantEntityRepository.findAll();
+            
+            assertThat(found)
+                    .isNotEmpty()
+                    .allMatch(tournamentParticipantEntity -> tournamentParticipantEntity.getScore() != 0, "투표가 정상적으로 처리되지 않았습니다.");
+        }
+        
+        private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult() {
+            
+            TournamentParticipantEntity user1 = TournamentParticipantEntity.of("user1");
+            TournamentParticipantEntity user2 = TournamentParticipantEntity.of("user2");
+            TournamentParticipantEntity user3 = TournamentParticipantEntity.of("user3");
+            TournamentParticipantEntity user4 = TournamentParticipantEntity.of("user4");
+            TournamentParticipantEntity user5 = TournamentParticipantEntity.of("user5");
+            TournamentParticipantEntity user6 = TournamentParticipantEntity.of("user6");
+            TournamentParticipantEntity user7 = TournamentParticipantEntity.of("user7");
+            TournamentParticipantEntity user8 = TournamentParticipantEntity.of("user8");
+            TournamentParticipantEntity user9 = TournamentParticipantEntity.of("user9");
+            TournamentParticipantEntity user10 = TournamentParticipantEntity.of("user10");
+            TournamentParticipantEntity user11 = TournamentParticipantEntity.of("user11");
+            TournamentParticipantEntity user12 = TournamentParticipantEntity.of("user12");
+            TournamentParticipantEntity user13 = TournamentParticipantEntity.of("user13");
+            TournamentParticipantEntity user14 = TournamentParticipantEntity.of("user14");
+            TournamentParticipantEntity user15 = TournamentParticipantEntity.of("user15");
+            TournamentParticipantEntity user16 = TournamentParticipantEntity.of("user16");
+            
+            return new TournamentParticipantTestResult(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11, user12, user13, user14, user15, user16);
+        }
+        
+        private record TournamentParticipantTestResult(TournamentParticipantEntity user1,
+                                                       TournamentParticipantEntity user2,
+                                                       TournamentParticipantEntity user3,
+                                                       TournamentParticipantEntity user4,
+                                                       TournamentParticipantEntity user5,
+                                                       TournamentParticipantEntity user6,
+                                                       TournamentParticipantEntity user7,
+                                                       TournamentParticipantEntity user8,
+                                                       TournamentParticipantEntity user9,
+                                                       TournamentParticipantEntity user10,
+                                                       TournamentParticipantEntity user11,
+                                                       TournamentParticipantEntity user12,
+                                                       TournamentParticipantEntity user13,
+                                                       TournamentParticipantEntity user14,
+                                                       TournamentParticipantEntity user15,
+                                                       TournamentParticipantEntity user16) {}
     }
 }
