@@ -1,7 +1,10 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
+import com.st.eighteen_be.jwt.JwtRequestDto;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
@@ -47,7 +50,6 @@ public class UserService {
         }
     }
 
-    @Transactional
     public JwtTokenDto signIn(SignInRequestDto requestDto) {
 
         // 1. phoneNumber와 verificationCode를 기반으로 Authentication 객체 생성
@@ -67,9 +69,37 @@ public class UserService {
 
         // 4. RefreshToken 저장
         RefreshToken refreshToken = refreshTokenService.saveOrUpdate(authentication);
-        jwtTokenProvider.setRefreshTokenAtCookie(refreshToken);
+
+        // RefreshToken Cookie에 저장
+        // jwtTokenProvider.setRefreshTokenAtCookie(refreshToken);
 
         // 5. 토큰 발급
+        return token;
+    }
+
+    public JwtTokenDto reissue(JwtRequestDto requestDto) {
+        // 1. Refresh Token 검증
+        if (!jwtTokenProvider.validateToken(requestDto.getRefreshToken())) {
+            throw new NotValidException(ErrorCode.REFRESH_TOKEN_NOT_VALID);
+        }
+
+        // 2. Access Token 에서 User ID 가져오기
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
+
+        // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져옴
+        RefreshToken refreshToken = refreshTokenService.findRefreshTokenById(authentication.getName());
+
+        // 4. Refresh Token 일치하는지 검사
+        if (!refreshToken.getRefreshToken().equals(requestDto.getRefreshToken())) {
+            throw new AuthenticationException(ErrorCode.TOKEN_UNAUTHORIZED);
+        }
+
+        // 5. 새로운 토큰 생성
+        JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
+
+        // 6. 저장소 정보 업데이트
+        refreshTokenService.saveOrUpdate(authentication);
+
         return token;
     }
 

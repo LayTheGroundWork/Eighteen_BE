@@ -2,6 +2,7 @@ package com.st.eighteen_be.user.api;
 
 import com.st.eighteen_be.common.response.ApiResponse;
 import com.st.eighteen_be.common.security.SecurityUtil;
+import com.st.eighteen_be.jwt.JwtRequestDto;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
@@ -48,6 +49,11 @@ public class UserApiController {
         JwtTokenDto jwtTokenDto = userService.signIn(requestDto);
 
         return ApiResponse.success(HttpStatus.OK, jwtTokenDto);
+    }
+
+    @PostMapping("/v1/api/user/reissue")
+    public ApiResponse<JwtTokenDto> reissue(@RequestBody JwtRequestDto requestDto) {
+        return ApiResponse.success(HttpStatus.OK, userService.reissue(requestDto));
     }
 
     @PostMapping("/test")
