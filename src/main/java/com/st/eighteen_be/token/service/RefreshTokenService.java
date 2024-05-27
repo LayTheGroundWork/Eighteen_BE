@@ -1,7 +1,5 @@
 package com.st.eighteen_be.token.service;
 
-import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.repository.RefreshTokenRepository;
@@ -29,7 +27,7 @@ public class RefreshTokenService {
     }
     public RefreshToken findRefreshTokenById(String username) {
         return refreshTokenRepository.findById(username).orElseThrow(
-                () -> new NotFoundException(ErrorCode.TOKEN_NOT_FOUND)
+                () -> new RuntimeException("로그아웃 된 사용자입니다.")
         );
     }
 
