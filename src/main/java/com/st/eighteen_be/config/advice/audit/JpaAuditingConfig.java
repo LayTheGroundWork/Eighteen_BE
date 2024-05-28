@@ -1,4 +1,4 @@
-package com.st.eighteen_be.config.audit;
+package com.st.eighteen_be.config.advice.audit;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

@@ -302,17 +302,16 @@ class TournamentServiceTest {
             
             tournamentEntityRepository.save(tournamentEntity);
             
-            //유저 16개 추가
             TournamentParticipantTestResult result = getTournamentParticipantTestResult();
             
             tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
             
-            //16명에 대한 투표 요청 dto 전달 - 반복문으로 처리하고 List 생성
             List<TournamentVoteRequestDTO> voteRequests = new ArrayList<>();
             
             for (int i = 1; i <= 16; i++) {
                 voteRequests.add(TournamentVoteRequestDTO.builder()
-                        .participantId("voter" + i)
+                        .voterId("voter" + i)
+                        .voteeId("user" + i)
                         .votePoint(i)
                         .build());
             }
@@ -326,6 +325,42 @@ class TournamentServiceTest {
             assertThat(found)
                     .isNotEmpty()
                     .allMatch(tournamentParticipantEntity -> tournamentParticipantEntity.getScore() != 0, "투표가 정상적으로 처리되지 않았습니다.");
+        }
+        
+        @Test
+        @DisplayName("토너먼트 투표시 투표기록이 정상적으로 처리되는지 확인한다")
+        void When_voteTournament_Then_insertVoteRecord() {
+            // given
+            TournamentEntity tournamentEntity = TournamentEntity.builder()
+                    .category(TournamentCategoryEnums.GAME)
+                    .build();
+            
+            tournamentEntityRepository.save(tournamentEntity);
+            
+            TournamentParticipantTestResult result = getTournamentParticipantTestResult();
+            
+            tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
+            
+            List<TournamentVoteRequestDTO> voteRequests = new ArrayList<>();
+            
+            for (int i = 1; i <= 16; i++) {
+                voteRequests.add(TournamentVoteRequestDTO.builder()
+                        .tournamentNo(tournamentEntity.getTournamentNo())
+                        .voterId("voter" + i)
+                        .voteeId("user" + i)
+                        .votePoint(i)
+                        .build());
+            }
+            
+            // when
+            tournamentService.processVote(voteRequests);
+            
+            // then
+            List<VoteEntity> found = voteEntityRepository.findAll();
+            
+            assertThat(found)
+                    .isNotEmpty()
+                    .hasSize(voteRequests.size());
         }
         
         private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult() {

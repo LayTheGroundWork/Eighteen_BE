@@ -21,13 +21,18 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Column(name = "PARTICIPANT_NO")
     private Long participantNo;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Comment("토너먼트 고유번호")
+    @JoinColumn(name = "TOURNAMENT_NO", nullable = false)
+    private TournamentEntity tournament;
+    
     @Size(max = 200)
     @Comment("토너먼트 참가자 ID")
     @Column(name = "USER_ID", length = 200)
     private String userId;
     
     @Comment("토너먼트 참가자 점수")
-    @Column(name = "SCORE")
+    @Column(name = "SCORE",columnDefinition = "INT DEFAULT 0")
     private int score;
     
     public static TournamentParticipantEntity of(String userId) {

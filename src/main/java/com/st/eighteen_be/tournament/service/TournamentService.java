@@ -128,7 +128,6 @@ public class TournamentService {
         log.info("processVote start");
         
         tournamentParticipantEntityRepository.updateVotePoints(voteRequests);
-        
-        //투표자 목록에 기록한다.
+        tournamentParticipantEntityRepository.insertVoteRecord(voteRequests);
     }
 }

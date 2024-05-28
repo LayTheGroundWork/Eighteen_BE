@@ -17,4 +17,6 @@ import java.util.List;
  */
 public interface TournamentParticipantRepositoryCustom {
     void updateVotePoints(List<TournamentVoteRequestDTO> voteRequestDTOs);
+    
+    void insertVoteRecord(List<TournamentVoteRequestDTO> voteRequestDTOs);
 }

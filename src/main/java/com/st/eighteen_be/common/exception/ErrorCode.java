@@ -28,6 +28,8 @@ public enum ErrorCode {
     NOT_FOUND_GAME_ROUND(HttpStatus.NOT_FOUND, "해당하는 경기 라운드를 찾을 수 없습니다."),
     NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "해당하는 카테고리를 찾을 수 없습니다."),
     INVALID_USER_COUNT(HttpStatus.BAD_REQUEST, "유저 수가 올바르지 않습니다."),
+    NOT_FOUND_TOURNAMENT(HttpStatus.NOT_FOUND, "해당하는 토너먼트를 찾을 수 없습니다."),
+    NOT_FOUND_TOURNAMENT_PARTICIPANT(HttpStatus.NOT_FOUND, "해당하는 토너먼트 참가자를 찾을 수 없습니다."),
     
     //common
     NOT_NULL(HttpStatus.BAD_REQUEST, "필수 값이 누락되었습니다."),

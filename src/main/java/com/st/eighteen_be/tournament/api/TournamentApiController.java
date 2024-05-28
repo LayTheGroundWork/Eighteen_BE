@@ -80,7 +80,7 @@ public class TournamentApiController {
     public ApiResp<Object> vote(@RequestBody List<TournamentVoteRequestDTO> voteRequests) {
         tournamentService.processVote(voteRequests);
         
-        return ApiResp.success(HttpStatus.OK, "test");
+        return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }
     
     @Operation(summary = "토너먼트 강제 시작", description = "토너먼트를 강제로 시작합니다.")
