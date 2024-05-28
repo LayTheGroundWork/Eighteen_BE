@@ -75,6 +75,8 @@ public class TournamentApiController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
     })
     @PostMapping("/v1/tournament/final/vote")
     public ApiResp<Object> vote(@RequestBody List<TournamentVoteRequestDTO> voteRequests) {
