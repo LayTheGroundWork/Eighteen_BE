@@ -11,6 +11,4 @@ public class JwtTokenDto {
     private String accessToken;
     private long accessTokenExpiresIn;
     private String refreshToken;
-
-
 }

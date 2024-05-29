@@ -16,11 +16,8 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String TOKEN_TYPE = "Bearer-";
     private final JwtTokenProvider jwtTokenProvider;
 
     // 실제 필터링 로직은 doFilterInternal 에 들어감
@@ -31,7 +28,7 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws IOException, ServletException {
 
         // 1. Request Header 에서 토큰을 꺼냄
-        String jwt = resolveToken(request);
+        String jwt = jwtTokenProvider.resolveAccessToken(request);
 
         // 2. validateToken 으로 토큰 유효성 검사
         // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
@@ -43,12 +40,4 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // Request Header에서 토큰 정보 추출
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_TYPE)) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
 }
