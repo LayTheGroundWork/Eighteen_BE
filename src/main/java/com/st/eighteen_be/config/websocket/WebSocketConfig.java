@@ -31,7 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("http://localhost:8080", "http://49.142.101.231:8080");
         
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/ws-sockjs")
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("http://localhost:8080", "http://49.142.101.231:8080")
                 .withSockJS();

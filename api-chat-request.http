@@ -7,7 +7,7 @@
     client.global.set("koreaTimestamp", koreaTimestamp);
 %}
 
-GET http://localhost:8080/api/v1/chat/enter
+GET http://{{host}}:{{port}}/api/v1/chat/enter
 Content-Type: application/json
 
 #적절한 ID 를 입력해주세요
@@ -19,7 +19,7 @@ Content-Type: application/json
 
 ### 채팅방 조회 및 최신메시지 조회
 
-GET http://localhost:8080/api/v1/chat/all
+GET http://{{host}}:{{port}}/api/v1/chat/all
 Content-Type: application/json
 
 {
