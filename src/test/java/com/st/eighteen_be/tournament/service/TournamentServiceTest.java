@@ -12,6 +12,8 @@ import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +45,9 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 @DisplayName("TournamentService 테스트")
 @ServiceWithMySQLTest
 class TournamentServiceTest {
+    @PersistenceContext
+    private EntityManager em;
+    
     private TournamentService tournamentService;
     
     @Autowired
@@ -163,15 +168,22 @@ class TournamentServiceTest {
         @DisplayName("토너먼트 시작시 토너먼트 참가자가 랜덤으로 선정되는지 확인한다.")
         void When_startTournament_Then_pickRandomUser() {
             // given
+            TournamentEntity tournament = TournamentEntity.builder()
+                    .category(TournamentCategoryEnums.GAME)
+                    .season(1)
+                    .build();
+            
+            em.persist(tournament);
+            
             List<TournamentParticipantEntity> tournamentParticipantEntities = List.of(
-                    TournamentParticipantEntity.of("user1"),
-                    TournamentParticipantEntity.of("user2"),
-                    TournamentParticipantEntity.of("user3"),
-                    TournamentParticipantEntity.of("user4"),
-                    TournamentParticipantEntity.of("user5"),
-                    TournamentParticipantEntity.of("user6"),
-                    TournamentParticipantEntity.of("user7"),
-                    TournamentParticipantEntity.of("user8")
+                    TournamentParticipantEntity.of("user1", tournament),
+                    TournamentParticipantEntity.of("user2", tournament),
+                    TournamentParticipantEntity.of("user3", tournament),
+                    TournamentParticipantEntity.of("user4", tournament),
+                    TournamentParticipantEntity.of("user5", tournament),
+                    TournamentParticipantEntity.of("user6", tournament),
+                    TournamentParticipantEntity.of("user7", tournament),
+                    TournamentParticipantEntity.of("user8", tournament)
             );
             
             try (MockedStatic<TournamentHelperService> tournamentHelperServiceMockedStatic = Mockito.mockStatic(TournamentHelperService.class)) {
@@ -187,6 +199,46 @@ class TournamentServiceTest {
                         .isNotEmpty()
                         .hasSize(tournamentParticipantEntities.size());
             }
+        }
+        
+        @Test
+        @DisplayName("종료된 토너먼트가 있는 경우 시즌이 증가되어 새로운 토너먼트가 생성되는지 확인한다.")
+        void When_startTournament_Then_createNewTournament() {
+            // given
+            List<TournamentEntity> tournamentEntities = new ArrayList<>();
+            
+            for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+                TournamentEntity gameTournament = TournamentEntity.builder()
+                        .season(2)
+                        .status(false)
+                        .category(category)
+                        .build();
+                
+                tournamentEntities.add(gameTournament);
+            }
+            
+            tournamentEntityRepository.saveAll(tournamentEntities);
+            
+            // when
+            tournamentService.startTournament();
+            
+            // then
+            List<TournamentEntity> activeTournaments = em.createQuery(
+                    "SELECT t FROM TournamentEntity t WHERE t.status = true"
+                    , TournamentEntity.class
+            ).getResultList();
+            
+            assertThat(activeTournaments)
+                    .isNotEmpty()
+                    .hasSize(TournamentCategoryEnums.values().length);
+            
+            assertSoftly(
+                    softly -> {
+                        for (TournamentEntity tournamentEntity : activeTournaments) {
+                            softly.assertThat(tournamentEntity.getSeason()).isEqualTo(3);
+                        }
+                    }
+            );
         }
     }
     
@@ -232,8 +284,8 @@ class TournamentServiceTest {
             
             //참여자 추가하기
             List<TournamentParticipantEntity> tournamentParticipantEntities = List.of(
-                    TournamentParticipantEntity.of("user1"),
-                    TournamentParticipantEntity.of("user2")
+                    TournamentParticipantEntity.of("user1", tournamentEntity),
+                    TournamentParticipantEntity.of("user2", tournamentEntity)
             );
             
             tournamentParticipantEntityRepository.saveAll((tournamentParticipantEntities));
@@ -302,7 +354,7 @@ class TournamentServiceTest {
             
             tournamentEntityRepository.save(tournamentEntity);
             
-            TournamentParticipantTestResult result = getTournamentParticipantTestResult();
+            TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
             
             tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
             
@@ -310,6 +362,7 @@ class TournamentServiceTest {
             
             for (int i = 1; i <= 16; i++) {
                 voteRequests.add(TournamentVoteRequestDTO.builder()
+                        .tournamentNo(tournamentEntity.getTournamentNo())
                         .voterId("voter" + i)
                         .voteeId("user" + i)
                         .votePoint(i)
@@ -337,7 +390,7 @@ class TournamentServiceTest {
             
             tournamentEntityRepository.save(tournamentEntity);
             
-            TournamentParticipantTestResult result = getTournamentParticipantTestResult();
+            TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
             
             tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
             
@@ -363,24 +416,24 @@ class TournamentServiceTest {
                     .hasSize(voteRequests.size());
         }
         
-        private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult() {
+        private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult(TournamentEntity tournamentEntity) {
             
-            TournamentParticipantEntity user1 = TournamentParticipantEntity.of("user1");
-            TournamentParticipantEntity user2 = TournamentParticipantEntity.of("user2");
-            TournamentParticipantEntity user3 = TournamentParticipantEntity.of("user3");
-            TournamentParticipantEntity user4 = TournamentParticipantEntity.of("user4");
-            TournamentParticipantEntity user5 = TournamentParticipantEntity.of("user5");
-            TournamentParticipantEntity user6 = TournamentParticipantEntity.of("user6");
-            TournamentParticipantEntity user7 = TournamentParticipantEntity.of("user7");
-            TournamentParticipantEntity user8 = TournamentParticipantEntity.of("user8");
-            TournamentParticipantEntity user9 = TournamentParticipantEntity.of("user9");
-            TournamentParticipantEntity user10 = TournamentParticipantEntity.of("user10");
-            TournamentParticipantEntity user11 = TournamentParticipantEntity.of("user11");
-            TournamentParticipantEntity user12 = TournamentParticipantEntity.of("user12");
-            TournamentParticipantEntity user13 = TournamentParticipantEntity.of("user13");
-            TournamentParticipantEntity user14 = TournamentParticipantEntity.of("user14");
-            TournamentParticipantEntity user15 = TournamentParticipantEntity.of("user15");
-            TournamentParticipantEntity user16 = TournamentParticipantEntity.of("user16");
+            TournamentParticipantEntity user1 = TournamentParticipantEntity.of("user1", tournamentEntity);
+            TournamentParticipantEntity user2 = TournamentParticipantEntity.of("user2", tournamentEntity);
+            TournamentParticipantEntity user3 = TournamentParticipantEntity.of("user3", tournamentEntity);
+            TournamentParticipantEntity user4 = TournamentParticipantEntity.of("user4", tournamentEntity);
+            TournamentParticipantEntity user5 = TournamentParticipantEntity.of("user5", tournamentEntity);
+            TournamentParticipantEntity user6 = TournamentParticipantEntity.of("user6", tournamentEntity);
+            TournamentParticipantEntity user7 = TournamentParticipantEntity.of("user7", tournamentEntity);
+            TournamentParticipantEntity user8 = TournamentParticipantEntity.of("user8", tournamentEntity);
+            TournamentParticipantEntity user9 = TournamentParticipantEntity.of("user9", tournamentEntity);
+            TournamentParticipantEntity user10 = TournamentParticipantEntity.of("user10", tournamentEntity);
+            TournamentParticipantEntity user11 = TournamentParticipantEntity.of("user11", tournamentEntity);
+            TournamentParticipantEntity user12 = TournamentParticipantEntity.of("user12", tournamentEntity);
+            TournamentParticipantEntity user13 = TournamentParticipantEntity.of("user13", tournamentEntity);
+            TournamentParticipantEntity user14 = TournamentParticipantEntity.of("user14", tournamentEntity);
+            TournamentParticipantEntity user15 = TournamentParticipantEntity.of("user15", tournamentEntity);
+            TournamentParticipantEntity user16 = TournamentParticipantEntity.of("user16", tournamentEntity);
             
             return new TournamentParticipantTestResult(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11, user12, user13, user14, user15, user16);
         }
