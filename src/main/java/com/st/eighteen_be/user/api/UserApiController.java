@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024-04-18        ehgur             최초 생성
  */
 
-@RestController
 @Slf4j
+@RestController
 @RequiredArgsConstructor
 @RequestMapping
 public class UserApiController {
@@ -49,6 +49,12 @@ public class UserApiController {
         JwtTokenDto jwtTokenDto = userService.signIn(requestDto);
 
         return ApiResponse.success(HttpStatus.OK, jwtTokenDto);
+    }
+
+    @PostMapping("/v1/api/user/sign-out")
+    public ApiResponse<String> signOut(@RequestBody JwtRequestDto requestDto) {
+        userService.signOut(requestDto);
+        return ApiResponse.success(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
     @PostMapping("/v1/api/user/reissue")

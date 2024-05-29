@@ -12,6 +12,7 @@ import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
+import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final EncryptService encryptService;
+    private final TokenBlackList tokenBlackList;
 
 
     public UserPrivacy save(SignUpRequestDto requestDto) {
@@ -77,7 +79,28 @@ public class UserService {
         return token;
     }
 
+    public void signOut(JwtRequestDto requestDto) {
+
+        // 1. Access Token 검증
+        if (!jwtTokenProvider.validateToken(requestDto.getAccessToken())) {
+            throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
+        }
+
+        // 2. Access Token 에서 authentication 을 가져옵니다.
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
+
+        // 3. DB에 저장된 Refresh Token 제거
+        refreshTokenService.deleteRefreshTokenById(authentication.getName());
+
+        // 4. Access Token blacklist에 등록하여 만료시키기
+        // 해당 엑세스 토큰의 남은 유효시간을 얻음
+        Long expiration = jwtTokenProvider.getExpiration(requestDto.getAccessToken());
+        tokenBlackList.setBlackList(requestDto.getAccessToken(), "access_token", expiration);
+
+    }
+
     public JwtTokenDto reissue(JwtRequestDto requestDto) {
+
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(requestDto.getRefreshToken())) {
             throw new NotValidException(ErrorCode.REFRESH_TOKEN_NOT_VALID);
