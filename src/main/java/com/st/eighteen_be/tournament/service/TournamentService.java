@@ -58,7 +58,7 @@ public class TournamentService {
         log.info("findLastestTournamentsGroupByCategory start");
         
         for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
-            TournamentEntity lastestTournament = tournamentEntityRepository.findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(category)
+            TournamentEntity lastestTournament = tournamentEntityRepository.findFirstByCategoryOrderByCreatedDateDesc(category)
                     .orElse(null);
             
             int newSeason = lastestTournament == null ? 1 : lastestTournament.getSeason() + 1;

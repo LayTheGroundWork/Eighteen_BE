@@ -12,6 +12,8 @@ import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +45,9 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 @DisplayName("TournamentService 테스트")
 @ServiceWithMySQLTest
 class TournamentServiceTest {
+    @PersistenceContext
+    private EntityManager em;
+    
     private TournamentService tournamentService;
     
     @Autowired
@@ -187,6 +192,46 @@ class TournamentServiceTest {
                         .isNotEmpty()
                         .hasSize(tournamentParticipantEntities.size());
             }
+        }
+        
+        @Test
+        @DisplayName("종료된 토너먼트가 있는 경우 시즌이 증가되어 새로운 토너먼트가 생성되는지 확인한다.")
+        void When_startTournament_Then_createNewTournament() {
+            // given
+            List<TournamentEntity> tournamentEntities = new ArrayList<>();
+            
+            for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+                TournamentEntity gameTournament = TournamentEntity.builder()
+                        .season(2)
+                        .status(false)
+                        .category(category)
+                        .build();
+                
+                tournamentEntities.add(gameTournament);
+            }
+            
+            tournamentEntityRepository.saveAll(tournamentEntities);
+            
+            // when
+            tournamentService.startTournament();
+            
+            // then
+            List<TournamentEntity> activeTournaments = em.createQuery(
+                    "SELECT t FROM TournamentEntity t WHERE t.status = true"
+                    , TournamentEntity.class
+            ).getResultList();
+            
+            assertThat(activeTournaments)
+                    .isNotEmpty()
+                    .hasSize(TournamentCategoryEnums.values().length);
+            
+            assertSoftly(
+                    softly -> {
+                        for (TournamentEntity tournamentEntity : activeTournaments) {
+                            softly.assertThat(tournamentEntity.getSeason()).isEqualTo(3);
+                        }
+                    }
+            );
         }
     }
     

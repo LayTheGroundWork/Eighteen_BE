@@ -1,6 +1,6 @@
 package com.st.eighteen_be.common.annotation;
 
-import com.st.eighteen_be.config.audit.JpaAuditingConfig;
+import com.st.eighteen_be.config.advice.audit.JpaAuditingConfig;
 import com.st.eighteen_be.config.querydsl.QuerydslConfig;
 import com.st.eighteen_be.config.repository.JpaConfig;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
