@@ -11,6 +11,7 @@ import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -45,12 +46,19 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
         for (TournamentVoteRequestDTO voteRequest : voteRequestDTOs) {
             qf.update(tournamentParticipantEntity)
                     .set(tournamentParticipantEntity.score, tournamentParticipantEntity.score.add(voteRequest.getVotePoint()))
-                    .where(eqVoteeId(voteRequest.getVoteeId(), voteRequest.getVotePoint()))
+                    .where(
+                            eqVoteeId(voteRequest.getVoteeId())
+                                    .and(eqTournamentNoOfTournamentParticipant(voteRequest.getTournamentNo()))
+                    )
                     .execute();
         }
         
         em.flush();
         em.clear();
+    }
+    
+    private static BooleanExpression eqTournamentNoOfTournamentParticipant(@NotNull Long tournamentNo) {
+        return tournamentParticipantEntity.tournament.tournamentNo.eq(tournamentNo);
     }
     
     @Override
@@ -64,7 +72,7 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
             
             // 투표한 참여자 정보를 조회합니다.
             TournamentParticipantEntity foundTournamentParticipant = Optional.ofNullable(qf.selectFrom(tournamentParticipantEntity)
-                    .where(eqVoteeId(voteRequest.getVoteeId(), voteRequest.getVotePoint()))
+                    .where(eqVoteeId(voteRequest.getVoteeId()))
                     .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT_PARTICIPANT));
             
             VoteEntity vote = voteRequest.toEntity(foundTournament, foundTournamentParticipant);
@@ -73,12 +81,12 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
         }
     }
     
-    private static BooleanExpression eqTournamentNo(long tournamentNo) {
+    private static BooleanExpression eqTournamentNo(Long tournamentNo) {
         return tournamentEntity.tournamentNo.eq(tournamentNo);
     }
     
-    private static BooleanExpression eqVoteeId(String voteeId, int votePoint) {
-        if (voteeId == null || votePoint == 0) {
+    private static BooleanExpression eqVoteeId(String voteeId) {
+        if (voteeId == null) {
             throw new BadRequestException(ErrorCode.INVALID_PARAMETER);
         }
         
