@@ -1,12 +1,11 @@
 package com.st.eighteen_be.jwt;
 
-import com.st.eighteen_be.token.domain.RefreshToken;
+import com.st.eighteen_be.user.repository.TokenBlackList;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,22 +15,22 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class JwtTokenProvider {
 
-    private final Key key;
+    private final TokenBlackList tokenBlackList;
+    private Key key;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     @Value("${jwt.accessTokenExpireTime}")
     private long accessTokenExpireTime;
@@ -39,13 +38,25 @@ public class JwtTokenProvider {
     @Value("${jwt.refreshTokenExpireTime}")
     private long refreshTokenExpireTime;
 
-    private static final String TOKEN_TYPE = "Bearer-";
+    private static final String TOKEN_TYPE = "Bearer";
+    private static final String BEARER_PREFIX = "Bearer-";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+
     private static final String AUTHORITIES_KEY = "auth";
 
-    // application-jwt.yaml에서 secret 값 가져와서 key에 저장
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+    public JwtTokenProvider(TokenBlackList tokenBlackList) {
+        this.tokenBlackList = tokenBlackList;
+    }
+
+
+    // 이 코드는 HMAC-SHA 키를 생성하는 데 사용되는 Base64 인코딩된 문자열을 디코딩하여 키를 초기화하는 용도로 사용
+    @PostConstruct
+    public void init() {
+        byte[] bytes = Base64.getDecoder()
+                .decode(secretKey);// Base64로 인코딩된 값을 시크릿키 변수에 저장한 값을 디코딩하여 바이트 배열로 변환
+        //* Base64 (64진법) : 바이너리(2진) 데이터를 문자 코드에 영향을 받지 않는 공통 ASCII문자로 표현하기 위해 만들어진 인코딩
+        key = Keys.hmacShaKeyFor(
+                bytes);//디코팅된 바이트 배열을 기반으로 HMAC-SHA 알고르즘을 사용해서 Key객체로 반환 , 이를 key 변수에 대입
     }
 
     // Member 정보를 가지고 AccessToken, RefreshToken을 생성하는 메서드
@@ -106,6 +117,13 @@ public class JwtTokenProvider {
                 claims.get(AUTHORITIES_KEY).toString()));
     }
 
+    public long getExpiration(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        Date expiration = claims.getExpiration();
+        long now = (new Date()).getTime();
+        return expiration.getTime() - now;
+    }
+
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         try {
@@ -113,7 +131,7 @@ public class JwtTokenProvider {
                     .verifyWith((SecretKey) key)
                     .build()
                     .parseSignedClaims(token);
-            return true;
+            return !tokenBlackList.hasKeyBlackList(token);
         } catch (SecurityException | MalformedJwtException e) {
             log.info("invalid JWT", e);
         } catch (ExpiredJwtException e) {
@@ -138,33 +156,14 @@ public class JwtTokenProvider {
             return e.getClaims();
         }
     }
-    public void setRefreshTokenAtCookie(RefreshToken refreshToken) {
-        // 쿠키 생성 및 설정
-        Cookie cookie = createRefreshTokenCookie(refreshToken);
 
-        // 현재 HTTP 응답 객체 가져오기
-        HttpServletResponse response = getCurrentHttpResponse();
-
-        // 쿠키를 응답에 추가
-        if (response != null) {
-            response.addCookie(cookie);
-        } else {
-            throw new IllegalStateException("Failed to get the current HTTP response.");
+    // Request Header에 Access Token 정보를 추출하는 메서드
+    public String resolveAccessToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(7);
         }
-    }
-
-    private Cookie createRefreshTokenCookie(RefreshToken refreshToken) {
-        Cookie cookie = new Cookie("RefreshToken", refreshToken.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(refreshToken.getExpiration().intValue());
-        cookie.setPath("/"); // 쿠키의 경로 설정 (필요에 따라 조정 가능)
-        return cookie;
-    }
-
-    private HttpServletResponse getCurrentHttpResponse() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return attributes != null ? attributes.getResponse() : null;
+        return null;
     }
 
 }
