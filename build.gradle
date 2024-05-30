@@ -50,6 +50,9 @@ dependencies {
     // coolSMS
     implementation 'net.nurigo:sdk:4.3.0'
 
+    // neis
+    implementation 'kr.go.neis.api:neis-api:4.0.1'
+
     // QueryDSL - Qdsl Jakarta.persistence-api -https://github.com/querydsl/querydsl/issues/3233
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
