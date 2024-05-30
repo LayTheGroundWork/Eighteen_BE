@@ -1,8 +1,6 @@
 package com.st.eighteen_be.user.dto.sign;
 
-import com.st.eighteen_be.user.domain.SchoolLocation;
 import com.st.eighteen_be.user.domain.UserPrivacy;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -42,7 +40,7 @@ public record SignUpRequestDto(
         LocalDateTime birthDay
 
         // 학교
-//        SchoolLocation location
+//        Sc location
 
         // 이미지 파일
 ) {
