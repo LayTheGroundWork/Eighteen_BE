@@ -4,7 +4,6 @@ import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
-import com.st.eighteen_be.jwt.JwtRequestDto;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
@@ -14,6 +13,7 @@ import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -70,7 +70,7 @@ public class UserService {
         JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
 
         // 4. RefreshToken 저장
-        RefreshToken refreshToken = refreshTokenService.saveOrUpdate(authentication);
+        refreshTokenService.saveOrUpdate(authentication);
 
         // RefreshToken Cookie에 저장
         // jwtTokenProvider.setRefreshTokenAtCookie(refreshToken);
@@ -79,41 +79,46 @@ public class UserService {
         return token;
     }
 
-    public void signOut(JwtRequestDto requestDto) {
+    public void signOut(HttpServletRequest request) {
+
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
 
         // 1. Access Token 검증
-        if (!jwtTokenProvider.validateToken(requestDto.getAccessToken())) {
+        if (!jwtTokenProvider.validateToken(requestAccessToken)) {
             throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
         }
 
         // 2. Access Token 에서 authentication 을 가져옵니다.
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
         // 3. DB에 저장된 Refresh Token 제거
         refreshTokenService.deleteRefreshTokenById(authentication.getName());
 
         // 4. Access Token blacklist에 등록하여 만료시키기
         // 해당 엑세스 토큰의 남은 유효시간을 얻음
-        Long expiration = jwtTokenProvider.getExpiration(requestDto.getAccessToken());
-        tokenBlackList.setBlackList(requestDto.getAccessToken(), "access_token", expiration);
+        Long expiration = jwtTokenProvider.getExpiration(requestAccessToken);
+        tokenBlackList.setBlackList(requestAccessToken, "access_token", expiration);
 
     }
 
-    public JwtTokenDto reissue(JwtRequestDto requestDto) {
+    public JwtTokenDto reissue(HttpServletRequest request) {
+
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+        String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
         // 1. Refresh Token 검증
-        if (!jwtTokenProvider.validateToken(requestDto.getRefreshToken())) {
+        if (!jwtTokenProvider.validateToken(requestRefreshToken)) {
             throw new NotValidException(ErrorCode.REFRESH_TOKEN_NOT_VALID);
         }
 
         // 2. Access Token 에서 User ID 가져오기
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
         // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져옴
         RefreshToken refreshToken = refreshTokenService.findRefreshTokenById(authentication.getName());
 
         // 4. Refresh Token 일치하는지 검사
-        if (!refreshToken.getRefreshToken().equals(requestDto.getRefreshToken())) {
+        if (!refreshToken.getRefreshToken().equals(requestRefreshToken)) {
             throw new AuthenticationException(ErrorCode.TOKEN_UNAUTHORIZED);
         }
 
