@@ -41,7 +41,7 @@ public class JwtTokenProvider {
     private static final String TOKEN_TYPE = "Bearer";
     private static final String BEARER_PREFIX = "Bearer-";
     public static final String AUTHORIZATION_HEADER = "Authorization";
-
+    public static final String REFRESH_HEADER = "Refresh";
     private static final String AUTHORITIES_KEY = "auth";
 
     public JwtTokenProvider(TokenBlackList tokenBlackList) {
@@ -162,6 +162,15 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    // Request Header에 Refresh Token 정보를 추출하는 메서드
+    public String resolveRefreshToken(HttpServletRequest request) {
+        String refreshToken = request.getHeader(REFRESH_HEADER);
+        if (StringUtils.hasText(refreshToken)) {
+            return refreshToken;
         }
         return null;
     }

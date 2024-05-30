@@ -2,12 +2,13 @@ package com.st.eighteen_be.user.api;
 
 import com.st.eighteen_be.common.response.ApiResponse;
 import com.st.eighteen_be.common.security.SecurityUtil;
-import com.st.eighteen_be.jwt.JwtRequestDto;
 import com.st.eighteen_be.jwt.JwtTokenDto;
+import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
 import com.st.eighteen_be.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,18 +53,20 @@ public class UserApiController {
     }
 
     @PostMapping("/v1/api/user/sign-out")
-    public ApiResponse<String> signOut(@RequestBody JwtRequestDto requestDto) {
-        userService.signOut(requestDto);
+    public ApiResponse<String> signOut(HttpServletRequest request) {
+        userService.signOut(request);
         return ApiResponse.success(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
     @PostMapping("/v1/api/user/reissue")
-    public ApiResponse<JwtTokenDto> reissue(@RequestBody JwtRequestDto requestDto) {
-        return ApiResponse.success(HttpStatus.OK, userService.reissue(requestDto));
+    public ApiResponse<JwtTokenDto> reissue(HttpServletRequest request) {
+        return ApiResponse.success(HttpStatus.OK, userService.reissue(request));
     }
 
     @PostMapping("/test")
-    public String test() {
-        return SecurityUtil.getCurrentUsername();
+    public String test(HttpServletRequest request) {
+        String accessToken = request.getHeader("Authorization");
+        String refreshToken = request.getHeader("Refresh");
+        return SecurityUtil.getCurrentUsername() + "\n" + accessToken + "\n" + refreshToken;
     }
 }
