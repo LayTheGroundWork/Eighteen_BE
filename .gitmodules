@@ -1,3 +1,6 @@
 [submodule "Eighteen_Be_Docker"]
 	path = Eighteen_Be_Docker
 	url = https://github.com/LayTheGroundWork/Eighteen_Be_Docker.git
+[submodule "Eighteen_Be_Setting"]
+	path = Eighteen_Be_Setting
+	url = https://github.com/LayTheGroundWork/Eighteen_Be_Setting.git
