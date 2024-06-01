@@ -1,28 +1,26 @@
 ### 채팅방 입장
 < {%
-    // 현재 시간을 한국 시간대로 변환
+    /// 현재 시간을 한국 시간대로 변환
     const now = new Date();
     const koreaTimeOffset = 9 * 60; // 한국은 UTC+9
-    const koreaTimestamp = new Date(now.getTime() + koreaTimeOffset * 60000).toISOString();
-    client.global.set("koreaTimestamp", koreaTimestamp);
+    const koreaTimestamp = new Date(now.getTime() + koreaTimeOffset * 60000);
+
+    // 한국 시간대를 '2021-04-12T00:00:00' 형식으로 변환
+    const year = koreaTimestamp.getFullYear();
+    const month = String(koreaTimestamp.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+    const day = String(koreaTimestamp.getDate()).padStart(2, '0');
+    const hours = String(koreaTimestamp.getHours()).padStart(2, '0');
+    const minutes = String(koreaTimestamp.getMinutes()).padStart(2, '0');
+    const seconds = String(koreaTimestamp.getSeconds()).padStart(2, '0');
+
+    const formattedKoreaTimestamp = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    client.global.set("koreaTimestamp", formattedKoreaTimestamp);
 %}
 
-GET http://{{host}}:{{port}}/api/v1/chat/enter
+GET http://{{host}}:{{port}}/api/v1/chat/enter/663fa5af10fa866c4c0232d7?requestTime={{koreaTimestamp}}
 Content-Type: application/json
-
-#적절한 ID 를 입력해주세요
-{
-  "chatroomInfoId": "663fa5af10fa866c4c0232d7",
-  "receiverNo": 2,
-  "requestTime": "{{koreaTimestamp}}"
-}
 
 ### 채팅방 조회 및 최신메시지 조회
 
-GET http://{{host}}:{{port}}/api/v1/chat/all
+GET http://{{host}}:{{port}}/api/v1/chat/all/1
 Content-Type: application/json
-
-{
-  "senderNo": 1,
-  "receiverNo": 2
-}

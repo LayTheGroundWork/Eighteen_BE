@@ -24,4 +24,10 @@ public record FindChatRoomRequestDTO(
     @Builder
     public FindChatRoomRequestDTO {
     }
+    
+    public static FindChatRoomRequestDTO of(long senderNo) {
+        return FindChatRoomRequestDTO.builder()
+                .senderNo(senderNo)
+                .build();
+    }
 }

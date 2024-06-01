@@ -11,17 +11,18 @@ import com.st.eighteen_be.chat.service.facade.ChatroomFacade;
 import com.st.eighteen_be.chat.service.kafka.ChattingProducer;
 import com.st.eighteen_be.common.response.ApiResp;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -51,11 +52,15 @@ public class ChattingApiController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
-    @GetMapping("/api/v1/chat/all")
-    public ApiResp<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(@Valid @RequestBody FindChatRoomRequestDTO requestDTO) {
-        log.info("findAllMyChatrooms.requestDTO.senderNo() = {}", requestDTO.senderNo());
+    @GetMapping("/api/v1/chat/all/{senderNo}")
+    public ApiResp<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(
+            @PathVariable("senderNo")
+            @Parameter(description = "사용자 번호", example = "1")
+            Long senderNo
+    ) {
+        log.info("findAllMyChatrooms.senderNo() = {}", senderNo);
         
-        return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(requestDTO));
+        return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(FindChatRoomRequestDTO.of(senderNo)));
     }
     
     @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다. 없으면 생성하고 조회합니다.")
@@ -64,12 +69,18 @@ public class ChattingApiController {
             @ApiResponse(responseCode = "302", description = "INVALID REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
-    @GetMapping("/api/v1/chat/enter")
-    public ApiResp<List<ChatMessageResponseDTO>> enterChatroom(@Valid @RequestBody EnterChatRoomRequestDTO requestDTO) {
-        log.info("enterChatroom.requestDTO.chatroomInfoId() = {}", requestDTO.chatroomInfoId());
-        log.info("enterChatroom.requestDTO.requestTime() = {}", requestDTO.requestTime());
+    @GetMapping("/api/v1/chat/enter/{chatroomInfoId}")
+    public ApiResp<List<ChatMessageResponseDTO>> enterChatroom(
+            @PathVariable
+            @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3b3")
+            String chatroomInfoId,
+            
+            @Parameter(description = "요청 시간", example = "2021-04-12T00:00:00")
+            @RequestParam(required = true)
+            String requestTime) {
+        log.info("enterChatroom.chatroomInfoId() = {} , requestTime = {}", chatroomInfoId, requestTime);
         
-        return ApiResp.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(requestDTO));
+        return ApiResp.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(EnterChatRoomRequestDTO.of(chatroomInfoId, requestTime)));
     }
     
     @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.", ignoreJsonView = true)

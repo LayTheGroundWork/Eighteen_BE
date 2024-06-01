@@ -31,4 +31,15 @@ public record EnterChatRoomRequestDTO(
     @Builder
     public EnterChatRoomRequestDTO {
     }
+    
+    public static EnterChatRoomRequestDTO of(String chatroomInfoId, String requestTime) {
+        if(requestTime == null) {
+            requestTime = LocalDateTime.now().toString();
+        }
+        
+        return EnterChatRoomRequestDTO.builder()
+                .chatroomInfoId(chatroomInfoId)
+                .requestTime(LocalDateTime.parse(requestTime))
+                .build();
+    }
 }
