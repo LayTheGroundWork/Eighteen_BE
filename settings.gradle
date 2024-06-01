@@ -1,1 +1,3 @@
 rootProject.name = 'Eighteen_BE'
+include 'Eighteen_Be_Docker'
+include 'Eighteen_Be_Setting'
