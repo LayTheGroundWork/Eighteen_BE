@@ -24,7 +24,6 @@ class SmsUtilTest {
 
     private SmsUtil smsUtil;
 
-    @Autowired
     private SmsCertification smsCertification;
 
     private SignInRequestDto requestDto;

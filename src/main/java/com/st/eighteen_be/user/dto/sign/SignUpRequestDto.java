@@ -4,6 +4,7 @@ import com.st.eighteen_be.user.domain.UserPrivacy;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ import java.util.List;
  */
 
 @Slf4j
+@Builder
 public record SignUpRequestDto(
 
         @NotBlank(message = "공백으로 설정할 수 없습니다.")

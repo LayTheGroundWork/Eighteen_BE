@@ -48,7 +48,6 @@ public class JwtTokenProvider {
         this.tokenBlackList = tokenBlackList;
     }
 
-
     // 이 코드는 HMAC-SHA 키를 생성하는 데 사용되는 Base64 인코딩된 문자열을 디코딩하여 키를 초기화하는 용도로 사용
     @PostConstruct
     public void init() {
