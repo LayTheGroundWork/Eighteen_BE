@@ -1,0 +1,13 @@
+jwt:
+  secret: ebc3ea35e553d6aae8e70a955cd9c124b4df3fdb7aafd9472ee32244f8b5030d
+  accessTokenExpireTime: 1800000 # 1000 * 60 * 30 = 30분
+  refreshTokenExpireTime: 21600000 # 1000 * 60 * 60 * 6 = 6시간
+
+symmetric:
+  key: 'U2FsdGVkX1+5K1J2Q1Z3a2x5bG9uZ2tleWZvcmVuY3J5cHRpb24='
+  salt: '70726574657374'
+
+coolsms:
+  apikey: NCS3ORLOH3YH41NJ
+  apisecret: N0YNCP8AS89TMWKBEVXYFMKYLQE2ZSAX
+  fromnumber: 01033781934
