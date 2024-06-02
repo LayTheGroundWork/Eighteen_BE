@@ -5,7 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
-import com.st.eighteen_be.tournament.api.TournamentVoteRequestDTO;
+import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;

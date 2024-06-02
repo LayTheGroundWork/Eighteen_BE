@@ -1,6 +1,6 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
-import com.st.eighteen_be.tournament.api.TournamentVoteRequestDTO;
+import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 
 import java.util.List;
 

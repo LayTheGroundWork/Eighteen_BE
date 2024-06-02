@@ -1,4 +1,4 @@
-package com.st.eighteen_be.tournament.api;
+package com.st.eighteen_be.tournament.domain.dto.request;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;

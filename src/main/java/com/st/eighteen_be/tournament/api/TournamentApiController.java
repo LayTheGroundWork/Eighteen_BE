@@ -1,6 +1,7 @@
 package com.st.eighteen_be.tournament.api;
 
 import com.st.eighteen_be.common.response.ApiResp;
+import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.service.TournamentService;
@@ -30,7 +31,7 @@ import java.util.List;
  * -----------------------------------------------------------
  * 24. 5. 15.        ipeac       최초 생성
  */
-@Tag(name = "TournamentApiController", description = "토너먼트 API")
+@Tag(name = "토너먼트 API", description = "토너먼트 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/")

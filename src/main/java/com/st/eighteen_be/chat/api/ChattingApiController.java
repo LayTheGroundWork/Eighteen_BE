@@ -38,7 +38,7 @@ import java.util.List;
  * -----------------------------------------------------------
  * 2024-03-29        ipeac       최초 생성
  */
-@Tag(name = "ChattingApiController", description = "채팅 API")
+@Tag(name = "채팅 API", description = "채팅 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j

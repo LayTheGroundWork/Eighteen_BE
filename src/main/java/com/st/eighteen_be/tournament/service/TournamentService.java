@@ -2,7 +2,7 @@ package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
-import com.st.eighteen_be.tournament.api.TournamentVoteRequestDTO;
+import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
