@@ -3,6 +3,7 @@ package com.st.eighteen_be.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.st.eighteen_be.jwt.JwtTokenDto;
+import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -69,6 +71,8 @@ class UserApiControllerTest {
     private SignInRequestDto signInRequestDto; // 테스트에 사용할 SignInRequestDto 객체
 
     private ObjectMapper objectMapper; // JSON 직렬화/역직렬화를 위한 ObjectMapper 객체
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +80,7 @@ class UserApiControllerTest {
         jwtTokenDto = JwtTokenDto.builder()
                 .grantType("Bearer")
                 .accessToken("accessToken")
-                .accessTokenExpiresIn(60000)
+                .accessTokenExpiresIn((new Date()).getTime() + 3600000)
                 .refreshToken("refreshToken")
                 .build();
 
@@ -141,10 +145,13 @@ class UserApiControllerTest {
     @DisplayName("회원 로그아웃")
     void user_sign_out() throws Exception {
         //given
-        //when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_OUT_URL)
-                        .header("Authorization", "Bearer-abed")
-                        .header("Refresh","abeda"))
+        String accessToken = jwtTokenDto.getAccessToken(); // "Bearer-" 접두사 제거
+        String refreshToken = jwtTokenDto.getRefreshToken();
+
+        // when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(SIGN_OUT_URL)
+                        .header("Authorization", "Bearer " + accessToken) // "Bearer " 접두사 추가
+                        .header("Refresh", refreshToken))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
@@ -157,10 +164,13 @@ class UserApiControllerTest {
     @DisplayName("회원 토큰 재발급")
     void user_sign_reissue() throws Exception {
         //given
-        //when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(REISSUE_URL)
-                        .header("Authorization", "Bearer-abed.sv.ds")
-                        .header("Refresh","abe.da.sdf"))
+        String accessToken = "Bearer "+jwtTokenDto.getAccessToken();
+        String refreshToken = jwtTokenDto.getRefreshToken();
+
+        // when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(REISSUE_URL)
+                        .header("Authorization", accessToken)
+                        .header("Refresh",refreshToken))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
