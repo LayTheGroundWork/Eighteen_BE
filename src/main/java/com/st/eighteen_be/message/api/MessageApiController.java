@@ -3,6 +3,7 @@ package com.st.eighteen_be.message.api;
 import com.st.eighteen_be.common.response.ApiResponse;
 import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.service.SmsUtil;
+import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,11 @@ public class MessageApiController {
         return ApiResponse.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
     }
 
-//    @PostMapping("/v1/api/message/confirms")
-//    public ApiResponse<String> smsVerification(@Valid @RequestBody SmsCertificationRequestDto requestDto) {
-//
-//        smsUtil.verifySms(requestDto);
-//
-//        return ApiResponse.success(HttpStatus.OK,"인증 완료");
-//    }
+    @PostMapping("/v1/api/message/confirms")
+    public ApiResponse<String> smsVerification(@Valid @RequestBody SignInRequestDto requestDto) {
+
+        smsUtil.verifySms(requestDto);
+
+        return ApiResponse.success(HttpStatus.OK,"인증 완료");
+    }
 }

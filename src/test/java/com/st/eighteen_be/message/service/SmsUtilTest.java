@@ -34,6 +34,7 @@ class SmsUtilTest {
     @BeforeEach
     void setUp() {
         // Given
+        smsCertification = new SmsCertification(stringRedisTemplate);
         smsUtil = new SmsUtil(smsCertification);
 
         requestDto = new SignInRequestDto(phone,certificationNumber);

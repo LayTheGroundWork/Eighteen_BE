@@ -10,11 +10,11 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class TokenBlackList {
-    private final RedisTemplate<String, Object> redisBlackListTemplate;
+    private final RedisTemplate<String, String> redisBlackListTemplate;
 
-    public void setBlackList(String key, Object o, Long milliSeconds) {
-        redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(o.getClass()));
-        redisBlackListTemplate.opsForValue().set(key, o, milliSeconds, TimeUnit.MILLISECONDS);
+    public void setBlackList(String key, String phoneNumber, Long milliSeconds) {
+        redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(phoneNumber.getClass()));
+        redisBlackListTemplate.opsForValue().set(key, phoneNumber, milliSeconds, TimeUnit.MILLISECONDS);
     }
 
     public Object getBlackList(String key) {

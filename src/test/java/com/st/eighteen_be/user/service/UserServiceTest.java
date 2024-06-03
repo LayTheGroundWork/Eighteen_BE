@@ -2,12 +2,10 @@ package com.st.eighteen_be.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.st.eighteen_be.common.annotation.ServiceWithMySQLTest;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.repository.RefreshTokenRepository;
-import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserPrivacy;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
@@ -16,22 +14,14 @@ import com.st.eighteen_be.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
 
@@ -61,6 +51,9 @@ public class UserServiceTest {
 
     @MockBean
     private RefreshTokenRepository refreshTokenRepository;
+
+    @MockBean
+    private TokenBlackList tokenBlackList;
 
     @MockBean
     private EncryptService encryptService;
@@ -141,45 +134,5 @@ public class UserServiceTest {
         assertThat(signInUserToken).isEqualTo(jwtTokenDto);
     }
 
-//    @Test
-//    @DisplayName("로그아웃 서비스 테스트")
-//    void user_sign_out() throws Exception {
-//        //given
-//        MockHttpServletRequest request = new MockHttpServletRequest();
-//        request.addHeader("Authorization", "Bearer " + jwtTokenDto.getAccessToken());
-//        request.addHeader("Refresh", jwtTokenDto.getAccessToken());
-//
-//        when(jwtTokenProvider.resolveAccessToken(request)).thenReturn(jwtTokenDto.getAccessToken());
-//        when(jwtTokenProvider.validateToken(jwtTokenDto.getAccessToken())).thenReturn(true);
-//        when(jwtTokenProvider.getAuthentication(jwtTokenDto.getAccessToken())).thenReturn(null);
-//        when(refreshTokenRepository.deleteById(phoneNumber)).thenReturn()
-//
-//        //when
-//
-//
-//        userService.signOut(request);
-//
-//        //then
-//        assertThat(tokenBlackList.getBlackList(jwtTokenDto.getAccessToken()))
-//                .isEqualTo(request.getHeader("Authorization"));
-//    }
-
-//    @Test
-//    @DisplayName("토큰 재발급 서비스 테스트")
-//    void user_reissue() throws Exception {
-//        //given
-//        userService.save(signUpRequestDto);
-//        JwtTokenDto token = userService.signIn(signInRequestDto);
-//
-//        //when
-//        MockHttpServletRequest request = new MockHttpServletRequest();
-//        request.addHeader("Authorization", "Bearer " + token.getAccessToken());
-//        request.addHeader("Refresh-Token", token.getRefreshToken());
-//        JwtTokenDto newToken = userService.reissue(request);
-//
-//        //then
-//        assertThat(newToken).isNotNull();
-//        assertThat(newToken.getAccessToken()).isNotEmpty();
-//        assertThat(newToken.getRefreshToken()).isNotEmpty();
-//    }
+    // 토큰 재발급과 로그아웃은 redis 저장소 테스트기 때문에 repository 테스트로 진행
 }

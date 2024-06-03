@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ServiceWithRedisTest
 class SmsCertificationTest {
 
-    @Autowired
     private SmsCertification smsCertification;
 
     @Autowired
@@ -22,6 +21,7 @@ class SmsCertificationTest {
 
     @BeforeEach
     void setUp() {
+        smsCertification = new SmsCertification(stringRedisTemplate);
         // 테스트 데이터 초기화
         stringRedisTemplate.delete("sms:" + phone);
     }

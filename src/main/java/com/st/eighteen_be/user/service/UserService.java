@@ -97,7 +97,7 @@ public class UserService {
         // 4. Access Token blacklist에 등록하여 만료시키기
         // 해당 엑세스 토큰의 남은 유효시간을 얻음
         Long expiration = jwtTokenProvider.getExpiration(requestAccessToken);
-        tokenBlackList.setBlackList(requestAccessToken, "access_token", expiration);
+        tokenBlackList.setBlackList(requestAccessToken, authentication.getName(), expiration);
 
     }
 

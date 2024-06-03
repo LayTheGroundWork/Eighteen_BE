@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class SchoolData extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "SchoolData_id")
+    @Column(name = "school_data_id")
     private Integer id;
 
     private String schoolName;
