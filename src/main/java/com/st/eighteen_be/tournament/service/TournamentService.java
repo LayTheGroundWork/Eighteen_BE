@@ -130,4 +130,11 @@ public class TournamentService {
         tournamentParticipantEntityRepository.updateVotePoints(voteRequests);
         tournamentParticipantEntityRepository.insertVoteRecord(voteRequests);
     }
+    
+    public void showResult() {
+        log.info("showResult start");
+        
+        //TODO : 토너먼트 결과를 보여준다.
+        
+    }
 }

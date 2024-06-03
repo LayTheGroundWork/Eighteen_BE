@@ -86,6 +86,17 @@ public class TournamentApiController {
         return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }
     
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not Found"),
+    })
+    @GetMapping("/v1/tournament/result/show")
+    public ApiResp<Object> showResult() {
+        tournamentService.showResult();
+        
+        return ApiResp.success(HttpStatus.OK, "토너먼트 결과 조회 완료");
+    }
+    
     @Operation(summary = "토너먼트 강제 시작", description = "토너먼트를 강제로 시작합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
