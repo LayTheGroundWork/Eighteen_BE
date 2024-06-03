@@ -3,7 +3,7 @@ package com.st.eighteen_be.user.service;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.user.domain.CustomUserDetails;
-import com.st.eighteen_be.user.domain.UserPrivacy;
+import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 return
-    private UserDetails createUserDetails(UserPrivacy user) {
+    private UserDetails createUserDetails(UserInfo user) {
         return CustomUserDetails.of(user, passwordEncoder.encode(""));
     }
 }

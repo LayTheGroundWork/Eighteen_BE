@@ -18,12 +18,12 @@ public class UserSnsLink extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserProfile user;
+    private UserInfo user;
 
     private String snsLink;
 
     @Builder
-    public UserSnsLink(UserProfile user, String snsLink) {
+    public UserSnsLink(UserInfo user, String snsLink) {
         this.user = user;
         //== 연관관계 편의 메서드 ==//
         user.getSnsLinks().add(this);

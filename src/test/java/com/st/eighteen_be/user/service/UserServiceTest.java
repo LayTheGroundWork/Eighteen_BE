@@ -6,10 +6,9 @@ import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.repository.RefreshTokenRepository;
-import com.st.eighteen_be.user.domain.UserPrivacy;
+import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
-import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,9 +50,6 @@ public class UserServiceTest {
 
     @MockBean
     private RefreshTokenRepository refreshTokenRepository;
-
-    @MockBean
-    private TokenBlackList tokenBlackList;
 
     @MockBean
     private EncryptService encryptService;
@@ -102,15 +98,15 @@ public class UserServiceTest {
     void user_sign_up() throws Exception {
         //given
         String encryptPhoneNumber = "encryptedPhoneNumber";
-        UserPrivacy userPrivacy = UserPrivacy.builder()
+        UserInfo userInfo = UserInfo.builder()
                 .phoneNumber(phoneNumber)
                 .build();
 
         when(encryptService.encryptPhoneNumber(phoneNumber)).thenReturn(encryptPhoneNumber);
-        when(userRepository.save(any(UserPrivacy.class))).thenReturn(userPrivacy);
+        when(userRepository.save(any(UserInfo.class))).thenReturn(userInfo);
 
         //when
-        UserPrivacy saveUser = userService.save(signUpRequestDto);
+        UserInfo saveUser = userService.save(signUpRequestDto);
 
         //then
         assertThat(saveUser.getPhoneNumber()).isEqualTo(phoneNumber);

@@ -8,7 +8,7 @@ import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
-import com.st.eighteen_be.user.domain.UserPrivacy;
+import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
 import com.st.eighteen_be.user.repository.TokenBlackList;
@@ -39,7 +39,7 @@ public class UserService {
     private final TokenBlackList tokenBlackList;
 
 
-    public UserPrivacy save(SignUpRequestDto requestDto) {
+    public UserInfo save(SignUpRequestDto requestDto) {
         try {
             return userRepository.save(requestDto.toEntity(
                     encryptService.encryptPhoneNumber(requestDto.phoneNumber()))
@@ -131,7 +131,7 @@ public class UserService {
         return token;
     }
 
-    public Optional<UserPrivacy> findByPhoneNumber(String encryptPhoneNumber) {
+    public Optional<UserInfo> findByPhoneNumber(String encryptPhoneNumber) {
         return userRepository.findByPhoneNumber(encryptPhoneNumber);
     }
 }

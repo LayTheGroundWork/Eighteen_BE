@@ -1,12 +1,12 @@
 package com.st.eighteen_be.user.repository;
 
-import com.st.eighteen_be.user.domain.UserPrivacy;
+import com.st.eighteen_be.user.domain.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<UserPrivacy,Integer> {
+public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 
-    Optional<UserPrivacy> findByPhoneNumber(String phoneNumber);
+    Optional<UserInfo> findByPhoneNumber(String phoneNumber);
     boolean existsByPhoneNumber(String phoneNumber);
 }

@@ -1,6 +1,6 @@
 package com.st.eighteen_be.user.dto.sign;
 
-import com.st.eighteen_be.user.domain.UserPrivacy;
+import com.st.eighteen_be.user.domain.UserInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -47,12 +47,12 @@ public record SignUpRequestDto(
         // 이미지 파일
 ) {
 
-    public UserPrivacy toEntity(String encryptPhoneNumber) {
+    public UserInfo toEntity(String encryptPhoneNumber) {
 
         List<String> roles = new ArrayList<>();
         roles.add("USER");
 
-        return UserPrivacy.builder()
+        return UserInfo.builder()
                 .phoneNumber(encryptPhoneNumber)
                 .birthDay(birthDay)
                 .roles(roles)

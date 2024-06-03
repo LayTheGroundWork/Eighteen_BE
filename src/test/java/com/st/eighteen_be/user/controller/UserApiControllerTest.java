@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.WithCustomMockUser;
-import com.st.eighteen_be.user.domain.UserPrivacy;
+import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
 import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
 import com.st.eighteen_be.user.repository.UserRepository;
@@ -103,7 +103,7 @@ class UserApiControllerTest {
     @DisplayName("회원 가입")
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
-        UserPrivacy userPrivacy = signUpRequestDto.toEntity("encryptPhoneNumber");
+        UserInfo userPrivacy = signUpRequestDto.toEntity("encryptPhoneNumber");
         when(userService.save(signUpRequestDto)).thenReturn(userPrivacy);
 
         // when: 실제 API 호출

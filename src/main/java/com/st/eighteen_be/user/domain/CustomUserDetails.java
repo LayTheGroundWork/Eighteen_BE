@@ -14,17 +14,17 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @ToString
-public class CustomUserDetails extends UserPrivacy implements UserDetails {
+public class CustomUserDetails extends UserInfo implements UserDetails {
     private Integer id;
     private String phoneNumber;
     private List<String> roles;
     private String password;
 
-    private CustomUserDetails(UserPrivacy userPrivacy, String encodePassword) {
-        this.id = userPrivacy.getId();
-        this.phoneNumber = userPrivacy.getPhoneNumber();
+    private CustomUserDetails(UserInfo userInfo, String encodePassword) {
+        this.id = userInfo.getId();
+        this.phoneNumber = userInfo.getPhoneNumber();
         this.password = encodePassword;
-        this.roles = userPrivacy.getRoles();
+        this.roles = userInfo.getRoles();
     }
 
     private CustomUserDetails(String phoneNumber, List<String> roles) {
@@ -38,8 +38,8 @@ public class CustomUserDetails extends UserPrivacy implements UserDetails {
         this.roles = roles;
     }
 
-    public static CustomUserDetails of(UserPrivacy userPrivacy, String encodePassword) {
-        return new CustomUserDetails(userPrivacy,encodePassword);
+    public static CustomUserDetails of(UserInfo userInfo, String encodePassword) {
+        return new CustomUserDetails(userInfo,encodePassword);
     }
 
     public static CustomUserDetails of(String phoneNumber, List<String> roles) {
