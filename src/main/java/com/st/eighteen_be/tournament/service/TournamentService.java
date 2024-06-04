@@ -110,10 +110,6 @@ public class TournamentService {
         
         List<TournamentVoteResultResponseDTO> voteResult = voteEntityRepository.findTournamentVoteResult(tournamentNo);
         
-        if (voteResult.isEmpty()) {
-            throw new NotFoundException(ErrorCode.NOT_FOUND_VOTE_RESULT);
-        }
-        
         setRank(voteResult);
         
         return voteResult;

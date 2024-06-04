@@ -27,6 +27,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.st.eighteen_be.tournament.domain.entity.TournamentEntity.THUMBNAIL_DEFAULT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -270,7 +271,7 @@ class TournamentServiceTest {
             
             assertThat(foundAll)
                     .isNotEmpty()
-                    .allMatch(tournamentEntity -> tournamentEntity.isStatus() == false, "토너먼트 상태값이 변경되지 않았습니다.");
+                    .allMatch(tournamentEntity -> Objects.equals(tournamentEntity.isStatus(), Boolean.FALSE), "토너먼트 상태값이 변경되지 않았습니다.");
         }
         
         @Test
