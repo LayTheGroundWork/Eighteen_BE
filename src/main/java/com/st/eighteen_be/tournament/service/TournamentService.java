@@ -110,6 +110,10 @@ public class TournamentService {
         
         List<TournamentVoteResultResponseDTO> voteResult = voteEntityRepository.findTournamentVoteResult(tournamentNo);
         
+        if (voteResult.isEmpty()) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND_VOTE_RESULT);
+        }
+        
         setRank(voteResult);
         
         return voteResult;
@@ -129,12 +133,5 @@ public class TournamentService {
         
         tournamentParticipantEntityRepository.updateVotePoints(voteRequests);
         tournamentParticipantEntityRepository.insertVoteRecord(voteRequests);
-    }
-    
-    public void showResult() {
-        log.info("showResult start");
-        
-        //TODO : 토너먼트 결과를 보여준다.
-        
     }
 }

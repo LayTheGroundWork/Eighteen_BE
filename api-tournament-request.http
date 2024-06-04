@@ -32,3 +32,6 @@ Content-Type: application/json
     "votePoint": 4
   }
 ]
+
+### 토너먼트 결과 조회
+GET http://{{host}}:{{port}}/api/v1/tournament/final/result?tournamentNo=1

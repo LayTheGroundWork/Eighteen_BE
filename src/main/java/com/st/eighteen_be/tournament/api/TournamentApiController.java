@@ -3,10 +3,12 @@ package com.st.eighteen_be.tournament.api;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
+import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,8 +43,8 @@ public class TournamentApiController {
     
     @Operation(summary = "토너먼트 검색", description = "토너먼트를 조건에 맞게 검색하고, 페이징 처리하여 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TournamentSearchResponseDTO.class)), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @GetMapping("/v1/tournament/search")
     public ApiResp<List<TournamentSearchResponseDTO>> search(
@@ -70,14 +73,14 @@ public class TournamentApiController {
     @Operation(summary = "토너먼트 투표",
             description = "토너먼트에 투표합니다.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TournamentVoteRequestDTO.class))
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = TournamentVoteRequestDTO.class)))
             )
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @PostMapping("/v1/tournament/final/vote")
     public ApiResp<Object> vote(@RequestBody List<TournamentVoteRequestDTO> voteRequests) {
@@ -86,20 +89,22 @@ public class TournamentApiController {
         return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }
     
+    @Operation(summary = "토너먼트 최종 결과 조회", description = "토너먼트의 최종 결과를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema, schema = @Schema(implementation = TournamentVoteResultResponseDTO.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
     })
-    @GetMapping("/v1/tournament/result/show")
-    public ApiResp<Object> showResult() {
-        tournamentService.showResult();
-        
-        return ApiResp.success(HttpStatus.OK, "토너먼트 결과 조회 완료");
+    @GetMapping("/v1/tournament/final/result")
+    public ApiResp<List<TournamentVoteResultResponseDTO>> showResult(
+            @Parameter(description = "토너먼트 번호", example = "1")
+            @RequestParam(value = "tournamentNo") Long tournamentNo
+    ) {
+        return ApiResp.success(HttpStatus.OK, tournamentService.determineWinner(tournamentNo));
     }
     
     @Operation(summary = "토너먼트 강제 시작", description = "토너먼트를 강제로 시작합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
     })
     @PostMapping("/v1/tournament/force-start")
     public ApiResp<Object> startTournament() {
@@ -110,8 +115,8 @@ public class TournamentApiController {
     
     @Operation(summary = "토너먼트 강제 종료", description = "토너먼트를 강제로 종료합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "Not Found"),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @PostMapping("/v1/tournament/force-end")
     public ApiResp<Object> endTournament() {
