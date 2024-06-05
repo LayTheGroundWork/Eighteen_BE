@@ -1,6 +1,6 @@
 package com.st.eighteen_be.message.api;
 
-import com.st.eighteen_be.common.response.ApiResponse;
+import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.service.SmsUtil;
 import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
@@ -23,18 +23,18 @@ public class MessageApiController {
     private final SmsUtil smsUtil;
 
     @PostMapping("/v1/api/message/send")
-    public ApiResponse<String> sendSms(@Valid @RequestBody SmsCertificationRequestDto requestDto){
+    public ApiResp<String> sendSms(@Valid @RequestBody SmsCertificationRequestDto requestDto){
 
         smsUtil.sendOne(requestDto.getPhoneNumber());
 
-        return ApiResponse.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
+        return ApiResp.success(HttpStatus.OK,requestDto.getPhoneNumber() + ": 전송 완료");
     }
 
     @PostMapping("/v1/api/message/confirms")
-    public ApiResponse<String> smsVerification(@Valid @RequestBody SignInRequestDto requestDto) {
+    public ApiResp<String> smsVerification(@Valid @RequestBody SignInRequestDto requestDto) {
 
         smsUtil.verifySms(requestDto);
 
-        return ApiResponse.success(HttpStatus.OK,"인증 완료");
+        return ApiResp.success(HttpStatus.OK,"인증 완료");
     }
 }

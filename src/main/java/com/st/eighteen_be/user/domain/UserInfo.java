@@ -25,6 +25,7 @@ public class UserInfo extends BaseEntity {
     private Integer id;
 
     // SNS 링크 정보 [학생(1) : 주소(N)]
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSnsLink> snsLinks = new ArrayList<>();
 

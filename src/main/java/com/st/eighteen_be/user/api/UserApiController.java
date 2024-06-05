@@ -1,6 +1,6 @@
 package com.st.eighteen_be.user.api;
 
-import com.st.eighteen_be.common.response.ApiResponse;
+import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.domain.UserInfo;
@@ -35,28 +35,28 @@ public class UserApiController {
     private final UserService userService;
 
     @PostMapping("/v1/api/user/sign-up")
-    public ApiResponse<UserInfo> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
+    public ApiResp<UserInfo> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
 
-        return ApiResponse.success(HttpStatus.OK, userService.save(requestDto));
+        return ApiResp.success(HttpStatus.OK, userService.save(requestDto));
     }
 
     @PostMapping("/v1/api/user/sign-in")
-    public ApiResponse<JwtTokenDto> signIn(@Valid @RequestBody SignInRequestDto requestDto) {
+    public ApiResp<JwtTokenDto> signIn(@Valid @RequestBody SignInRequestDto requestDto) {
 
         JwtTokenDto jwtTokenDto = userService.signIn(requestDto);
 
-        return ApiResponse.success(HttpStatus.OK, jwtTokenDto);
+        return ApiResp.success(HttpStatus.OK, jwtTokenDto);
     }
 
     @DeleteMapping("/v1/api/user/sign-out")
-    public ApiResponse<String> signOut(HttpServletRequest request) {
+    public ApiResp<String> signOut(HttpServletRequest request) {
         userService.signOut(request);
-        return ApiResponse.success(HttpStatus.OK, "로그아웃 되었습니다.");
+        return ApiResp.success(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
     @PutMapping("/v1/api/user/reissue")
-    public ApiResponse<JwtTokenDto> reissue(HttpServletRequest request) {
-        return ApiResponse.success(HttpStatus.OK, userService.reissue(request));
+    public ApiResp<JwtTokenDto> reissue(HttpServletRequest request) {
+        return ApiResp.success(HttpStatus.OK, userService.reissue(request));
     }
 
     @PostMapping("/test")

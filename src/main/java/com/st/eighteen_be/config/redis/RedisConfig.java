@@ -1,5 +1,8 @@
 package com.st.eighteen_be.config.redis;
 
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.sync.RedisCommands;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -44,5 +47,15 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(genericToStringSerializer);
         
         return redisTemplate;
+    }
+
+
+    @PostConstruct
+    public void init() {
+        // Redis 설정 변경
+        RedisClient redisClient = RedisClient.create("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort());
+        RedisCommands<String, String> commands = redisClient.connect().sync();
+        commands.configSet("stop-writes-on-bgsave-error", "no");
+        redisClient.shutdown();
     }
 }
