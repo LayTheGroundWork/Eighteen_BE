@@ -65,6 +65,9 @@ jobs:
             git config --global url.https://${{ secrets.PAT }}@github.com/.insteadOf https://github.com/
             git checkout dev
             git submodule update --init --recursive
+            git submodule update --init --recursive
+            git submodule foreach --recursive git checkout main
+            git submodule foreach --recursive git pull origin main
             git pull
             docker stop eighteen-be
             docker rm eighteen-be
