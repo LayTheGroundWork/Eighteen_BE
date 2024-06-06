@@ -71,12 +71,12 @@ class TournamentServiceTest {
     void When_searchTournamentByCategory_Then_returnTournamentList() {
         // given
         TournamentEntity tournamentEntity = TournamentEntity.builder()
-                .category(TournamentCategoryEnums.GAME)
-                .build();
+                                                    .category(TournamentCategoryEnums.GAME)
+                                                    .build();
         
         TournamentEntity tournamentEntity2 = TournamentEntity.builder()
-                .category(TournamentCategoryEnums.MOVIE)
-                .build();
+                                                     .category(TournamentCategoryEnums.MOVIE)
+                                                     .build();
         
         tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
         
@@ -94,12 +94,12 @@ class TournamentServiceTest {
     void When_searchTournamentByCategory_Then_returnEmptyList() {
         // given
         TournamentEntity tournamentEntity = TournamentEntity.builder()
-                .category(TournamentCategoryEnums.GAME)
-                .build();
+                                                    .category(TournamentCategoryEnums.GAME)
+                                                    .build();
         
         TournamentEntity tournamentEntity2 = TournamentEntity.builder()
-                .category(TournamentCategoryEnums.MOVIE)
-                .build();
+                                                     .category(TournamentCategoryEnums.MOVIE)
+                                                     .build();
         
         tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
         
@@ -149,8 +149,8 @@ class TournamentServiceTest {
             
             for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
-                        .category(category)
-                        .build();
+                                                          .category(category)
+                                                          .build();
                 
                 tournamentEntities.add(gameTournament);
             }
@@ -171,9 +171,9 @@ class TournamentServiceTest {
         void When_startTournament_Then_pickRandomUser() {
             // given
             TournamentEntity tournament = TournamentEntity.builder()
-                    .category(TournamentCategoryEnums.GAME)
-                    .season(1)
-                    .build();
+                                                  .category(TournamentCategoryEnums.GAME)
+                                                  .season(1)
+                                                  .build();
             
             em.persist(tournament);
             
@@ -211,10 +211,10 @@ class TournamentServiceTest {
             
             for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
-                        .season(2)
-                        .status(false)
-                        .category(category)
-                        .build();
+                                                          .season(2)
+                                                          .status(false)
+                                                          .category(category)
+                                                          .build();
                 
                 tournamentEntities.add(gameTournament);
             }
@@ -255,8 +255,8 @@ class TournamentServiceTest {
             
             for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
-                        .category(category)
-                        .build();
+                                                          .category(category)
+                                                          .build();
                 
                 tournamentEntities.add(gameTournament);
             }
@@ -279,8 +279,8 @@ class TournamentServiceTest {
         void When_endTournament_Then_determineWinner() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(TournamentCategoryEnums.GAME)
-                    .build();
+                                                        .category(TournamentCategoryEnums.GAME)
+                                                        .build();
             
             tournamentEntityRepository.save(tournamentEntity);
             
@@ -323,25 +323,25 @@ class TournamentServiceTest {
         
         private static @NotNull Result getResult(TournamentEntity tournamentEntity, List<TournamentParticipantEntity> tournamentParticipantEntities) {
             VoteEntity voter1 = VoteEntity.builder()
-                    .tournament(tournamentEntity)
-                    .participant(tournamentParticipantEntities.get(0))
-                    .voterId("voter1")
-                    .votePoint(1)
-                    .build();
+                                        .tournament(tournamentEntity)
+                                        .participant(tournamentParticipantEntities.get(0))
+                                        .voterId("voter1")
+                                        .votePoint(1)
+                                        .build();
             
             VoteEntity voter2 = VoteEntity.builder()
-                    .tournament(tournamentEntity)
-                    .participant(tournamentParticipantEntities.get(0))
-                    .voterId("voter2")
-                    .votePoint(1)
-                    .build();
+                                        .tournament(tournamentEntity)
+                                        .participant(tournamentParticipantEntities.get(0))
+                                        .voterId("voter2")
+                                        .votePoint(1)
+                                        .build();
             
             VoteEntity voter3 = VoteEntity.builder()
-                    .tournament(tournamentEntity)
-                    .participant(tournamentParticipantEntities.get(1))
-                    .voterId("voter3")
-                    .votePoint(3)
-                    .build();
+                                        .tournament(tournamentEntity)
+                                        .participant(tournamentParticipantEntities.get(1))
+                                        .voterId("voter3")
+                                        .votePoint(3)
+                                        .build();
             
             return new Result(voter1, voter2, voter3);
         }
@@ -358,8 +358,8 @@ class TournamentServiceTest {
         void When_voteTournament_Then_processVote() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(TournamentCategoryEnums.GAME)
-                    .build();
+                                                        .category(TournamentCategoryEnums.GAME)
+                                                        .build();
             
             tournamentEntityRepository.save(tournamentEntity);
             
@@ -367,26 +367,27 @@ class TournamentServiceTest {
             
             tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
             
-            List<TournamentVoteRequestDTO> voteRequests = new ArrayList<>();
-            
-            for (int i = 1; i <= 16; i++) {
-                voteRequests.add(TournamentVoteRequestDTO.builder()
-                        .tournamentNo(tournamentEntity.getTournamentNo())
-                        .voterId("voter" + i)
-                        .voteeId("user" + i)
-                        .votePoint(i)
-                        .build());
-            }
+            TournamentVoteRequestDTO tournamentVoteRequestDTO = TournamentVoteRequestDTO.builder()
+                                                                        .tournamentNo(tournamentEntity.getTournamentNo())
+                                                                        .voterId("voter")
+                                                                        .participantIdsOrderByRank(List.of("user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12", "user13", "user14", "user15", "user16"))
+                                                                        .build();
             
             // when
-            tournamentService.processVote(voteRequests);
+            tournamentService.processVote(tournamentVoteRequestDTO);
             
             // then
             List<TournamentParticipantEntity> found = tournamentParticipantEntityRepository.findAll();
             
             assertThat(found)
-                    .isNotEmpty()
-                    .allMatch(tournamentParticipantEntity -> tournamentParticipantEntity.getScore() != 0, "투표가 정상적으로 처리되지 않았습니다.");
+                    .isNotEmpty();
+            
+            assertSoftly(softAssertions -> {
+                softAssertions.assertThat(found.get(0).getScore()).isEqualTo(4);
+                softAssertions.assertThat(found.get(1).getScore()).isEqualTo(2);
+                softAssertions.assertThat(found.get(2).getScore()).isEqualTo(1);
+                softAssertions.assertThat(found.get(3).getScore()).isEqualTo(1);
+            });
         }
         
         @Test
@@ -394,8 +395,8 @@ class TournamentServiceTest {
         void When_voteTournament_Then_insertVoteRecord() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(TournamentCategoryEnums.GAME)
-                    .build();
+                                                        .category(TournamentCategoryEnums.GAME)
+                                                        .build();
             
             tournamentEntityRepository.save(tournamentEntity);
             
@@ -403,26 +404,22 @@ class TournamentServiceTest {
             
             tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
             
-            List<TournamentVoteRequestDTO> voteRequests = new ArrayList<>();
-            
-            for (int i = 1; i <= 16; i++) {
-                voteRequests.add(TournamentVoteRequestDTO.builder()
-                        .tournamentNo(tournamentEntity.getTournamentNo())
-                        .voterId("voter" + i)
-                        .voteeId("user" + i)
-                        .votePoint(i)
-                        .build());
-            }
+            TournamentVoteRequestDTO tournamentVoteRequestDTO =
+                    TournamentVoteRequestDTO.builder()
+                            .tournamentNo(tournamentEntity.getTournamentNo())
+                            .voterId("voter")
+                            .participantIdsOrderByRank(List.of("user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12", "user13", "user14", "user15", "user16"))
+                            .build();
             
             // when
-            tournamentService.processVote(voteRequests);
+            tournamentService.processVote(tournamentVoteRequestDTO);
             
             // then
             List<VoteEntity> found = voteEntityRepository.findAll();
             
             assertThat(found)
                     .isNotEmpty()
-                    .hasSize(voteRequests.size());
+                    .hasSize(16);
         }
         
         private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult(TournamentEntity tournamentEntity) {
@@ -462,6 +459,7 @@ class TournamentServiceTest {
                                                        TournamentParticipantEntity user13,
                                                        TournamentParticipantEntity user14,
                                                        TournamentParticipantEntity user15,
-                                                       TournamentParticipantEntity user16) {}
+                                                       TournamentParticipantEntity user16) {
+        }
     }
 }
