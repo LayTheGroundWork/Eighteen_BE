@@ -52,7 +52,7 @@ public class ChattingApiController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
-    @GetMapping("/api/v1/chat/all/{senderNo}")
+    @GetMapping("/v1/api/chat/all/{senderNo}")
     public ApiResp<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(
             @PathVariable("senderNo")
             @Parameter(description = "사용자 번호", example = "1")
@@ -69,7 +69,7 @@ public class ChattingApiController {
             @ApiResponse(responseCode = "302", description = "INVALID REQUEST"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
-    @GetMapping("/api/v1/chat/enter/{chatroomInfoId}")
+    @GetMapping("/v1/api/chat/enter/{chatroomInfoId}")
     public ApiResp<List<ChatMessageResponseDTO>> enterChatroom(
             @PathVariable
             @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3b3")
@@ -84,7 +84,7 @@ public class ChattingApiController {
     }
     
     @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.", ignoreJsonView = true)
-    @MessageMapping("/v1/chat/{chatroom-id}/message") // /pub/chat/{senderNo}/{receiverNo}/message
+    @MessageMapping("/v1/api/chat/{chatroom-id}/message") // /pub/v1/apichat/{chatroom-id}/message
     public void sendMessage(@DestinationVariable(value = "chatroom-id") String chatroomId, ChatMessageRequestDTO chatMessage) {
         log.info("sendMessage.chatMessage.senderNo() = {} , chatMessage.receiverNo() = {}", chatMessage.getSenderNo(), chatMessage.getReceiverNo());
         
