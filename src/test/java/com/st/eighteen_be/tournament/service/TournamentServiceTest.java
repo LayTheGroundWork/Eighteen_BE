@@ -23,9 +23,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.st.eighteen_be.tournament.domain.entity.TournamentEntity.THUMBNAIL_DEFAULT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -269,7 +271,7 @@ class TournamentServiceTest {
             
             assertThat(foundAll)
                     .isNotEmpty()
-                    .allMatch(tournamentEntity -> tournamentEntity.isStatus() == false, "토너먼트 상태값이 변경되지 않았습니다.");
+                    .allMatch(tournamentEntity -> Objects.equals(tournamentEntity.isStatus(), Boolean.FALSE), "토너먼트 상태값이 변경되지 않았습니다.");
         }
         
         @Test
@@ -288,10 +290,14 @@ class TournamentServiceTest {
                     TournamentParticipantEntity.of("user2", tournamentEntity)
             );
             
-            tournamentParticipantEntityRepository.saveAll((tournamentParticipantEntities));
-            
             //투표자들 추가하기
             Result result = getResult(tournamentEntity, tournamentParticipantEntities);
+            
+            //점수 직접 추가
+            ReflectionTestUtils.setField(tournamentParticipantEntities.get(0), "score", result.voter1().getVotePoint() + result.voter2().getVotePoint());
+            ReflectionTestUtils.setField(tournamentParticipantEntities.get(1), "score", result.voter3().getVotePoint());
+            
+            tournamentParticipantEntityRepository.saveAll((tournamentParticipantEntities));
             
             voteEntityRepository.saveAll(List.of(result.voter1(), result.voter2(), result.voter3()));
             
@@ -304,13 +310,13 @@ class TournamentServiceTest {
             
             assertSoftly(
                     softly -> {
-                        softly.assertThat(actual.get(0).getRankerId()).isEqualTo("user1");
+                        softly.assertThat(actual.get(0).getRankerId()).isEqualTo("user2");
                         softly.assertThat(actual.get(0).getRank()).isEqualTo(1);
-                        softly.assertThat(actual.get(0).getVoteCount()).isEqualTo(2);
+                        softly.assertThat(actual.get(0).getVoteCount()).isEqualTo(3);
                         
-                        softly.assertThat(actual.get(1).getRankerId()).isEqualTo("user2");
+                        softly.assertThat(actual.get(1).getRankerId()).isEqualTo("user1");
                         softly.assertThat(actual.get(1).getRank()).isEqualTo(2);
-                        softly.assertThat(actual.get(1).getVoteCount()).isEqualTo(1);
+                        softly.assertThat(actual.get(1).getVoteCount()).isEqualTo(2);
                     }
             );
         }
@@ -320,18 +326,21 @@ class TournamentServiceTest {
                     .tournament(tournamentEntity)
                     .participant(tournamentParticipantEntities.get(0))
                     .voterId("voter1")
+                    .votePoint(1)
                     .build();
             
             VoteEntity voter2 = VoteEntity.builder()
                     .tournament(tournamentEntity)
                     .participant(tournamentParticipantEntities.get(0))
                     .voterId("voter2")
+                    .votePoint(1)
                     .build();
             
             VoteEntity voter3 = VoteEntity.builder()
                     .tournament(tournamentEntity)
                     .participant(tournamentParticipantEntities.get(1))
                     .voterId("voter3")
+                    .votePoint(3)
                     .build();
             
             return new Result(voter1, voter2, voter3);

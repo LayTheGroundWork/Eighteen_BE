@@ -35,7 +35,7 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Builder.Default
     @Comment("토너먼트 참가자 점수")
     @Column(name = "SCORE")
-    private int score = 0;
+    private long score = 0;
     
     public static TournamentParticipantEntity of(String userId) {
         return TournamentParticipantEntity.builder()

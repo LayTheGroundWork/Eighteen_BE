@@ -17,10 +17,10 @@
     client.global.set("koreaTimestamp", formattedKoreaTimestamp);
 %}
 
-GET http://{{host}}:{{port}}/api/v1/chat/enter/663fa5af10fa866c4c0232d7?requestTime={{koreaTimestamp}}
+GET http://{{host}}:{{port}}/v1/api/chat/enter/663fa5af10fa866c4c0232d7?requestTime={{koreaTimestamp}}
 Content-Type: application/json
 
 ### 채팅방 조회 및 최신메시지 조회
 
-GET http://{{host}}:{{port}}/api/v1/chat/all/1
+GET http://{{host}}:{{port}}/v1/api/chat/all/1
 Content-Type: application/json

@@ -21,7 +21,7 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
     public List<TournamentVoteResultResponseDTO> findTournamentVoteResult(Long tournamentNo) {
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
                 tournamentParticipantEntity.userId,
-                voteEntity.count().as("voteCount"));
+                tournamentParticipantEntity.score);
         
         return qf.select(dto)
                 .from(voteEntity)
@@ -29,6 +29,7 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
                 .on(eqJoinParticipantNo())
                 .where(eqTournamentNo(tournamentNo))
                 .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant)
+                .orderBy(tournamentParticipantEntity.score.desc())
                 .fetch();
     }
     

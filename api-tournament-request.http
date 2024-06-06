@@ -1,15 +1,15 @@
 ### 토너먼트 강제 시작
-POST http://{{host}}:{{port}}/api/v1/tournament/force-start
+POST http://{{host}}:{{port}}/v1/api/tournament/force-start
 
 ### 토너먼트 강제 종료
-POST http://{{host}}:{{port}}/api/v1/tournament/force-end
+POST http://{{host}}:{{port}}/v1/api/tournament/force-end
 
 ### 토너먼트 검색
-GET http://{{host}}:{{port}}/api/v1/tournament/search?size=10&page=0&sort=TOURNAMENT_NO&sortDirection=DESC
+GET http://{{host}}:{{port}}/v1/api/tournament/search?size=10&page=0&sort=TOURNAMENT_NO&sortDirection=DESC
 Content-Type: application/json
 
 ### 토너먼트 투표
-POST http://{{host}}:{{port}}/api/v1/tournament/final/vote
+POST http://{{host}}:{{port}}/v1/api/tournament/final/vote
 Content-Type: application/json
 
 [
@@ -32,3 +32,6 @@ Content-Type: application/json
     "votePoint": 4
   }
 ]
+
+### 토너먼트 결과 조회
+GET http://{{host}}:{{port}}/v1/api/tournament/final/result?tournamentNo=1
