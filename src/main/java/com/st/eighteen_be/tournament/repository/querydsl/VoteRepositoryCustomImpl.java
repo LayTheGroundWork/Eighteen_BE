@@ -11,6 +11,7 @@ import java.util.List;
 
 import static com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity.tournamentParticipantEntity;
 import static com.st.eighteen_be.tournament.domain.entity.QVoteEntity.voteEntity;
+import static com.st.eighteen_be.user.domain.QUserInfo.userInfo;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,16 +22,29 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
     public List<TournamentVoteResultResponseDTO> findTournamentVoteResult(Long tournamentNo) {
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
                 tournamentParticipantEntity.userId,
-                tournamentParticipantEntity.score);
+                tournamentParticipantEntity.score,
+                userInfo.profileImg);
         
+        //토너먼트 참여자에 대한 썸네일 이미지등도 가져와야 한다.
         return qf.select(dto)
-                .from(voteEntity)
-                .leftJoin(tournamentParticipantEntity)
-                .on(eqJoinParticipantNo())
-                .where(eqTournamentNo(tournamentNo))
-                .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant)
-                .orderBy(tournamentParticipantEntity.score.desc())
-                .fetch();
+                       .from(voteEntity)
+                       
+                       .leftJoin(tournamentParticipantEntity)
+                       .on(eqJoinParticipantNo())
+                       
+                       .leftJoin(userInfo)
+                       .on(getUserId())
+                       
+                       .where(eqTournamentNo(tournamentNo))
+                       
+                       .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant)
+                       
+                       .orderBy(tournamentParticipantEntity.score.desc())
+                       .fetch();
+    }
+    
+    private static BooleanExpression getUserId() {
+        return tournamentParticipantEntity.userId.eq(userInfo.certificationId);
     }
     
     private static BooleanExpression eqJoinParticipantNo() {
