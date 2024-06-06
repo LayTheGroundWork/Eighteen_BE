@@ -12,26 +12,15 @@ Content-Type: application/json
 POST http://{{host}}:{{port}}/v1/api/tournament/final/vote
 Content-Type: application/json
 
-[
-  {
-    "tournamentNo": 1,
-    "voterId": "voter1",
-    "voteeId": "user1",
-    "votePoint": 1
-  },
-  {
-    "tournamentNo": 1,
-    "voterId": "voter1",
-    "voteeId": "user2",
-    "votePoint": 2
-  },
-  {
-    "tournamentNo": 1,
-    "voterId": "voter1",
-    "voteeId": "user3",
-    "votePoint": 4
-  }
-]
+{
+  "voterId": "voter1",
+  "tournamentNo": 1,
+  "participantIdsOrderByRank": [
+    "user1",
+    "user2",
+    "user3"
+  ]
+}
 
 ### 토너먼트 결과 조회
 GET http://{{host}}:{{port}}/v1/api/tournament/final/result?tournamentNo=1
