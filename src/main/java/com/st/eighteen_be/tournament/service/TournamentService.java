@@ -124,10 +124,10 @@ public class TournamentService {
     }
     
     @Transactional(readOnly = false)
-    public void processVote(List<TournamentVoteRequestDTO> voteRequests) {
+    public void processVote(TournamentVoteRequestDTO voteRequestDTO) {
         log.info("processVote start");
         
-        tournamentParticipantEntityRepository.updateVotePoints(voteRequests);
-        tournamentParticipantEntityRepository.insertVoteRecord(voteRequests);
+        tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO);
+        tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO);
     }
 }

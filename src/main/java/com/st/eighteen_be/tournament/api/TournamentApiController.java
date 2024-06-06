@@ -82,8 +82,8 @@ public class TournamentApiController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @PostMapping("/v1/api/tournament/final/vote")
-    public ApiResp<Object> vote(@RequestBody List<TournamentVoteRequestDTO> voteRequests) {
-        tournamentService.processVote(voteRequests);
+    public ApiResp<Object> vote(@RequestBody TournamentVoteRequestDTO voteRequest) {
+        tournamentService.processVote(voteRequest);
         
         return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }
