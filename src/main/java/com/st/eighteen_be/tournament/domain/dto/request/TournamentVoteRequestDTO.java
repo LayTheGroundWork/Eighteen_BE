@@ -5,10 +5,12 @@ import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadReq
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -35,24 +37,19 @@ public class TournamentVoteRequestDTO {
     @Schema(description = "누가 투표했는지 ID", example = "voter1")
     private String voterId;
     
-    @NotNull
-    @Schema(description = "누구에게 투표했는지 ID", example = "user1")
-    private String voteeId;
+    @ArraySchema(schema = @Schema(description = "참여자들의 아이디, 등수순으로", example = "[\"participant1\", \"participant2\", \"participant3\"]"))
+    private List<String> participantIdsOrderByRank;
     
-    @PositiveOrZero
-    @Schema(description = "투표 점수", example = "1")
-    private int votePoint;
-    
-    public VoteEntity toEntity(TournamentEntity tournamentEntity, TournamentParticipantEntity participantEntity) {
+    public VoteEntity toEntity(TournamentEntity tournamentEntity, TournamentParticipantEntity participantEntity, int point) {
         if (tournamentEntity == null || participantEntity == null) {
             throw new BadRequestException(ErrorCode.INVALID_PARAMETER);
         }
         
         return VoteEntity.builder()
-                .voterId(voterId)
-                .tournament(tournamentEntity)
-                .participant(participantEntity)
-                .votePoint(votePoint)
-                .build();
+                       .voterId(voterId)
+                       .tournament(tournamentEntity)
+                       .participant(participantEntity)
+                       .votePoint(point)
+                       .build();
     }
 }

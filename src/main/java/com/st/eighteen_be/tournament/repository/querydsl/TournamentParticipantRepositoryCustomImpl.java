@@ -5,17 +5,16 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
+import com.st.eighteen_be.tournament.domain.dto.request.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
-import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.st.eighteen_be.tournament.domain.entity.QTournamentEntity.tournamentEntity;
@@ -41,20 +40,35 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
     private final JPAQueryFactory qf;
     
     @Override
-    public void updateVotePoints(List<TournamentVoteRequestDTO> voteRequestDTOs) {
+    public void updateVotePoints(TournamentVoteRequestDTO voteRequestDTO) {
+        int rank = 1;
         
-        for (TournamentVoteRequestDTO voteRequest : voteRequestDTOs) {
-            qf.update(tournamentParticipantEntity)
-                    .set(tournamentParticipantEntity.score, tournamentParticipantEntity.score.add(voteRequest.getVotePoint()))
-                    .where(
-                            eqVoteeId(voteRequest.getVoteeId())
-                                    .and(eqTournamentNoOfTournamentParticipant(voteRequest.getTournamentNo()))
-                    )
-                    .execute();
+        for (String participantId : voteRequestDTO.getParticipantIdsOrderByRank()) {
+            int points = calculatePoints(rank);
+            
+            if (points > 0) {
+                qf.update(tournamentParticipantEntity)
+                        .set(tournamentParticipantEntity.score, tournamentParticipantEntity.score.add(points))
+                        .where(
+                                eqVoteeId(participantId)
+                                        .and(eqTournamentNoOfTournamentParticipant(voteRequestDTO.getTournamentNo()))
+                        )
+                        .execute();
+            }
+            
+            rank++;
         }
         
         em.flush();
         em.clear();
+    }
+    
+    private int calculatePoints(int rank) {
+        if (rank <= 0 || rank > TournamentConstants.VOTE_POINT.length) {
+            return 0;
+        }
+        
+        return TournamentConstants.VOTE_POINT[rank - 1];
     }
     
     private static BooleanExpression eqTournamentNoOfTournamentParticipant(@NotNull Long tournamentNo) {
@@ -62,23 +76,27 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
     }
     
     @Override
-    public void insertVoteRecord(List<TournamentVoteRequestDTO> voteRequestDTOs) {
+    public void insertVoteRecord(TournamentVoteRequestDTO voteRequestDTO) {
+        int rank = 1;
         
-        for (TournamentVoteRequestDTO voteRequest : voteRequestDTOs) {
+        for (String participantId : voteRequestDTO.getParticipantIdsOrderByRank()) {
+            int point = calculatePoints(rank);
+            
             // 토너먼토와 참여자 정보를 조회합니다.
             TournamentEntity foundTournament = Optional.ofNullable(qf.selectFrom(tournamentEntity)
-                    .where(eqTournamentNo(voteRequest.getTournamentNo()))
-                    .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT));
+                                                                           .where(eqTournamentNo(voteRequestDTO.getTournamentNo()))
+                                                                           .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT));
             
             // 투표한 참여자 정보를 조회합니다.
             TournamentParticipantEntity foundTournamentParticipant = Optional.ofNullable(qf.selectFrom(tournamentParticipantEntity)
-                    .where(eqVoteeId(voteRequest.getVoteeId()))
-                    .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT_PARTICIPANT));
+                                                                                                 .where(eqVoteeId(participantId))
+                                                                                                 .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT_PARTICIPANT));
             
-            VoteEntity vote = voteRequest.toEntity(foundTournament, foundTournamentParticipant);
-            
-            em.persist(vote);
+            em.persist(voteRequestDTO.toEntity(foundTournament, foundTournamentParticipant, point));
         }
+        
+        em.flush();
+        em.clear();
     }
     
     private static BooleanExpression eqTournamentNo(Long tournamentNo) {

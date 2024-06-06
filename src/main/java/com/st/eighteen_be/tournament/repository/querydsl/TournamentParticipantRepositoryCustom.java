@@ -2,8 +2,6 @@ package com.st.eighteen_be.tournament.repository.querydsl;
 
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 
-import java.util.List;
-
 /**
  * packageName    : com.st.eighteen_be.tournament.repository
  * fileName       : TournamentParticipantEntityRepositoryCustom
@@ -16,7 +14,7 @@ import java.util.List;
  * 24. 5. 27.        ipeac       최초 생성
  */
 public interface TournamentParticipantRepositoryCustom {
-    void updateVotePoints(List<TournamentVoteRequestDTO> voteRequestDTOs);
+    void updateVotePoints(TournamentVoteRequestDTO voteRequestDTOs);
     
-    void insertVoteRecord(List<TournamentVoteRequestDTO> voteRequestDTOs);
+    void insertVoteRecord(TournamentVoteRequestDTO voteRequestDTOs);
 }
