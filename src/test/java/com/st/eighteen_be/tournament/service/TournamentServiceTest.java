@@ -12,6 +12,7 @@ import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
+import com.st.eighteen_be.user.domain.UserInfo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -144,17 +146,6 @@ class TournamentServiceTest {
         @Test
         @DisplayName("토너먼트 시작시 토너먼트가 생성되는지 확인한다.")
         void When_startTournament_Then_createTournament() {
-            // given
-            List<TournamentEntity> tournamentEntities = new ArrayList<>();
-            
-            for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
-                TournamentEntity gameTournament = TournamentEntity.builder()
-                                                          .category(category)
-                                                          .build();
-                
-                tournamentEntities.add(gameTournament);
-            }
-            
             // when
             tournamentService.startTournament();
             
@@ -278,6 +269,18 @@ class TournamentServiceTest {
         @DisplayName("토너먼트 종료시 토너먼트 투표순으로 승자를 선정한다.")
         void When_endTournament_Then_determineWinner() {
             // given
+            //참여자 정보 주입하기
+            for (int i = 1; i <= 3; i++) {
+                UserInfo user = UserInfo.builder()
+                                        .birthDay(LocalDateTime.now())
+                                        .phoneNumber("010-1234-567" + i)
+                                        .certificationId("user" + i)
+                                        .profileImg("https://picsum.photos/200")
+                                        .build();
+                
+                em.persist(user);
+            }
+            
             TournamentEntity tournamentEntity = TournamentEntity.builder()
                                                         .category(TournamentCategoryEnums.GAME)
                                                         .build();
@@ -313,10 +316,12 @@ class TournamentServiceTest {
                         softly.assertThat(actual.get(0).getRankerId()).isEqualTo("user2");
                         softly.assertThat(actual.get(0).getRank()).isEqualTo(1);
                         softly.assertThat(actual.get(0).getVoteCount()).isEqualTo(3);
+                        softly.assertThat(actual.get(0).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
                         
                         softly.assertThat(actual.get(1).getRankerId()).isEqualTo("user1");
                         softly.assertThat(actual.get(1).getRank()).isEqualTo(2);
                         softly.assertThat(actual.get(1).getVoteCount()).isEqualTo(2);
+                        softly.assertThat(actual.get(1).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
                     }
             );
         }

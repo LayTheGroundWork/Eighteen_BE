@@ -26,18 +26,21 @@ public class TournamentVoteResultResponseDTO {
     private Long rank;
     @Schema(description = "투표 수", example = "10")
     private Long voteCount;
+    @Schema(description = "프로필 이미지 URL", example = "https://picsum.photos/200")
+    private String profileImageUrl;
     
     @Builder
     @QueryProjection
-    public TournamentVoteResultResponseDTO(String rankerId, Long voteCount) {
+    public TournamentVoteResultResponseDTO(String rankerId, Long voteCount, String profileImageUrl) {
         this.rankerId = rankerId;
         this.voteCount = voteCount;
+        this.profileImageUrl = profileImageUrl;
     }
     
     public static TournamentVoteResultResponseDTO of(String rankerId, Long voteCount) {
         return TournamentVoteResultResponseDTO.builder()
-                .rankerId(rankerId)
-                .voteCount(voteCount)
-                .build();
+                       .rankerId(rankerId)
+                       .voteCount(voteCount)
+                       .build();
     }
 }
