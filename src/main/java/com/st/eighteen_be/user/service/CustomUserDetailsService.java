@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
         return userRepository.findByPhoneNumber(encryptService.encryptPhoneNumber(phoneNumber))
                 .map(this::createUserDetails)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.SIGN_IN_NOT_FOUND_USER));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
     }
 
     // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 return
