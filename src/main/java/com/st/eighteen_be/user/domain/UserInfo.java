@@ -1,7 +1,6 @@
 package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import com.st.eighteen_be.user.enums.GradeType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -49,24 +48,23 @@ public class UserInfo extends BaseEntity {
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
-    private String profileImg;
+    //private List<String> profileImg;
 
     @Column(length = 50)
     private String nickName;
 
-    @Column(length = 50, unique = true)
-    private String certificationId;
+    @Column(length = 50, nullable = false ,unique = true)
+    private String uniqueId;
 
-    // 학년 데이터는 수정될 가능성이 현저히 낮기 때문에 Convert를 사용하지 않음
-    private GradeType grade;
-
-    @Column(length = 300)
+    @Column(length = 100)
     private String introduction;
 
     @Column(length = 4)
     private String mbti;
 
-    private Boolean gender;
+    private Integer likeCount;
+
+    // 10문 10답
 
 
 }
