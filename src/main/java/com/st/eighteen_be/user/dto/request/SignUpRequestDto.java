@@ -1,4 +1,4 @@
-package com.st.eighteen_be.user.dto.sign;
+package com.st.eighteen_be.user.dto.request;
 
 import com.st.eighteen_be.user.domain.UserInfo;
 import jakarta.validation.constraints.NotBlank;

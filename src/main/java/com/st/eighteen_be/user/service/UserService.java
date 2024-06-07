@@ -9,8 +9,8 @@ import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
-import com.st.eighteen_be.user.dto.sign.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.request.SignInRequestDto;
+import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -134,4 +134,5 @@ public class UserService {
     public Optional<UserInfo> findByPhoneNumber(String encryptPhoneNumber) {
         return userRepository.findByPhoneNumber(encryptPhoneNumber);
     }
+
 }

@@ -2,7 +2,7 @@ package com.st.eighteen_be.message.service;
 
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
 import com.st.eighteen_be.message.repository.SmsCertification;
-import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
+import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
