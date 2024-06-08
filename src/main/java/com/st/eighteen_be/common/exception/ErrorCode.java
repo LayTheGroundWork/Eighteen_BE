@@ -37,8 +37,8 @@ public enum ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "잘못된 파라미터입니다."),
 
     NOT_FOUND_CHATROOM_TYPE(HttpStatus.NOT_FOUND, "채팅방 타입을 찾을 수 없습니다."),
-    SIGN_UP_EXISTS_USER(HttpStatus.CONFLICT, "계정이 존재합니다."),
-    SIGN_IN_NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원 정보가 존재하지 않습니다."),
+    EXISTS_USER(HttpStatus.CONFLICT, "계정이 존재합니다."),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원 정보가 존재하지 않습니다."),
     AUTHENTICATION_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized..."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden..."),

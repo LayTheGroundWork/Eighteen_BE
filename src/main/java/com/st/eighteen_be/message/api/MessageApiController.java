@@ -3,7 +3,7 @@ package com.st.eighteen_be.message.api;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.service.SmsUtil;
-import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
+import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

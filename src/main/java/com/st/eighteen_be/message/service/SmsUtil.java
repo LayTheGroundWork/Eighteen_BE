@@ -3,7 +3,7 @@ package com.st.eighteen_be.message.service;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
 import com.st.eighteen_be.message.repository.SmsCertification;
-import com.st.eighteen_be.user.dto.sign.SignInRequestDto;
+import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;

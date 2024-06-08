@@ -1,4 +1,4 @@
-package com.st.eighteen_be.user.dto.sign;
+package com.st.eighteen_be.user.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
