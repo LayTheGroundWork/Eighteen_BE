@@ -15,7 +15,7 @@ public class UserDetailsResponseDto {
 
 
     //private List<String> profileImages;
-    private Integer likeCount;
+    private int likeCount;
     private String nickName;
     private String uniqueId;
     private LocalDateTime birthDay;
@@ -28,6 +28,7 @@ public class UserDetailsResponseDto {
     @Builder
     public UserDetailsResponseDto(UserInfo entity) {
         //this.profileImages = entity.getProfileImg();
+        this.likeCount = entity.getLikeCount();
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.birthDay = entity.getBirthDay();

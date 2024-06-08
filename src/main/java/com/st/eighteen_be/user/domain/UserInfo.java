@@ -62,7 +62,7 @@ public class UserInfo extends BaseEntity {
     @Column(length = 4)
     private String mbti;
 
-    private Integer likeCount;
+    private int likeCount;
 
     // 10문 10답
 
