@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 24. 5. 4.        ipeac       최초 생성
  */
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/v1/api/test")
 @Tag(name = "Test", description = "테스트 API")
 public class TestApiController {
     

@@ -2,7 +2,10 @@ package com.st.eighteen_be.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.jwt.*;
+import com.st.eighteen_be.jwt.JwtAccessDeniedHandler;
+import com.st.eighteen_be.jwt.JwtAuthenticationEntryPoint;
+import com.st.eighteen_be.jwt.JwtAuthenticationFilter;
+import com.st.eighteen_be.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +54,10 @@ public class SecurityConfig {
     private static final String[] PERMIT_ALL_PATTERNS = new String[] {
             "/v1/api/**",
             "/h2-console/**",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/v3/api-docs/**",
+            "/webjars/**",
     };
 
     @Bean
@@ -129,4 +136,3 @@ public class SecurityConfig {
                 writer.flush();
             };
 }
-
