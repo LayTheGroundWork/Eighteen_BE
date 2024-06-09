@@ -30,7 +30,7 @@ jobs:
           ./gradlew copyEnv --no-daemon
 
       - name: Docker compose up
-        run: docker-compose --env-file .env.local up -d --scale server=0
+        run: docker-compose --env-file .env.local up -d mysql mongodb kafka redis-master redis-slave-1 redis-slave-2 redis-sentinel-1 redis-sentinel-2 redis-sentinel-3
 
       - name: Run tests
         run: ./gradlew test --no-daemon
