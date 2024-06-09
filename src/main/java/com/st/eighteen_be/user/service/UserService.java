@@ -2,6 +2,7 @@ package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
 import com.st.eighteen_be.jwt.JwtTokenDto;
@@ -11,6 +12,8 @@ import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +26,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -46,7 +51,7 @@ public class UserService {
             );
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")) {
-                throw new OccupiedException(ErrorCode.SIGN_UP_EXISTS_USER);
+                throw new OccupiedException(ErrorCode.EXISTS_USER);
             }
             throw e;
         }
@@ -131,8 +136,33 @@ public class UserService {
         return token;
     }
 
-    public Optional<UserInfo> findByPhoneNumber(String encryptPhoneNumber) {
-        return userRepository.findByPhoneNumber(encryptPhoneNumber);
+    public UserDetailsResponseDto findByUniqueId(String uniqueId) {
+
+        Optional<UserInfo> userInfo = userRepository.findByUniqueId(uniqueId);
+
+        if(userInfo.isPresent())
+            return new UserDetailsResponseDto(userInfo.get());
+
+        throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
+    }
+
+    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId) {
+        Optional<UserInfo> userInfo = userRepository.findByUniqueId(uniqueId);
+
+        if(userInfo.isPresent())
+            return new UserProfileResponseDto(userInfo.get());
+
+        throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
+    }
+
+    public List<UserProfileResponseDto> findAll(){
+        List<UserInfo> users = userRepository.findAll();
+        List<UserProfileResponseDto> usersDto = new ArrayList<>();
+
+        for(UserInfo user : users){
+            usersDto.add(new UserProfileResponseDto(user));
+        }
+        return usersDto;
     }
 
 }

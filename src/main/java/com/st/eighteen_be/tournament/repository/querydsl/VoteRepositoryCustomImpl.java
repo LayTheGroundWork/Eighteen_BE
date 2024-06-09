@@ -1,6 +1,7 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.st.eighteen_be.tournament.domain.dto.response.QTournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
@@ -20,10 +21,11 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
     private final JPAQueryFactory qf;
     
     public List<TournamentVoteResultResponseDTO> findTournamentVoteResult(Long tournamentNo) {
+        
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
                 tournamentParticipantEntity.userId,
                 tournamentParticipantEntity.score,
-                userInfo.profileImg);
+                Expressions.constant("임의 프로필 값입니다. 추후 수정필요"));
         
         //토너먼트 참여자에 대한 썸네일 이미지등도 가져와야 한다.
         return qf.select(dto)
@@ -44,7 +46,7 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
     }
     
     private static BooleanExpression getUserId() {
-        return tournamentParticipantEntity.userId.eq(userInfo.certificationId);
+        return tournamentParticipantEntity.userId.eq(userInfo.uniqueId);
     }
     
     private static BooleanExpression eqJoinParticipantNo() {

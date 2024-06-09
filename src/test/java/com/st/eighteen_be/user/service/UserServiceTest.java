@@ -9,11 +9,15 @@ import com.st.eighteen_be.token.repository.RefreshTokenRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,6 +27,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -116,7 +123,6 @@ public class UserServiceTest {
     @DisplayName("로그인 서비스 테스트")
     void user_sign_in() throws Exception {
         //given
-
         authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber,"");
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authenticationToken);
@@ -130,5 +136,72 @@ public class UserServiceTest {
         assertThat(signInUserToken).isEqualTo(jwtTokenDto);
     }
 
-    // 토큰 재발급과 로그아웃은 redis 저장소 테스트기 때문에 repository 테스트로 진행
+    @Test
+    @DisplayName("식별 아이디로 유저 상세정보 보기")
+    public void find_user_details() throws Exception {
+        //given
+        String uniqueId = "@abc_sc";
+        UserInfo mockUser = UserInfo.builder()
+                .phoneNumber(phoneNumber)
+                .uniqueId(uniqueId)
+                .build();
+
+        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
+
+        //when
+        UserDetailsResponseDto findUserDetails = userService.findByUniqueId(uniqueId);
+
+        //then
+        assertThat(findUserDetails.getUniqueId()).isEqualTo(uniqueId);
+    }
+
+    @Test
+    @DisplayName("식별 아이디로 유저 프로필 보기")
+    public void find_user_profile() throws Exception {
+        //given
+        String uniqueId = "@abc_sc";
+        String nickName = "ehgur";
+        UserInfo mockUser = UserInfo.builder()
+                .phoneNumber(phoneNumber)
+                .uniqueId(uniqueId)
+                .nickName(nickName)
+                .build();
+
+        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
+
+        //when
+        UserProfileResponseDto findUserProfile = userService.findUserProfileByUniqueId(uniqueId);
+
+        //then
+        assertThat(findUserProfile.getNickName()).isEqualTo(nickName);
+    }
+
+    @Test
+    @DisplayName("모든 유저 프로필 보기")
+    public void find_all_user() throws Exception {
+        //given
+        String uniqueId_A = "@A";
+        String uniqueId_B = "@B";
+        UserInfo mockUserA = UserInfo.builder()
+                .uniqueId(uniqueId_A)
+                .build();
+
+        UserInfo mockUserB = UserInfo.builder()
+                .uniqueId(uniqueId_B)
+                .build();
+
+        List<UserInfo> users = new ArrayList<>();
+        users.add(mockUserA);
+        users.add(mockUserB);
+
+        when(userRepository.findAll()).thenReturn(users);
+
+        //when
+        List<UserProfileResponseDto> findUsers = userService.findAll();
+
+        //then
+        assertThat(findUsers.get(0).getUniqueId()).isEqualTo(uniqueId_A);
+        assertThat(findUsers.get(1).getUniqueId()).isEqualTo(uniqueId_B);
+
+    }
 }
