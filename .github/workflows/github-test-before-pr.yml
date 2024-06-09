@@ -30,7 +30,7 @@ jobs:
           ./gradlew copyEnv --no-daemon
 
       - name: Docker compose up
-        run: docker-compose --env-file .env.local up -d
+        run: docker-compose --env-file .env.local up -d --scale server=0
 
       - name: Run tests
         run: ./gradlew test --no-daemon
