@@ -268,14 +268,14 @@ class TournamentServiceTest {
         @Test
         @DisplayName("토너먼트 종료시 토너먼트 투표순으로 승자를 선정한다.")
         void When_endTournament_Then_determineWinner() {
+            //TODO 프로필 설정완료되면 관련 프로필까지 조회되는지 테스트 추가해야합니다.. 2024-06-09
             // given
             //참여자 정보 주입하기
             for (int i = 1; i <= 3; i++) {
                 UserInfo user = UserInfo.builder()
                                         .birthDay(LocalDateTime.now())
                                         .phoneNumber("010-1234-567" + i)
-                                        .certificationId("user" + i)
-                                        .profileImg("https://picsum.photos/200")
+                                        .uniqueId("user" + i)
                                         .build();
                 
                 em.persist(user);
@@ -316,12 +316,12 @@ class TournamentServiceTest {
                         softly.assertThat(actual.get(0).getRankerId()).isEqualTo("user2");
                         softly.assertThat(actual.get(0).getRank()).isEqualTo(1);
                         softly.assertThat(actual.get(0).getVoteCount()).isEqualTo(3);
-                        softly.assertThat(actual.get(0).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
+                        //softly.assertThat(actual.get(0).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
                         
                         softly.assertThat(actual.get(1).getRankerId()).isEqualTo("user1");
                         softly.assertThat(actual.get(1).getRank()).isEqualTo(2);
                         softly.assertThat(actual.get(1).getVoteCount()).isEqualTo(2);
-                        softly.assertThat(actual.get(1).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
+                        //softly.assertThat(actual.get(1).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
                     }
             );
         }
