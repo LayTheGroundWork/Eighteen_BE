@@ -29,5 +29,11 @@ jobs:
           ./gradlew copyYaml --no-daemon
           ./gradlew copyEnv --no-daemon
 
+      - name: Docker compose up
+        run: docker-compose --env-file .env.local up -d
+
       - name: Run tests
         run: ./gradlew test --no-daemon
+
+      - name: Docker compose down
+        run: docker-compose down -v
