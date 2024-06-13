@@ -1,8 +1,5 @@
 package com.st.eighteen_be.config.redis;
 
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.sync.RedisCommands;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -49,13 +47,25 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    public StringRedisTemplate stringRedisTemplate() {
+        final StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
+        stringRedisTemplate.setKeySerializer(new StringRedisSerializer());
+        stringRedisTemplate.setConnectionFactory(redisConnectionFactory());
 
-    @PostConstruct
-    public void init() {
-        // Redis 설정 변경
-        RedisClient redisClient = RedisClient.create("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort());
-        RedisCommands<String, String> commands = redisClient.connect().sync();
-        commands.configSet("stop-writes-on-bgsave-error", "no");
-        redisClient.shutdown();
+        GenericToStringSerializer<Object> genericToStringSerializer = new GenericToStringSerializer<>(Object.class);
+        stringRedisTemplate.setValueSerializer(genericToStringSerializer);
+
+        return stringRedisTemplate;
     }
+
+
+//    @PostConstruct
+//    public void init() {
+//        // Redis 설정 변경
+//        RedisClient redisClient = RedisClient.create("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort());
+//        RedisCommands<String, String> commands = redisClient.connect().sync();
+//        commands.configSet("stop-writes-on-bgsave-error", "no");
+//        redisClient.shutdown();
+//    }
 }
