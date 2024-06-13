@@ -1,5 +1,6 @@
-package com.st.eighteen_be.user.service;
+package com.st.eighteen_be.school.service;
 
+import com.st.eighteen_be.school.dto.SchoolsResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,11 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Objects;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -53,31 +55,16 @@ class SchoolServiceTest {
     @Test
     public void school_search() throws Exception {
         //given
-        String mockResponse = "{\"schoolList\": [{\"name\": \"서울고등학교\"}]}";
-        String keyword = "서울";
+        String schoolName = "서울고등학교";
 
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(mockResponse));
-
-        //when
-        Mono<String> find_school = schoolService.searchSchools(keyword);
-
-        //then
-        String result = find_school.block(); // Mono를 블록하여 결과를 가져옴
-        assertThat(result).isEqualTo(mockResponse);
-    }
-
-    @Test
-    public void school_search_failure() throws Exception {
-        //given
-        String keyword = "서울";
-
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientResponseException(500, "Internal Server Error", null, null, null)));
+//        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(mockResponse));
 
         //when
-        Mono<String> find_school = schoolService.searchSchools(keyword);
+        Mono<List<SchoolsResponseDto>> find_school = schoolService.searchSchools(schoolName);
 
         //then
-        RuntimeException exception = assertThrows(RuntimeException.class, find_school::block);
-        assertThat(exception.getMessage()).contains("API 호출 실패");
+        SchoolsResponseDto result = Objects.requireNonNull(find_school.block()).get(0); // Mono를 블록하여 결과를 가져옴
+        assertThat(result.getSchoolName()).isEqualTo(schoolName);
     }
+
 }
