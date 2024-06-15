@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.WithCustomMockUser;
+import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
@@ -71,6 +72,7 @@ class UserApiControllerTest {
     private SignInRequestDto signInRequestDto; // 테스트에 사용할 SignInRequestDto 객체
 
     private ObjectMapper objectMapper; // JSON 직렬화/역직렬화를 위한 ObjectMapper 객체
+
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
@@ -87,9 +89,16 @@ class UserApiControllerTest {
         String birthday = "2018-12-15T10:10";
         String phoneNumber = "01012341234";
         String verificationCode = "123456";
+        String unique_id = "@abs_sd";
+        String schoolName = "서울고등학교";
+        String schoolAddr = "서울 송파구";
+
+        SchoolData schoolData = new SchoolData(schoolName, schoolAddr);
 
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)
+                .uniqueId(unique_id)
+                .schoolData(schoolData)
                 .birthDay(LocalDateTime.parse(birthday))
                 .build();
 

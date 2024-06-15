@@ -1,5 +1,6 @@
 package com.st.eighteen_be.user.dto.request;
 
+import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,19 +33,17 @@ public record SignUpRequestDto(
         @Pattern(regexp = "^01(0|1|[6-9])[0-9]{3,4}[0-9]{4}$")
         String phoneNumber,
 
-
         // 고유 아이디
-//        @NotBlank(message = "공백으로 설정할 수 없습니다.")
-//        @NotNull(message = "식별아이디는 필수 입력 값 입니다.")
-//        String identifierId,
+        @NotBlank(message = "공백으로 설정할 수 없습니다.")
+        @NotNull(message = "식별아이디는 필수 입력 값 입니다.")
+        String uniqueId,
 
         @NotNull(message = "생년월일은 필수 입력 값 입니다.")
-        LocalDateTime birthDay
+        LocalDateTime birthDay,
 
         // 학교
-//        Sc location
-
-        // 이미지 파일
+        @NotNull(message = "학교는 필수 입력 값 입니다.")
+        SchoolData schoolData
 ) {
 
     public UserInfo toEntity(String encryptPhoneNumber) {
@@ -54,6 +53,8 @@ public record SignUpRequestDto(
 
         return UserInfo.builder()
                 .phoneNumber(encryptPhoneNumber)
+                .uniqueId(uniqueId)
+                .schoolData(schoolData)
                 .birthDay(birthDay)
                 .roles(roles)
                 .build();

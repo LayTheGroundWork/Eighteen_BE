@@ -28,9 +28,8 @@ public class UserInfo extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSnsLink> snsLinks = new ArrayList<>();
 
-
-
-    // 학교 위치 정보 [학교(1) : 학생(N)]
+    @Embedded
+    private SchoolData schoolData;
 
     // 약관 정보 N:M
 
@@ -53,7 +52,7 @@ public class UserInfo extends BaseEntity {
     @Column(length = 50)
     private String nickName;
 
-    @Column(length = 50, nullable = false ,unique = true)
+    @Column(length = 50, nullable = false, unique = true)
     private String uniqueId;
 
     @Column(length = 100)
@@ -65,6 +64,8 @@ public class UserInfo extends BaseEntity {
     private int likeCount;
 
     // 10문 10답
+
+    public void update(){}
 
 
 }
