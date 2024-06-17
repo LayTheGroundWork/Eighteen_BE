@@ -71,7 +71,7 @@ public class SmsUtil {
         smsCertification.deleteSmsCertification(requestDto.phoneNumber());
     }
 
-    private boolean isVerify(SignInRequestDto requestDto) {
+    public boolean isVerify(SignInRequestDto requestDto) {
         return !(smsCertification.hasKey(requestDto.phoneNumber()) &&
                  smsCertification.getSmsCertification(requestDto.phoneNumber())
                         .equals(requestDto.verificationCode()));

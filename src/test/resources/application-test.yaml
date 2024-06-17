@@ -11,3 +11,6 @@ coolsms:
   apikey: NCS3ORLOH3YH41NJ
   apisecret: N0YNCP8AS89TMWKBEVXYFMKYLQE2ZSAX
   fromnumber: 01033781934
+
+neis:
+  key: 'ae53b6f66298467dbb0d19e9db3da03f'
