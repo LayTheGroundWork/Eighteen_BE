@@ -8,21 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @ServiceWithRedisTest
 @ExtendWith(MockitoExtension.class)
 class SmsUtilTest {
 
-    @MockBean
+    @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     private SmsUtil smsUtil;
@@ -43,21 +40,16 @@ class SmsUtilTest {
         requestDto = new SignInRequestDto(phone, certificationNumber);
 
         // 테스트 데이터 초기화
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(stringRedisTemplate.delete("sms:" + phone)).thenReturn(true);
+        stringRedisTemplate.delete("sms:" + phone);
     }
 
     @Test
     public void verify() {
         //given
-        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
-        when(valueOperations.get("sms:" + phone)).thenReturn(certificationNumber);
-        when(smsUtil.isVerify(requestDto)).thenReturn(true);
 
         //when
-        smsCertification.createSmsCertification(phone, certificationNumber);
-        String storedCode = valueOperations.get("sms:" + phone);
+        smsCertification.createSmsCertification(phone,certificationNumber);
+        String storedCode = stringRedisTemplate.opsForValue().get("sms:" + phone);
 
         //then
         smsUtil.verifySms(requestDto);
@@ -66,7 +58,6 @@ class SmsUtilTest {
 
     @AfterEach
     void tearDown() {
-        when(stringRedisTemplate.keys("spring:session:TEST:sessions:*")).thenReturn(Collections.singleton("spring:session:TEST:sessions:1"));
         for (String key : Objects.requireNonNull(stringRedisTemplate.keys("spring:session:TEST:sessions:*"))) {
             stringRedisTemplate.delete(key);
         }

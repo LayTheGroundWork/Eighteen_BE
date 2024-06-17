@@ -3,21 +3,17 @@ package com.st.eighteen_be.message.repository;
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-
-import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @ServiceWithRedisTest
 class SmsCertificationTest {
 
     private SmsCertification smsCertification;
 
-    @MockBean
+    @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     private final String phone = "01033781934";
@@ -27,28 +23,21 @@ class SmsCertificationTest {
     void setUp() {
         smsCertification = new SmsCertification(stringRedisTemplate);
 
-        // ValueOperations 모킹
-        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
-        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
-
         // 테스트 데이터 초기화
-        when(stringRedisTemplate.delete("sms:" + phone)).thenReturn(true);
+        stringRedisTemplate.delete("sms:" + phone);
     }
 
     @Test
     void testCreateSmsCertification() {
-        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
-        doNothing().when(valueOperations).set("sms:" + phone, certificationNumber, Duration.ofMinutes(3));
-
         smsCertification.createSmsCertification(phone, certificationNumber);
-        verify(valueOperations, times(1)).set("sms:" + phone, certificationNumber, Duration.ofMinutes(3));
+        String storedCertificationNumber = stringRedisTemplate.opsForValue().get("sms:" + phone);
+
+        assertThat(storedCertificationNumber).isEqualTo(certificationNumber);
     }
 
     @Test
     void testGetSmsCertification() {
-        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
-        when(valueOperations.get("sms:" + phone)).thenReturn(certificationNumber);
-
+        stringRedisTemplate.opsForValue().set("sms:" + phone, certificationNumber);
         String fetchedCertificationNumber = smsCertification.getSmsCertification(phone);
 
         assertThat(fetchedCertificationNumber).isEqualTo(certificationNumber);
@@ -56,17 +45,15 @@ class SmsCertificationTest {
 
     @Test
     void testDeleteSmsCertification() {
-        when(stringRedisTemplate.delete("sms:" + phone)).thenReturn(true);
-
+        stringRedisTemplate.opsForValue().set("sms:" + phone, certificationNumber);
         smsCertification.deleteSmsCertification(phone);
 
-        verify(stringRedisTemplate, times(1)).delete("sms:" + phone);
+        assertThat(stringRedisTemplate.hasKey("sms:" + phone)).isFalse();
     }
 
     @Test
     void testHasKey() {
-        when(stringRedisTemplate.hasKey("sms:" + phone)).thenReturn(true);
-
+        stringRedisTemplate.opsForValue().set("sms:" + phone, certificationNumber);
         boolean exists = smsCertification.hasKey(phone);
 
         assertThat(exists).isTrue();
