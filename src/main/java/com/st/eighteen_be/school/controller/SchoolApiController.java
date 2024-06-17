@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class SchoolApiController {
 
     @Operation(summary = "학교검색", description = "학교검색")
     @GetMapping("/v1/api/schools")
-    public ApiResp<Mono<List<SchoolsResponseDto>>> searchSchools(@RequestParam String schoolName) {
-        return ApiResp.success(HttpStatus.OK, schoolService.searchSchools(schoolName));
+    public ApiResp<List<SchoolsResponseDto>> searchSchools(@RequestParam String schoolName) {
+        return ApiResp.success(HttpStatus.OK, schoolService.searchSchools(schoolName).block());
     }
 }
