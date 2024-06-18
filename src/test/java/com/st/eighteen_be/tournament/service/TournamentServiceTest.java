@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -273,7 +273,7 @@ class TournamentServiceTest {
             //참여자 정보 주입하기
             for (int i = 1; i <= 3; i++) {
                 UserInfo user = UserInfo.builder()
-                                        .birthDay(LocalDateTime.now())
+                                        .birthDay(LocalDate.now())
                                         .phoneNumber("010-1234-567" + i)
                                         .uniqueId("user" + i)
                                         .build();
