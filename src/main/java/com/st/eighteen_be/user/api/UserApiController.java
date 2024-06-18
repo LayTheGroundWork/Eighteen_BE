@@ -66,10 +66,12 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, userService.reissue(request));
     }
 
+    @Operation(summary = "토큰 인증 테스트", description = "유효한 토큰인지 테스트")
     @PostMapping("/test")
-    public String test(HttpServletRequest request) {
+    public ApiResp<String> test(HttpServletRequest request) {
         String accessToken = request.getHeader("Authorization");
         String refreshToken = request.getHeader("Refresh");
-        return SecurityUtil.getCurrentUsername() + "\n" + accessToken + "\n" + refreshToken;
+        return ApiResp.success(HttpStatus.OK,
+                SecurityUtil.getCurrentUsername() + "\n" + accessToken + "\n" + refreshToken);
     }
 }
