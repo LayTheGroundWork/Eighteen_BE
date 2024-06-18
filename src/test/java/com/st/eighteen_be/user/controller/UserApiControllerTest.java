@@ -91,9 +91,9 @@ class UserApiControllerTest {
         String verificationCode = "123456";
         String unique_id = "@abs_sd";
         String schoolName = "서울고등학교";
-        String schoolAddr = "서울 송파구";
+        String schoolLocation = "서울 송파구";
 
-        SchoolData schoolData = new SchoolData(schoolName, schoolAddr);
+        SchoolData schoolData = new SchoolData(schoolName, schoolLocation);
 
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)

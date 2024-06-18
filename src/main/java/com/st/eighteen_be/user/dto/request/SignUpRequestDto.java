@@ -47,7 +47,8 @@ public record SignUpRequestDto(
 
         // 학교
         @NotNull(message = "학교는 필수 입력 값 입니다.")
-        @Schema(description = "회원가입자 학교정보", example = "{학교이름, 학교위치}")
+        @Schema(description = "회원가입자 학교정보",
+                example = "{\"schoolName\":\"서울고등학교\"," + "\"locationSchoolName\":\"서울\"}")
         SchoolData schoolData
 ) {
 

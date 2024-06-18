@@ -9,12 +9,12 @@ public class SchoolData {
 
     private String schoolName;
 
-    private String locationSchoolName;
+    private String schoolLocation;
 
     protected SchoolData(){}
 
-    public SchoolData(String schoolName, String locationSchoolName) {
+    public SchoolData(String schoolName, String schoolLocation) {
         this.schoolName = schoolName;
-        this.locationSchoolName = locationSchoolName;
+        this.schoolLocation = schoolLocation;
     }
 }
