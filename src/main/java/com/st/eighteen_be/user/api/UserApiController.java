@@ -66,7 +66,6 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, userService.reissue(request));
     }
 
-    @Operation(summary = "토큰 인증 테스트", description = "유효한 토큰인지 테스트")
     @PostMapping("/v1/api/token/test")
     public ApiResp<String> test(HttpServletRequest request) {
         String accessToken = request.getHeader("Authorization");
