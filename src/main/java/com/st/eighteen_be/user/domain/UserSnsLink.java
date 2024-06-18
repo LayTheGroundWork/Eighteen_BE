@@ -17,18 +17,20 @@ public class UserSnsLink extends BaseEntity {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserInfo user;
 
     private String snsLink;
 
     @Builder
-    public UserSnsLink(UserInfo user, String snsLink) {
-        this.user = user;
-        //== 연관관계 편의 메서드 ==//
-        user.getSnsLinks().add(this);
-
+    public UserSnsLink(String snsLink) {
         this.snsLink = snsLink;
+    }
+
+    //== 연관관계 편의 메서드 ==//
+    public void setUser(UserInfo user) {
+        this.user = user;
+        user.getSnsLinks().add(this);
     }
 
 }
