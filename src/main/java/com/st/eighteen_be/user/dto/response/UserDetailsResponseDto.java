@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -18,7 +18,7 @@ public class UserDetailsResponseDto {
     private int likeCount;
     private String nickName;
     private String uniqueId;
-    private LocalDateTime birthDay;
+    private LocalDate birthDay;
     //private String location;
     //private String schoolName;
     private List<String> roles;

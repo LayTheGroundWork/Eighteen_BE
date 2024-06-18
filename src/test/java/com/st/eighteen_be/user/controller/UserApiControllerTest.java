@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,20 +86,20 @@ class UserApiControllerTest {
                 .refreshToken("refreshToken")
                 .build();
 
-        String birthday = "2018-12-15T10:10";
+        LocalDate birthDay = LocalDate.of(2018, 12, 21);
         String phoneNumber = "01012341234";
         String verificationCode = "123456";
         String unique_id = "@abs_sd";
         String schoolName = "서울고등학교";
-        String schoolAddr = "서울 송파구";
+        String schoolLocation = "서울 송파구";
 
-        SchoolData schoolData = new SchoolData(schoolName, schoolAddr);
+        SchoolData schoolData = new SchoolData(schoolName, schoolLocation);
 
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)
                 .uniqueId(unique_id)
                 .schoolData(schoolData)
-                .birthDay(LocalDateTime.parse(birthday))
+                .birthDay(birthDay)
                 .build();
 
         signInRequestDto = SignInRequestDto.builder()
