@@ -73,7 +73,7 @@ public class TournamentApiController {
             description = "토너먼트에 투표합니다.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = TournamentVoteRequestDTO.class)))
+                            schema = @Schema(implementation = TournamentVoteRequestDTO.class))
             )
     )
     @ApiResponses(value = {
