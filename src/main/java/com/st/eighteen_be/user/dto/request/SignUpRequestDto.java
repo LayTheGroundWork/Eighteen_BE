@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +42,8 @@ public record SignUpRequestDto(
         String uniqueId,
 
         @NotNull(message = "생년월일은 필수 입력 값 입니다.")
-        @Schema(description = "회원가입자 생년월일", example = "2024-12-23T11:00")
-        LocalDateTime birthDay,
+        @Schema(description = "회원가입자 생년월일", example = "2024-12-23")
+        LocalDate birthDay,
 
         // 학교
         @NotNull(message = "학교는 필수 입력 값 입니다.")

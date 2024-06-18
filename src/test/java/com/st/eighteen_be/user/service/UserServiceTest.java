@@ -16,8 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,7 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,12 +73,16 @@ public class UserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        String birthday = "2018-12-15T10:10";
+        int year = 2018;
+        int month = 12;
+        int dayOfMonth = 21;
+
+        LocalDate birthDay = LocalDate.of(year,month,dayOfMonth);
         String verificationCode = "123456";
 
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)
-                .birthDay(LocalDateTime.parse(birthday))
+                .birthDay(birthDay)
                 .build();
 
         signInRequestDto = SignInRequestDto.builder()
