@@ -90,6 +90,7 @@ class UserApiControllerTest {
         String phoneNumber = "01012341234";
         String verificationCode = "123456";
         String unique_id = "@abs_sd";
+        String nickName = "ehgur";
         String schoolName = "서울고등학교";
         String schoolLocation = "서울 송파구";
 
@@ -98,6 +99,7 @@ class UserApiControllerTest {
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)
                 .uniqueId(unique_id)
+                .nickName(nickName)
                 .schoolData(schoolData)
                 .birthDay(birthDay)
                 .build();
@@ -116,8 +118,8 @@ class UserApiControllerTest {
     @DisplayName("회원 가입")
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
-        UserInfo userPrivacy = signUpRequestDto.toEntity("encryptPhoneNumber");
-        when(userService.save(signUpRequestDto)).thenReturn(userPrivacy);
+        UserInfo userInfo = signUpRequestDto.toEntity("encryptPhoneNumber");
+        when(userService.save(signUpRequestDto)).thenReturn(userInfo);
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)

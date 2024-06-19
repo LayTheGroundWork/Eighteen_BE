@@ -47,7 +47,7 @@ public class UserInfo extends BaseEntity {
 
     //private List<String> profileImg;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String nickName;
 
     @Column(length = 50, nullable = false, unique = true)

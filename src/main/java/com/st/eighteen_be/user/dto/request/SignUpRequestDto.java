@@ -29,6 +29,7 @@ import java.util.List;
 @Builder
 public record SignUpRequestDto(
 
+        // 전화번호
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotNull(message = "전화번호는 필수 입력 값 입니다.")
         @Pattern(regexp = "^01(0|1|[6-9])[0-9]{3,4}[0-9]{4}$")
@@ -41,6 +42,13 @@ public record SignUpRequestDto(
         @Schema(description = "회원가입자 고유식별 아이디", example = "@AB_D")
         String uniqueId,
 
+        // 닉네임
+        @NotBlank(message = "공백으로 설정할 수 없습니다.")
+        @NotNull(message = "닉네임은 필수 입력 값 입니다.")
+        @Schema(description = "회원가입자 닉네임", example = "최도혁")
+        String nickName,
+
+        // 생년월일
         @NotNull(message = "생년월일은 필수 입력 값 입니다.")
         @Schema(description = "회원가입자 생년월일", example = "2024-12-23")
         LocalDate birthDay,
@@ -60,6 +68,7 @@ public record SignUpRequestDto(
         return UserInfo.builder()
                 .phoneNumber(encryptPhoneNumber)
                 .uniqueId(uniqueId)
+                .nickName(nickName)
                 .schoolData(schoolData)
                 .birthDay(birthDay)
                 .roles(roles)
