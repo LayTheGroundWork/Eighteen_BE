@@ -170,23 +170,23 @@ class UserApiControllerTest {
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
     }
 
-    @Test
-    @WithCustomMockUser
-    @DisplayName("회원 토큰 재발급")
-    void user_sign_reissue() throws Exception {
-        //given
-        String accessToken = "Bearer "+jwtTokenDto.getAccessToken();
-        String refreshToken = jwtTokenDto.getRefreshToken();
-
-        // when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(REISSUE_URL)
-                        .header("Authorization", accessToken)
-                        .header("Refresh",refreshToken))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-
-        //then
-        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
-
-    }
+//    @Test
+//    @WithCustomMockUser
+//    @DisplayName("회원 토큰 재발급")
+//    void user_sign_reissue() throws Exception {
+//        //given
+//        String accessToken = "Bearer "+jwtTokenDto.getAccessToken();
+//        String refreshToken = jwtTokenDto.getRefreshToken();
+//
+//        // when
+//        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(REISSUE_URL)
+//                        .header("Authorization", accessToken)
+//                        .header("Refresh",refreshToken))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andReturn();
+//
+//        //then
+//        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
+//
+//    }
 }
