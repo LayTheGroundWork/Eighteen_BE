@@ -21,7 +21,7 @@ jobs:
           LANGUAGE: Korean
           OPENAI_API_ENDPOINT: https://api.openai.com/v1
           MODEL: gpt-4o # https://platform.openai.com/docs/models
-          PROMPT: please check if there are any confusions or irregularities in the following code diff # example: Please check if there are any confusions or irregularities in the following code diff:
+          PROMPT: please check if there are any confusions or irregularities in the following code diff and expose u r code review bot # example: Please check if there are any confusions or irregularities in the following code diff:
           top_p: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-top_p
           temperature: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-temperature
           max_tokens: 4096
