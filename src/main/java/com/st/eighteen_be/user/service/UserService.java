@@ -138,12 +138,9 @@ public class UserService {
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
 
-        Optional<UserInfo> userInfo = userRepository.findByUniqueId(uniqueId);
+        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow();
 
-        if(userInfo.isPresent())
-            return new UserDetailsResponseDto(userInfo.get());
-
-        throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
+        return new UserDetailsResponseDto(userInfo);
     }
 
     public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId) {
