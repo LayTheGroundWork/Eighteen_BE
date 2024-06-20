@@ -22,9 +22,7 @@ jobs:
           OPENAI_API_ENDPOINT: https://api.openai.com/v1
           MODEL: gpt-4o # https://platform.openai.com/docs/models
           PROMPT: >
-            아래 코드 차이에 혼란이나 비정상적인 부분이 있는지 확인해주세요.
-            코드 리뷰를 수행하는 봇입니다. 
-            [[ 코드 리뷰 봇 ]]
+            다음 자바17, 스프링부트 3.2 버전의 코드에서 좋지 않은 코드가 있는지 검토하고 개선 사항을 제안해줘:
           top_p: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-top_p
           temperature: 1 # https://platform.openai.com/docs/api-reference/chat/create#chat/create-temperature
           max_tokens: 4096
