@@ -23,7 +23,6 @@ public class UserDetailsResponseDto {
     //private String schoolName;
     private List<String> roles;
     private List<String> question;
-    private List<UserSnsLink> snsLinks;
 
     @Builder
     public UserDetailsResponseDto(UserInfo entity) {
@@ -36,7 +35,6 @@ public class UserDetailsResponseDto {
         //this.schoolName = entity.getSchoolName();
         this.roles = entity.getRoles();
         //this.question = entity.getQuestion();
-        this.snsLinks = entity.getSnsLinks();
     }
 
 }

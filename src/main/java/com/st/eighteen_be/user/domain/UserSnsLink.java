@@ -7,9 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSnsLink extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,15 +20,24 @@ public class UserSnsLink extends BaseEntity {
     @JoinColumn(name = "user_id")
     private UserInfo user;
 
-    private String snsLink;
+    private String link;
 
     @Builder
-    public UserSnsLink(UserInfo user, String snsLink) {
+    public UserSnsLink(UserInfo user, String link) {
         this.user = user;
-        //== 연관관계 편의 메서드 ==//
-        user.getSnsLinks().add(this);
+        this.link = link;
+    }
 
-        this.snsLink = snsLink;
+    //== 생성 메서드 ==//
+    public static UserSnsLink addUserSnsLink(UserInfo user, String link) {
+        UserSnsLink userSnsLink = UserSnsLink.builder()
+                .user(user)
+                .link(link)
+                .build();
+
+        user.getSnsLinks().add(userSnsLink);
+
+        return userSnsLink;
     }
 
 }

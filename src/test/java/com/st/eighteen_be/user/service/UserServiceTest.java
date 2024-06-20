@@ -6,6 +6,7 @@ import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.repository.RefreshTokenRepository;
+import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
@@ -73,16 +74,24 @@ public class UserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        int year = 2018;
-        int month = 12;
-        int dayOfMonth = 21;
-
-        LocalDate birthDay = LocalDate.of(year,month,dayOfMonth);
+        LocalDate birthDay = LocalDate.of(1999,12,23);
         String verificationCode = "123456";
+        String uniqueId = "@abc_sc";
+        String nickName = "ehgur";
+        String schoolName = "서울고등학교";
+        String schoolLocation = "서울";
+
+        SchoolData schoolData = SchoolData.builder()
+                .schoolName(schoolName)
+                .schoolLocation(schoolLocation)
+                .build();
 
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)
                 .birthDay(birthDay)
+                .schoolData(schoolData)
+                .uniqueId(uniqueId)
+                .nickName(nickName)
                 .build();
 
         signInRequestDto = SignInRequestDto.builder()

@@ -8,10 +8,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"phoneNumber"}, name = "PHONE_NUMBER_UNIQUE")})
 public class UserInfo extends BaseEntity {
@@ -23,7 +21,6 @@ public class UserInfo extends BaseEntity {
     private Integer id;
 
     // SNS 링크 정보 [학생(1) : 주소(N)]
-    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSnsLink> snsLinks = new ArrayList<>();
 
@@ -42,12 +39,11 @@ public class UserInfo extends BaseEntity {
     private LocalDate birthDay;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
     private List<String> roles = new ArrayList<>();
 
     //private List<String> profileImg;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String nickName;
 
     @Column(length = 50, nullable = false, unique = true)
@@ -62,6 +58,19 @@ public class UserInfo extends BaseEntity {
     private int likeCount;
 
     // 10문 10답
+
+    @Builder
+    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, List<String> roles, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
+        this.schoolData = schoolData;
+        this.phoneNumber = phoneNumber;
+        this.birthDay = birthDay;
+        this.roles = roles;
+        this.nickName = nickName;
+        this.uniqueId = uniqueId;
+        this.introduction = introduction;
+        this.mbti = mbti;
+        this.likeCount = likeCount;
+    }
 
     public void update(){}
 
