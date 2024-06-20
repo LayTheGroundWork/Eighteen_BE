@@ -276,6 +276,7 @@ class TournamentServiceTest {
                                         .birthDay(LocalDate.now())
                                         .phoneNumber("010-1234-567" + i)
                                         .uniqueId("user" + i)
+                                        .nickName("name" + i)
                                         .build();
                 
                 em.persist(user);

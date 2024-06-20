@@ -1,20 +1,26 @@
 package com.st.eighteen_be.user.api;
 
+import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import static com.st.eighteen_be.jwt.JwtTokenProvider.*;
 
 /**
  * packageName    : com.st.eighteen_be.member.api
@@ -46,9 +52,13 @@ public class UserApiController {
 
     @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/v1/api/user/sign-in")
-    public ApiResp<JwtTokenDto> signIn(@Valid @RequestBody SignInRequestDto requestDto) {
+    public ApiResp<JwtTokenDto> signIn(@Valid @RequestBody SignInRequestDto requestDto, HttpServletResponse response) {
 
         JwtTokenDto jwtTokenDto = userService.signIn(requestDto);
+
+        // 응답 헤더에 토큰 추가
+        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
+        response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
         return ApiResp.success(HttpStatus.OK, jwtTokenDto);
     }
@@ -62,14 +72,36 @@ public class UserApiController {
 
     @Operation(summary = "토큰 재발급", description = "토큰 재발급")
     @PutMapping("/v1/api/user/reissue")
-    public ApiResp<JwtTokenDto> reissue(HttpServletRequest request) {
-        return ApiResp.success(HttpStatus.OK, userService.reissue(request));
+    public ApiResp<JwtTokenDto> reissue(HttpServletRequest request, HttpServletResponse response) {
+
+        JwtTokenDto jwtTokenDto = userService.reissue(request);
+        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
+        response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
+
+        return ApiResp.success(HttpStatus.OK, jwtTokenDto);
     }
 
-    @PostMapping("/test")
-    public String test(HttpServletRequest request) {
-        String accessToken = request.getHeader("Authorization");
-        String refreshToken = request.getHeader("Refresh");
-        return SecurityUtil.getCurrentUsername() + "\n" + accessToken + "\n" + refreshToken;
+    @Operation(summary = "회원 상세 정보 보기", description = "회원 상세 정보 보기")
+    @PostMapping("/v1/api/user/find/{unique-id}")
+    public ApiResp<UserDetailsResponseDto> find(@PathVariable("unique-id") String uniqueId) {
+        return ApiResp.success(HttpStatus.OK, userService.findByUniqueId(uniqueId));
+    }
+
+
+    @Operation(summary = "헤더에 토큰 확인", description = "헤더에 토큰 확인")
+    @PostMapping("/token/test")
+    public ApiResp<String> test(@RequestHeader HttpHeaders httpHeaders) {
+        String accessToken = httpHeaders.getFirst(AUTHORIZATION_HEADER);
+        String refreshToken = httpHeaders.getFirst(REFRESH_HEADER);
+
+        // 로그 추가
+        log.info("Authorization Header: {}", accessToken);
+        log.info("Refresh Header: {}", refreshToken);
+
+        if (accessToken == null || accessToken.isEmpty()) {
+            return ApiResp.fail(ErrorCode.ACCESS_TOKEN_NOT_VALID);
+        }
+        return ApiResp.success(HttpStatus.OK,
+                SecurityUtil.getCurrentUsername() + "/" + accessToken + "/" + refreshToken);
     }
 }

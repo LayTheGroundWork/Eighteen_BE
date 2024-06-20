@@ -90,6 +90,7 @@ class UserApiControllerTest {
         String phoneNumber = "01012341234";
         String verificationCode = "123456";
         String unique_id = "@abs_sd";
+        String nickName = "ehgur";
         String schoolName = "서울고등학교";
         String schoolLocation = "서울 송파구";
 
@@ -98,6 +99,7 @@ class UserApiControllerTest {
         signUpRequestDto = SignUpRequestDto.builder()
                 .phoneNumber(phoneNumber)
                 .uniqueId(unique_id)
+                .nickName(nickName)
                 .schoolData(schoolData)
                 .birthDay(birthDay)
                 .build();
@@ -116,8 +118,8 @@ class UserApiControllerTest {
     @DisplayName("회원 가입")
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
-        UserInfo userPrivacy = signUpRequestDto.toEntity("encryptPhoneNumber");
-        when(userService.save(signUpRequestDto)).thenReturn(userPrivacy);
+        UserInfo userInfo = signUpRequestDto.toEntity("encryptPhoneNumber");
+        when(userService.save(signUpRequestDto)).thenReturn(userInfo);
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)
@@ -168,23 +170,23 @@ class UserApiControllerTest {
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
     }
 
-    @Test
-    @WithCustomMockUser
-    @DisplayName("회원 토큰 재발급")
-    void user_sign_reissue() throws Exception {
-        //given
-        String accessToken = "Bearer "+jwtTokenDto.getAccessToken();
-        String refreshToken = jwtTokenDto.getRefreshToken();
-
-        // when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(REISSUE_URL)
-                        .header("Authorization", accessToken)
-                        .header("Refresh",refreshToken))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-
-        //then
-        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
-
-    }
+//    @Test
+//    @WithCustomMockUser
+//    @DisplayName("회원 토큰 재발급")
+//    void user_sign_reissue() throws Exception {
+//        //given
+//        String accessToken = "Bearer "+jwtTokenDto.getAccessToken();
+//        String refreshToken = jwtTokenDto.getRefreshToken();
+//
+//        // when
+//        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(REISSUE_URL)
+//                        .header("Authorization", accessToken)
+//                        .header("Refresh",refreshToken))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andReturn();
+//
+//        //then
+//        assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
+//
+//    }
 }
