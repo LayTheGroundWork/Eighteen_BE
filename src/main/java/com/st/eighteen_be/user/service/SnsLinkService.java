@@ -1,6 +1,7 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserInfo;
@@ -35,7 +36,9 @@ public class SnsLinkService {
 
         String certificationValue = jwtTokenProvider.getAuthentication(requestAccessToken).getName();
 
-        UserInfo userInfo = userRepository.findByPhoneNumber(certificationValue).orElseThrow();
+        UserInfo userInfo = userRepository.findByPhoneNumber(certificationValue).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+        );
 
         List<UserSnsLink> userSnsLinks = new ArrayList<>();
         for(String link : snsLinks){
@@ -54,7 +57,9 @@ public class SnsLinkService {
 
 
     public List<SnsLinksResponseDto> readAll(Integer userId){
-        UserInfo userInfo = userRepository.findById(userId).orElseThrow();
+        UserInfo userInfo = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+        );
 
         List<UserSnsLink> snsLinks = userInfo.getSnsLinks();
         List<SnsLinksResponseDto> snsLinksResponseDtoList = new ArrayList<>();

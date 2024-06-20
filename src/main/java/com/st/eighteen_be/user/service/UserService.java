@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -138,18 +137,19 @@ public class UserService {
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
 
-        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow();
+        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         return new UserDetailsResponseDto(userInfo);
     }
 
     public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId) {
-        Optional<UserInfo> userInfo = userRepository.findByUniqueId(uniqueId);
+        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+        );
 
-        if(userInfo.isPresent())
-            return new UserProfileResponseDto(userInfo.get());
 
-        throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
+        return new UserProfileResponseDto(userInfo);
     }
 
     public List<UserProfileResponseDto> findAll(){
