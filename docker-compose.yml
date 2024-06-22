@@ -119,7 +119,11 @@ services:
       - REDIS_REPLICATION_MODE=master
     volumes:
       - redis-master-data:/bitnami/redis/data:rw
-    command: redis-server --enable-debug-command yes --protected-mode no --stop-writes-on-bgsave-error no --maxmemory-policy allkeys-lru
+    command: >
+      redis-server --enable-debug-command yes 
+                   --protected-mode no 
+                   --stop-writes-on-bgsave-error no 
+                   --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
     networks:
@@ -137,7 +141,11 @@ services:
       - "6479:6379"
     volumes:
       - redis-slave-1-data:/bitnami/redis/data:rw
-    command: redis-server --enable-debug-command yes --protected-mode no --stop-writes-on-bgsave-error no --maxmemory-policy allkeys-lru
+    command: >
+      redis-server --enable-debug-command yes 
+                   --protected-mode no 
+                   --stop-writes-on-bgsave-error no 
+                   --maxmemory-policy allkeys-lru
     depends_on:
       - redis-master
     networks:
@@ -155,7 +163,11 @@ services:
       - "6579:6379"
     volumes:
       - redis-slave-2-data:/bitnami/redis/data:rw
-    command: redis-server --enable-debug-command yes --protected-mode no --stop-writes-on-bgsave-error no --maxmemory-policy allkeys-lru
+    command: >
+      redis-server --enable-debug-command yes 
+                   --protected-mode no 
+                   --stop-writes-on-bgsave-error no 
+                   --maxmemory-policy allkeys-lru
     depends_on:
       - redis-master
       - redis-slave-1
