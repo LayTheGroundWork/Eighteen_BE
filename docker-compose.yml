@@ -117,6 +117,7 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_REPLICATION_MODE=master
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru  # LRU 정책 설정
     volumes:
       - redis-master-data:/bitnami/redis/data:rw
     command: redis-server --enable-debug-command yes --protected-mode no --stop-writes-on-bgsave-error no
@@ -133,6 +134,7 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_MASTER_HOST=redis-master
       - REDIS_REPLICATION_MODE=slave
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru  # LRU 정책 설정
     ports:
       - "6479:6379"
     volumes:
@@ -150,6 +152,7 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_MASTER_HOST=redis-master
       - REDIS_REPLICATION_MODE=slave
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru  # LRU 정책 설정
     ports:
       - "6579:6379"
     volumes:
