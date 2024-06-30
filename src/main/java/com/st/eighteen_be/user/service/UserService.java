@@ -26,8 +26,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -148,18 +148,14 @@ public class UserService {
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
-
         return new UserProfileResponseDto(userInfo);
     }
 
-    public List<UserProfileResponseDto> findAll(){
+    public List<UserProfileResponseDto> findAll() {
         List<UserInfo> users = userRepository.findAll();
-        List<UserProfileResponseDto> usersDto = new ArrayList<>();
-
-        for(UserInfo user : users){
-            usersDto.add(new UserProfileResponseDto(user));
-        }
-        return usersDto;
+        return users.stream()
+                .map(UserProfileResponseDto::new)
+                .collect(Collectors.toList());
     }
 
 }
