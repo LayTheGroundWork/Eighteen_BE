@@ -19,6 +19,7 @@ import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,7 +44,7 @@ public class UserService {
     private final TokenBlackList tokenBlackList;
 
 
-    public UserInfo save(SignUpRequestDto requestDto) {
+    public UserInfo save(@NotNull SignUpRequestDto requestDto) {
         try {
             return userRepository.save(requestDto.toEntity(
                     encryptService.encryptPhoneNumber(requestDto.phoneNumber()))
@@ -56,7 +57,7 @@ public class UserService {
         }
     }
 
-    public JwtTokenDto signIn(SignInRequestDto requestDto) {
+    public JwtTokenDto signIn(@NotNull SignInRequestDto requestDto) {
 
         // 1. phoneNumber와 verificationCode를 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
