@@ -69,6 +69,7 @@ public class UserServiceTest {
     private JwtTokenDto jwtTokenDto;
 
     private final String phoneNumber = "01012341234";
+    private final String uniqueId = "@abc_sc";
 
     @BeforeEach
     void setUp() {
@@ -76,7 +77,6 @@ public class UserServiceTest {
 
         LocalDate birthDay = LocalDate.of(1999,12,23);
         String verificationCode = "123456";
-        String uniqueId = "@abc_sc";
         String nickName = "ehgur";
         String schoolName = "서울고등학교";
         String schoolLocation = "서울";
@@ -134,9 +134,16 @@ public class UserServiceTest {
     @DisplayName("로그인 서비스 테스트")
     void user_sign_in() throws Exception {
         //given
-        authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber,"");
+        UserInfo userInfo = signUpRequestDto.toEntity(phoneNumber);
+
+        when(encryptService.encryptPhoneNumber(phoneNumber)).thenReturn(phoneNumber);
+        when(userRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.ofNullable(userInfo));
+
+        authenticationToken = new UsernamePasswordAuthenticationToken(uniqueId,"");
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authenticationToken);
+
         when(jwtTokenProvider.generateToken(any(Authentication.class))).thenReturn(jwtTokenDto);
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(null);
 
@@ -151,7 +158,6 @@ public class UserServiceTest {
     @DisplayName("식별 아이디로 유저 상세정보 보기")
     public void find_user_details() throws Exception {
         //given
-        String uniqueId = "@abc_sc";
         UserInfo mockUser = UserInfo.builder()
                 .phoneNumber(phoneNumber)
                 .uniqueId(uniqueId)
@@ -170,7 +176,6 @@ public class UserServiceTest {
     @DisplayName("식별 아이디로 유저 프로필 보기")
     public void find_user_profile() throws Exception {
         //given
-        String uniqueId = "@abc_sc";
         String nickName = "ehgur";
         UserInfo mockUser = UserInfo.builder()
                 .phoneNumber(phoneNumber)
