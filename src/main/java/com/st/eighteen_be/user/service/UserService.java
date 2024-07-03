@@ -58,11 +58,16 @@ public class UserService {
     }
 
     public JwtTokenDto signIn(@NotNull SignInRequestDto requestDto) {
+        String encryptPhoneNumber = encryptService.encryptPhoneNumber(requestDto.phoneNumber());
+        log.info("encryptPhoneNumber->{}",encryptPhoneNumber);
+
+        UserInfo userInfo = userRepository.findByPhoneNumber(encryptPhoneNumber)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+        );
 
         // 1. phoneNumber와 verificationCode를 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                //new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), smsUtil.verifySms(requestDto));
-                new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), "");
+                new UsernamePasswordAuthenticationToken(userInfo.getUniqueId(), "");
 
         log.info("UsernamePasswordAuthenticationToken-> {}", authenticationToken);
 
