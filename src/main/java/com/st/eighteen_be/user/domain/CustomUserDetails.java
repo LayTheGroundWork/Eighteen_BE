@@ -16,24 +16,24 @@ import java.util.stream.Collectors;
 @ToString
 public class CustomUserDetails extends UserInfo implements UserDetails {
     private Integer id;
-    private String phoneNumber;
+    private String uniqueId;
     private List<String> roles;
     private String password;
 
     private CustomUserDetails(UserInfo userInfo, String encodePassword) {
         this.id = userInfo.getId();
-        this.phoneNumber = userInfo.getPhoneNumber();
+        this.uniqueId = userInfo.getUniqueId();
         this.password = encodePassword;
         this.roles = userInfo.getRoles();
     }
 
-    private CustomUserDetails(String phoneNumber, List<String> roles) {
-        this.phoneNumber = phoneNumber;
+    private CustomUserDetails(String uniqueId, List<String> roles) {
+        this.uniqueId = uniqueId;
         this.roles = roles;
     }
 
-    private CustomUserDetails(String phoneNumber, String password, List<String> roles) {
-        this.phoneNumber = phoneNumber;
+    private CustomUserDetails(String uniqueId, String password, List<String> roles) {
+        this.uniqueId = uniqueId;
         this.password = password;
         this.roles = roles;
     }
@@ -59,7 +59,7 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.phoneNumber;
+        return this.uniqueId;
     }
 
     @Override

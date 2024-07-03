@@ -19,13 +19,12 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final EncryptService encryptService;
     private final PasswordEncoder passwordEncoder;
 
 
     @Override
-    public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
-        return userRepository.findByPhoneNumber(encryptService.encryptPhoneNumber(phoneNumber))
+    public UserDetails loadUserByUsername(String uniqueId) throws UsernameNotFoundException {
+        return userRepository.findByUniqueId(uniqueId)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
     }
