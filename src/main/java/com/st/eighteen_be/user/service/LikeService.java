@@ -3,29 +3,53 @@ package com.st.eighteen_be.user.service;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
-import com.st.eighteen_be.user.domain.UserLike;
-import com.st.eighteen_be.user.repository.UserLikeRepository;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class LikeService {
 
-    private final UserLikeRepository userLikeRepository;
+    private final RedisTemplate<String,String> redisLikeTemplate;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public void countUp(HttpServletRequest request, Integer userId){
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+    private static final String PREFIX = "like->";
 
-        if (!jwtTokenProvider.validateToken(requestAccessToken)) {
+    public Long count(Integer userId){
+        return redisLikeTemplate.opsForHash().size(PREFIX+userId);
+    }
+
+    public void addLike(HttpServletRequest request, Integer userId){
+
+        Authentication authentication = authentication(request);
+        String key = PREFIX + userId;
+        String subKey = authentication.getName();
+
+        if (!redisLikeTemplate.opsForHash().hasKey(key, subKey)) {
+            redisLikeTemplate.opsForHash().put(key, subKey, "true");
+        }
+    }
+
+    public void cancelLike(HttpServletRequest request, Integer userId){
+
+        Authentication authentication = authentication(request);
+        String key = PREFIX + userId;
+        String subKey = authentication.getName();
+
+        if (redisLikeTemplate.opsForHash().hasKey(key, subKey)) {
+            redisLikeTemplate.opsForHash().delete(key, subKey);
+        }
+    }
+
+    private Authentication authentication(HttpServletRequest request){
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+        if (requestAccessToken == null || !jwtTokenProvider.validateToken(requestAccessToken)) {
             throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
         }
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
-
-        userLikeRepository.save(UserLike.from(userId,authentication.getName()));
-
+        return jwtTokenProvider.getAuthentication(requestAccessToken);
     }
 }
