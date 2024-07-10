@@ -1,7 +1,6 @@
 package com.st.eighteen_be.user.dto.response;
 
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.domain.UserSnsLink;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDetailsResponseDto {
 
-
+    private Integer id;
     //private List<String> profileImages;
     private int likeCount;
     private String nickName;
@@ -26,6 +25,7 @@ public class UserDetailsResponseDto {
 
     @Builder
     public UserDetailsResponseDto(UserInfo entity) {
+        this.id = entity.getId();
         //this.profileImages = entity.getProfileImg();
         this.likeCount = entity.getLikeCount();
         this.nickName = entity.getNickName();

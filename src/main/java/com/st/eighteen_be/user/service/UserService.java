@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,7 +43,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final EncryptService encryptService;
     private final TokenBlackList tokenBlackList;
-
+    private final LikeService likeService;
 
     public UserInfo save(@NotNull SignUpRequestDto requestDto) {
         try {
@@ -149,19 +150,26 @@ public class UserService {
         return new UserDetailsResponseDto(userInfo);
     }
 
-    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId) {
+    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId,HttpServletRequest request) {
         UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
-        return new UserProfileResponseDto(userInfo);
+        return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(request,userInfo.getId()));
     }
 
-    public List<UserProfileResponseDto> findAll() {
+    public List<UserProfileResponseDto> getUserProfilesWithLikes(HttpServletRequest request) {
         List<UserInfo> users = userRepository.findAll();
+        Set<String> likedUserIds = likeService.getLikedUserIds(request);
+
         return users.stream()
-                .map(UserProfileResponseDto::new)
+                .map(user -> toUserProfileResponseDto(user, likedUserIds))
                 .collect(Collectors.toList());
+    }
+
+    private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
+        boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
+        return new UserProfileResponseDto(user, isLiked);
     }
 
 }

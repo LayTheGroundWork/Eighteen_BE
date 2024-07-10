@@ -8,6 +8,8 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.st.eighteen_be.jwt.JwtTokenProvider.*;
 
@@ -42,6 +46,7 @@ import static com.st.eighteen_be.jwt.JwtTokenProvider.*;
 public class UserApiController {
 
     private final UserService userService;
+    private final LikeService likeService;
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
@@ -86,6 +91,20 @@ public class UserApiController {
     public ApiResp<UserDetailsResponseDto> find(@PathVariable("unique-id") String uniqueId) {
         return ApiResp.success(HttpStatus.OK, userService.findByUniqueId(uniqueId));
     }
+
+    @Operation(summary = "회원 전체 조회", description = "회원 전체 조회")
+    @PostMapping("/v1/api/user/find-all")
+    public ApiResp<List<UserProfileResponseDto>> findAll(HttpServletRequest request){
+        return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(request));
+    }
+
+    @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
+    @PostMapping("/v1/api/user/like")
+    public ApiResp<String> like(HttpServletRequest request, Integer likedId){
+        likeService.addLike(request,likedId);
+        return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
+    }
+
 
 
     @Operation(summary = "헤더에 토큰 확인", description = "헤더에 토큰 확인")
