@@ -10,7 +10,7 @@ import java.time.Duration;
 @Repository
 public class SmsCertification {
     private final String PREFIX = "sms:"; // key값이 중복되지 않도록 상수 선언
-    private final int LIMIT_TIME = 3 * 60; // 인증번호 유효 시간
+    private final int LIMIT_TIME = 30 * 24 * 60 * 60; // 인증번호 유효 시간
 
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -18,7 +18,7 @@ public class SmsCertification {
     public void createSmsCertification(String phone, String certificationNumber) {
         stringRedisTemplate.opsForValue()
                 //TODO: 테스트를 위해 유효시간 무한으로 설정
-                .set(PREFIX + phone, certificationNumber, Duration.ofSeconds(Long.MAX_VALUE));
+                .set(PREFIX + phone, certificationNumber, Duration.ofSeconds(LIMIT_TIME));
     }
 
     // 휴대전화 번호에 해당하는 인증번호 불러오기
