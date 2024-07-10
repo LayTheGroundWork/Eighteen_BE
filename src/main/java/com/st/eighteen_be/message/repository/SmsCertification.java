@@ -17,7 +17,8 @@ public class SmsCertification {
     // Redis에 저장
     public void createSmsCertification(String phone, String certificationNumber) {
         stringRedisTemplate.opsForValue()
-                .set(PREFIX + phone, certificationNumber, Duration.ofSeconds(LIMIT_TIME));
+                //TODO: 테스트를 위해 유효시간 무한으로 설정
+                .set(PREFIX + phone, certificationNumber, Duration.ofSeconds(Long.MAX_VALUE));
     }
 
     // 휴대전화 번호에 해당하는 인증번호 불러오기
