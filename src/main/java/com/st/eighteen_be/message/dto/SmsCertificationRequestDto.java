@@ -18,13 +18,8 @@ public class SmsCertificationRequestDto {
         @Schema(description = "메시지 수신자 전화번호", example = "01012345678")
         private String phoneNumber;
 
-        @Pattern(regexp = "[0-9]{0,6}", message = "인증코드는 숫자만 입력 가능합니다.")
-        @Schema(description = "수신자가 작성한 인증번호", example = "123456")
-        private String certificationNumber;
-
         @Builder
-        public SmsCertificationRequestDto(String phoneNumber, String certificationNumber) {
+        public SmsCertificationRequestDto(String phoneNumber) {
                 this.phoneNumber = phoneNumber;
-                this.certificationNumber = certificationNumber;
         }
 }
