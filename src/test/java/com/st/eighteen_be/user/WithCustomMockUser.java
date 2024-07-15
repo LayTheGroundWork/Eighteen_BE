@@ -10,5 +10,5 @@ import java.lang.annotation.RetentionPolicy;
 @WithSecurityContext(factory = WithCustomMockUserSecurityContextFactory.class)
 public @interface WithCustomMockUser {
 
-    String phoneNumber() default "01012345678";
+    String userName() default "@AB_D";
 }

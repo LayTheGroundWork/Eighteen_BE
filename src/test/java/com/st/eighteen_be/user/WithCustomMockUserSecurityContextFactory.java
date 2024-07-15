@@ -1,27 +1,22 @@
 package com.st.eighteen_be.user;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-
-import java.util.List;
 
 public class WithCustomMockUserSecurityContextFactory implements
         WithSecurityContextFactory<WithCustomMockUser> {
 
     @Override
     public SecurityContext createSecurityContext(WithCustomMockUser annotation) {
-        String phoneNumber = annotation.phoneNumber();
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(phoneNumber, "",
-                List.of(new SimpleGrantedAuthority("USER")));
+        final SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(auth);
+        final UsernamePasswordAuthenticationToken authenticationToken
+                = new UsernamePasswordAuthenticationToken(annotation.userName(), "");
 
-        return context;
+        securityContext.setAuthentication(authenticationToken);
+        return securityContext;
     }
 }
