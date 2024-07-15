@@ -86,6 +86,21 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, jwtTokenDto);
     }
 
+    @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
+    @PostMapping("/v1/api/user/like")
+    public ApiResp<String> like(HttpServletRequest request, Integer likedId){
+        likeService.addLike(request,likedId);
+        return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
+    }
+
+    @Operation(summary = "회원 좋아요 취소", description = "회원 좋아요 취소하기")
+    @PostMapping("/v1/api/user/like-cancel")
+    public ApiResp<String> cancelLike(HttpServletRequest request, Integer likedId){
+        likeService.cancelLike(request,likedId);
+        return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 취소 완료");
+    }
+
+
     @Operation(summary = "회원 상세 정보 보기", description = "회원 상세 정보 보기")
     @PostMapping("/v1/api/user/find/{unique-id}")
     public ApiResp<UserDetailsResponseDto> find(@PathVariable("unique-id") String uniqueId) {
@@ -96,13 +111,6 @@ public class UserApiController {
     @PostMapping("/v1/api/user/find-all")
     public ApiResp<List<UserProfileResponseDto>> findAll(HttpServletRequest request){
         return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(request));
-    }
-
-    @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
-    @PostMapping("/v1/api/user/like")
-    public ApiResp<String> like(HttpServletRequest request, Integer likedId){
-        likeService.addLike(request,likedId);
-        return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
     }
 
 
