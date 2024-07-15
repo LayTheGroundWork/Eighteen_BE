@@ -6,6 +6,7 @@ import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.repository.RefreshTokenRepository;
+import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
@@ -27,8 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +41,9 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LikeService likeService;
 
     @MockBean
     private UserRepository userRepository;
@@ -156,6 +158,34 @@ public class UserServiceTest {
     }
 
     @Test
+    @WithCustomMockUser
+    @DisplayName("유저 좋아요 추가")
+    public void addLike() throws Exception {
+        //given
+        Integer likedId = 1;
+
+        UserInfo mockUser = UserInfo.builder()
+                .phoneNumber(phoneNumber)
+                .uniqueId(uniqueId)
+                .nickName("nickName")
+                .build();
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addHeader("Authorization","Bearer abc.sdf.sdf");
+        mockRequest.addHeader("Refresh","abc.sdf.sdf");
+
+        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
+        when(likeService.getUserUniqueIdFromRequest(mockRequest)).thenReturn(uniqueId);
+
+        //when
+        likeService.addLike(mockRequest, likedId);
+
+        //then
+        assertThat(likeService.countLikes(likedId)).isEqualTo(1);
+        assertThat(likeService.getLikedUserId(mockRequest,likedId)).isTrue();
+    }
+
+    @Test
     @DisplayName("식별 아이디로 유저 상세정보 보기")
     public void find_user_details() throws Exception {
         //given
@@ -173,30 +203,30 @@ public class UserServiceTest {
         assertThat(findUserDetails.getUniqueId()).isEqualTo(uniqueId);
     }
 
-//    @Test
-//    @DisplayName("식별 아이디로 유저 프로필 보기")
-//    public void find_user_profile() throws Exception {
-//        //given
-//        String nickName = "ehgur";
-//        UserInfo mockUser = UserInfo.builder()
-//                .phoneNumber(phoneNumber)
-//                .uniqueId(uniqueId)
-//                .nickName(nickName)
-//                .build();
-//
-//        MockHttpServletRequest request = new MockHttpServletRequest();
-//        request.addHeader("Authentication", "Bearer-access.token.value");
-//        request.addHeader("Request", "request.token.value");
-//
-//
-//        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
-//
-//        //when
-//        UserProfileResponseDto findUserProfile = userService.findUserProfileByUniqueId(uniqueId,request);
-//
-//        //then
-//        assertThat(findUserProfile.getNickName()).isEqualTo(nickName);
-//    }
+    @Test
+    @WithCustomMockUser
+    @DisplayName("식별 아이디로 유저 프로필 보기")
+    public void find_user_profile() throws Exception {
+        //given
+        String nickName = "ehgur";
+        UserInfo mockUser = UserInfo.builder()
+                .phoneNumber(phoneNumber)
+                .uniqueId(uniqueId)
+                .nickName(nickName)
+                .build();
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addHeader("Authorization","Bearer abc.sdf.sdf");
+        mockRequest.addHeader("Refresh","abc.sdf.sdf");
+
+        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
+
+        //when
+        UserProfileResponseDto findUserProfile = userService.findUserProfileByUniqueId(uniqueId,mockRequest);
+
+        //then
+        assertThat(findUserProfile.getNickName()).isEqualTo(nickName);
+    }
 
 //    @Test
 //    @DisplayName("모든 유저 프로필 보기")
