@@ -22,22 +22,13 @@ public class LikeInfoBatchTest {
     private LikeService likeService;
 
     @Test
-    @DisplayName("backupUserLikeDataToMySQL 스케쥴러 정상 동작 테스트 - enums 길이만큼 backupUserLikeDataToMySQL 호출")
-    public void backup_user_like_Data_to_MySQL_Test() throws Exception {
+    @DisplayName("backupDataToMySQL 스케쥴러 정상 동작 테스트 - enums 길이만큼 backupDataToMySQL 호출")
+    public void backup_like_Data_to_MySQL_Test() throws Exception {
         //when
-        likeInfoScheduler.backupUserLikeDataToMySQL();
+        likeInfoScheduler.backupDataToMySQL();
 
         //then
         verify(likeService, times(1)).backupUserLikeDataToMySQL();
-    }
-
-    @Test
-    @DisplayName("backupLikeCountToMySQL 스케쥴러 정상 동작 테스트 - enums 길이만큼 backupLikeCountToMySQL 호출")
-    public void backup_user_like_count_to_MySQL_Test() throws Exception {
-        //when
-        likeInfoScheduler.backupLikeCountToMySQL();
-
-        //then
         verify(likeService, times(1)).backupLikeCountToMySQL();
     }
 }
