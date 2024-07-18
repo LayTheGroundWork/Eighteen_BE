@@ -28,14 +28,12 @@ public class UserLike extends BaseEntity {
     }
 
     //== 생성 메서드 ==//
-    public static UserLike addLikedId(UserInfo user, Integer likedId) {
+    public static void addLikedId(UserInfo user, Integer likedId) {
         UserLike userLike = UserLike.builder()
                 .user(user)
                 .likedId(likedId)
                 .build();
 
         user.getUserLikes().add(userLike);
-
-        return userLike;
     }
 }
