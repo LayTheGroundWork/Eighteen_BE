@@ -125,7 +125,7 @@ public class UserApiController {
     }
 
     @Operation(summary = "백업된 좋아요 정보 보기", description = "백업된 좋아요 정보 보기")
-    @PostMapping("/v1/api/user/like/view-backup-data/{userId}")
+    @GetMapping("/v1/api/user/like/view-backup-data/{userId}")
     public ApiResp<Integer> viewBackupData(@PathVariable("userId") Integer userId){
         return ApiResp.success(HttpStatus.OK, userService.findById(userId).getLikeCount());
     }
