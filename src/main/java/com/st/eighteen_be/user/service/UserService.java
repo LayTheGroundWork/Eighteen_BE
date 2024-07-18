@@ -16,7 +16,6 @@ import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -90,9 +89,9 @@ public class UserService {
         return token;
     }
 
-    public void signOut(HttpServletRequest request) {
+    public void signOut(String accessToken) {
 
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
 
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(requestAccessToken)) {
@@ -112,10 +111,10 @@ public class UserService {
 
     }
 
-    public JwtTokenDto reissue(HttpServletRequest request) {
+    public JwtTokenDto reissue(String accessToken, String refreshToken) {
 
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
-        String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(request);
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
+        String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(refreshToken);
 
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(requestRefreshToken)) {
@@ -126,20 +125,20 @@ public class UserService {
         Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
         // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져옴
-        RefreshToken refreshToken = refreshTokenService.findRefreshTokenById(authentication.getName());
+        RefreshToken token = refreshTokenService.findRefreshTokenById(authentication.getName());
 
         // 4. Refresh Token 일치하는지 검사
-        if (!refreshToken.getRefreshToken().equals(requestRefreshToken)) {
+        if (!token.getRefreshToken().equals(requestRefreshToken)) {
             throw new AuthenticationException(ErrorCode.TOKEN_UNAUTHORIZED);
         }
 
         // 5. 새로운 토큰 생성
-        JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
+        JwtTokenDto newToken = jwtTokenProvider.generateToken(authentication);
 
         // 6. 저장소 정보 업데이트
         refreshTokenService.saveOrUpdate(authentication);
 
-        return token;
+        return newToken;
     }
 
     public UserDetailsResponseDto findById(Integer userId) {
@@ -159,17 +158,17 @@ public class UserService {
         return new UserDetailsResponseDto(userInfo,likeCount);
     }
 
-    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId,HttpServletRequest request) {
+    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId, String accessToken) {
         UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
-        return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(request,userInfo.getId()));
+        return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(accessToken,userInfo.getId()));
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithLikes(HttpServletRequest request) {
+    public List<UserProfileResponseDto> getUserProfilesWithLikes(String accessToken) {
         List<UserInfo> users = userRepository.findAll();
-        Set<String> likedUserIds = likeService.getLikedUserIds(request);
+        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
 
         return users.stream()
                 .map(user -> toUserProfileResponseDto(user, likedUserIds))

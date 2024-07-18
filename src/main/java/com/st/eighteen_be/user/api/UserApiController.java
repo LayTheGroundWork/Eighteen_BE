@@ -13,7 +13,6 @@ import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,16 +69,18 @@ public class UserApiController {
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @DeleteMapping("/v1/api/user/sign-out")
-    public ApiResp<String> signOut(HttpServletRequest request) {
-        userService.signOut(request);
+    public ApiResp<String> signOut(@RequestHeader("Authorization") String accessToken) {
+        userService.signOut(accessToken);
         return ApiResp.success(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
     @Operation(summary = "토큰 재발급", description = "토큰 재발급")
     @PutMapping("/v1/api/user/reissue")
-    public ApiResp<JwtTokenDto> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ApiResp<JwtTokenDto> reissue(@RequestHeader("Refresh") String refreshToken,
+                                        @RequestHeader("Authorization") String accessToken,
+                                        HttpServletResponse response) {
 
-        JwtTokenDto jwtTokenDto = userService.reissue(request);
+        JwtTokenDto jwtTokenDto = userService.reissue(accessToken, refreshToken);
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
@@ -88,15 +89,15 @@ public class UserApiController {
 
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
     @PostMapping("/v1/api/user/like")
-    public ApiResp<String> like(HttpServletRequest request, Integer likedId){
-        likeService.addLike(request,likedId);
+    public ApiResp<String> like(@RequestHeader("Authorization") String accessToken, Integer likedId){
+        likeService.addLike(accessToken,likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
     }
 
     @Operation(summary = "회원 좋아요 취소", description = "회원 좋아요 취소하기")
     @PostMapping("/v1/api/user/like-cancel")
-    public ApiResp<String> cancelLike(HttpServletRequest request, Integer likedId){
-        likeService.cancelLike(request,likedId);
+    public ApiResp<String> cancelLike(@RequestHeader("Authorization") String accessToken, Integer likedId){
+        likeService.cancelLike(accessToken,likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 취소 완료");
     }
 
@@ -109,14 +110,14 @@ public class UserApiController {
 
     @Operation(summary = "회원 전체 조회", description = "회원 전체 조회")
     @PostMapping("/v1/api/user/find-all")
-    public ApiResp<List<UserProfileResponseDto>> findAll(HttpServletRequest request){
-        return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(request));
+    public ApiResp<List<UserProfileResponseDto>> findAll(@RequestHeader("Authorization") String accessToken){
+        return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(accessToken));
     }
 
 
     // Test API
     @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")
-    @PostMapping("/v1/api/user/like/force-start")
+    @GetMapping("/v1/api/user/like/force-start")
     public ApiResp<String> likeInfoBackupTest(){
         likeService.backupLikeCountToMySQL();
         likeService.backupUserLikeDataToMySQL();
@@ -131,7 +132,7 @@ public class UserApiController {
     }
 
     @Operation(summary = "헤더에 토큰 확인", description = "헤더에 토큰 확인")
-    @PostMapping("/token/test")
+    @GetMapping("/token/test")
     public ApiResp<String> test(@RequestHeader HttpHeaders httpHeaders) {
         String accessToken = httpHeaders.getFirst(AUTHORIZATION_HEADER);
         String refreshToken = httpHeaders.getFirst(REFRESH_HEADER);

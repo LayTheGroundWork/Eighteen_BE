@@ -5,7 +5,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -157,17 +156,15 @@ public class JwtTokenProvider {
     }
 
     // Request Header에 Access Token 정보를 추출하는 메서드
-    public String resolveAccessToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+    public String resolveAccessToken(String accessToken) {
+        if (StringUtils.hasText(accessToken) && accessToken.startsWith(BEARER_PREFIX)) {
+            return accessToken.substring(7);
         }
         return null;
     }
 
     // Request Header에 Refresh Token 정보를 추출하는 메서드
-    public String resolveRefreshToken(HttpServletRequest request) {
-        String refreshToken = request.getHeader(REFRESH_HEADER);
+    public String resolveRefreshToken(String refreshToken) {
         if (StringUtils.hasText(refreshToken)) {
             return refreshToken;
         }

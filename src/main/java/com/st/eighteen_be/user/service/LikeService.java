@@ -7,7 +7,6 @@ import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserLike;
 import com.st.eighteen_be.user.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,8 +30,8 @@ public class LikeService {
     public static final String USER_LIKES_PREFIX = "userLikes:";
 
 
-    public void addLike(HttpServletRequest request, Integer likedId){
-        String likerId = getUserUniqueIdFromRequest(request);
+    public void addLike(String accessToken, Integer likedId){
+        String likerId = getUserUniqueIdFromRequest(accessToken);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
 
         if (Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
@@ -44,8 +43,8 @@ public class LikeService {
         redisLikeTemplate.opsForValue().increment(LIKE_COUNT_PREFIX + likedId);
     }
 
-    public void cancelLike(HttpServletRequest request, Integer likedId){
-        String likerId = getUserUniqueIdFromRequest(request);
+    public void cancelLike(String accessToken, Integer likedId){
+        String likerId = getUserUniqueIdFromRequest(accessToken);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
 
         if (Boolean.FALSE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
@@ -70,24 +69,24 @@ public class LikeService {
     }
 
     @Transactional(readOnly = true)
-    public Set<String> getLikedUserIds(HttpServletRequest request) {
-        String likerId = getUserUniqueIdFromRequest(request);
+    public Set<String> getLikedUserIds(String accessToken) {
+        String likerId = getUserUniqueIdFromRequest(accessToken);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
 
         return redisLikeTemplate.opsForSet().members(userLikesKey);
     }
 
     @Transactional(readOnly = true)
-    public boolean getLikedUserId(HttpServletRequest request, Integer likedId) {
-        String likerId = getUserUniqueIdFromRequest(request);
+    public boolean getLikedUserId(String accessToken, Integer likedId) {
+        String likerId = getUserUniqueIdFromRequest(accessToken);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
 
         return Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId));
     }
 
 
-    private String getUserUniqueIdFromRequest(HttpServletRequest request){
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+    private String getUserUniqueIdFromRequest(String accessToken){
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
         if (requestAccessToken == null || !jwtTokenProvider.validateToken(requestAccessToken)) {
             throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
         }
