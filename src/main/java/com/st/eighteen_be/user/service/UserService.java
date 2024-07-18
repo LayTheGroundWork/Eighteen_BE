@@ -142,12 +142,21 @@ public class UserService {
         return token;
     }
 
+    public UserDetailsResponseDto findById(Integer userId) {
+
+        UserInfo userInfo = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        return new UserDetailsResponseDto(userInfo,userInfo.getLikeCount());
+    }
+
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
 
         UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        return new UserDetailsResponseDto(userInfo);
+        int likeCount = likeService.countLikes(userInfo.getId());
+        return new UserDetailsResponseDto(userInfo,likeCount);
     }
 
     public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId,HttpServletRequest request) {

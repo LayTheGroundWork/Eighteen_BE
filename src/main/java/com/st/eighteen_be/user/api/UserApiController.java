@@ -114,6 +114,21 @@ public class UserApiController {
     }
 
 
+    // Test API
+    @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")
+    @PostMapping("/v1/api/user/like/force-start")
+    public ApiResp<String> likeInfoBackupTest(){
+        likeService.backupLikeCountToMySQL();
+        likeService.backupUserLikeDataToMySQL();
+
+        return ApiResp.success(HttpStatus.OK, "좋아요 정보 백업 완료");
+    }
+
+    @Operation(summary = "백업된 좋아요 정보 보기", description = "백업된 좋아요 정보 보기")
+    @PostMapping("/v1/api/user/like/view-backup-data/{userId}")
+    public ApiResp<Integer> viewBackupData(@PathVariable("userId") Integer userId){
+        return ApiResp.success(HttpStatus.OK, userService.findById(userId).getLikeCount());
+    }
 
     @Operation(summary = "헤더에 토큰 확인", description = "헤더에 토큰 확인")
     @PostMapping("/token/test")

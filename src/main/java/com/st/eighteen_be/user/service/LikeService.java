@@ -1,18 +1,25 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
+import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserLike;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Set;
 
-@Component
+@Slf4j
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class LikeService {
 
@@ -20,11 +27,10 @@ public class LikeService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    private static final String LIKE_COUNT_PREFIX = "likeCount:";
-    private static final String USER_LIKES_PREFIX = "userLikes:";
+    public static final String LIKE_COUNT_PREFIX = "likeCount:";
+    public static final String USER_LIKES_PREFIX = "userLikes:";
 
 
-    @Transactional
     public void addLike(HttpServletRequest request, Integer likedId){
         String likerId = getUserUniqueIdFromRequest(request);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
@@ -38,7 +44,6 @@ public class LikeService {
         redisLikeTemplate.opsForValue().increment(LIKE_COUNT_PREFIX + likedId);
     }
 
-    @Transactional
     public void cancelLike(HttpServletRequest request, Integer likedId){
         String likerId = getUserUniqueIdFromRequest(request);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
@@ -51,6 +56,7 @@ public class LikeService {
         redisLikeTemplate.opsForValue().decrement(LIKE_COUNT_PREFIX + likedId);
     }
 
+    @Transactional(readOnly = true)
     public int countLikes(Integer userId) {
         String likeCountKey = LIKE_COUNT_PREFIX + userId;
         String count = redisLikeTemplate.opsForValue().get(likeCountKey);
@@ -63,6 +69,7 @@ public class LikeService {
         return Integer.parseInt(count);
     }
 
+    @Transactional(readOnly = true)
     public Set<String> getLikedUserIds(HttpServletRequest request) {
         String likerId = getUserUniqueIdFromRequest(request);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
@@ -70,6 +77,7 @@ public class LikeService {
         return redisLikeTemplate.opsForSet().members(userLikesKey);
     }
 
+    @Transactional(readOnly = true)
     public boolean getLikedUserId(HttpServletRequest request, Integer likedId) {
         String likerId = getUserUniqueIdFromRequest(request);
         String userLikesKey = USER_LIKES_PREFIX + likerId;
@@ -78,11 +86,57 @@ public class LikeService {
     }
 
 
-    public String getUserUniqueIdFromRequest(HttpServletRequest request){
+    private String getUserUniqueIdFromRequest(HttpServletRequest request){
         String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
         if (requestAccessToken == null || !jwtTokenProvider.validateToken(requestAccessToken)) {
             throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
         }
         return jwtTokenProvider.getAuthentication(requestAccessToken).getName();
+    }
+
+    public void backupUserLikeDataToMySQL(){
+        log.info("user likes backup start");
+
+        Set<String> userLikesRedisKey = redisLikeTemplate.keys(LikeService.USER_LIKES_PREFIX + "*");
+
+        if(userLikesRedisKey != null) {
+            for (String redisUserId : userLikesRedisKey) {
+                String uniqueId = redisUserId.split(":")[1];
+
+                UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
+                        () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+                );
+
+                Set<String> likedUser = Objects.requireNonNull(redisLikeTemplate.opsForSet().members(redisUserId));
+
+                for (String str : likedUser) {
+                    Integer likedId = Integer.parseInt(str);
+                    UserLike.addLikedId(userInfo, likedId);
+                }
+            }
+        }
+
+    }
+
+    public void backupLikeCountToMySQL(){
+        log.info("user like count backup start");
+
+        Set<String> likeCountRedisKey = redisLikeTemplate.keys(LikeService.LIKE_COUNT_PREFIX + "*");
+
+        if(likeCountRedisKey != null) {
+            for (String data : likeCountRedisKey) {
+                Integer userId = Integer.parseInt(data.split(":")[1]);
+
+                if (redisLikeTemplate.opsForValue().get(data) == null) break;
+
+                UserInfo userInfo = userRepository.findById(userId).orElseThrow(
+                        () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+                );
+
+                int likeCount = Integer.parseInt(Objects.requireNonNull(redisLikeTemplate.opsForValue().get(data)));
+                userInfo.backupLikeCount(likeCount);
+            }
+        }
+
     }
 }

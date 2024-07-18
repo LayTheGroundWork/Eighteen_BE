@@ -18,21 +18,21 @@ public class UserDetailsResponseDto {
     private String nickName;
     private String uniqueId;
     private LocalDate birthDay;
-    //private String location;
-    //private String schoolName;
+    private String location;
+    private String schoolName;
     private List<String> roles;
     private List<String> question;
 
     @Builder
-    public UserDetailsResponseDto(UserInfo entity) {
+    public UserDetailsResponseDto(UserInfo entity, int likeCount) {
         this.id = entity.getId();
         //this.profileImages = entity.getProfileImg();
-        this.likeCount = entity.getLikeCount();
+        this.likeCount = likeCount;
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.birthDay = entity.getBirthDay();
-        //this.location = entity.getLocation();
-        //this.schoolName = entity.getSchoolName();
+        this.location = entity.getSchoolData().getSchoolLocation();
+        this.schoolName = entity.getSchoolData().getSchoolName();
         this.roles = entity.getRoles();
         //this.question = entity.getQuestion();
     }
