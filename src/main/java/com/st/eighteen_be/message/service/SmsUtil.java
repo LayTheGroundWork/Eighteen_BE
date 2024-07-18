@@ -57,7 +57,8 @@ public class SmsUtil {
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
         message.setFrom(fromNumber);
         message.setTo(to);
-        message.setText("[A-Teen] 아래의 인증번호를 입력해주세요\n" + '['+verificationCode+']');
+        String textMessage = String.format("[A-Teen] 아래의 인증번호를 입력해주세요\n[%s]", verificationCode);
+        message.setText(textMessage);
 
         smsCertification.createSmsCertification(to,verificationCode);
         this.messageService.sendOne(new SingleMessageSendingRequest(message));
