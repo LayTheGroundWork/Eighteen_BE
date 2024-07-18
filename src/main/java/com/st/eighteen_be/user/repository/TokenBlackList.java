@@ -17,7 +17,7 @@ public class TokenBlackList {
 
     public void setBlackList(String key, String phoneNumber, Long milliSeconds) {
         redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(phoneNumber.getClass()));
-        redisBlackListTemplate.opsForValue().set(key, phoneNumber, milliSeconds, TimeUnit.MILLISECONDS);
+        redisBlackListTemplate.opsForValue().set(PREFIX + key, phoneNumber, milliSeconds, TimeUnit.MILLISECONDS);
     }
 
     public Object getBlackList(String key) {
