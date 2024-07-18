@@ -61,7 +61,7 @@ public class LikeService {
         String count = redisLikeTemplate.opsForValue().get(likeCountKey);
         if (count == null) {
             // Redis에 값이 없으면 데이터베이스에서 가져와 Redis에 저장
-            int likeCount = userRepository.getLikeCount(userId);
+            int likeCount = userRepository.findLikeCountById(userId);
             redisLikeTemplate.opsForValue().set(likeCountKey, String.valueOf(likeCount));
             return likeCount;
         }
