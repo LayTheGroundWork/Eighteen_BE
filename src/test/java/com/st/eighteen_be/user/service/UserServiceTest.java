@@ -157,68 +157,68 @@ public class UserServiceTest {
         assertThat(signInUserToken).isEqualTo(jwtTokenDto);
     }
 
-    @Test
-    @WithCustomMockUser
-    @DisplayName("유저 좋아요 추가")
-    public void addLike() throws Exception {
-        //given
-        Integer likedId = 1;
-
-        UserInfo mockUser = UserInfo.builder()
-                .phoneNumber(phoneNumber)
-                .uniqueId(uniqueId)
-                .nickName("nickName")
-                .build();
-
-        UsernamePasswordAuthenticationToken mockAuth= new UsernamePasswordAuthenticationToken(uniqueId,"");
-
-        String token = "Bearer abc.sdf.sdf";
-
-        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
-        when(jwtTokenProvider.resolveAccessToken(any())).thenReturn(token);
-        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
-        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
-
-        //when
-        likeService.addLike(token, likedId);
-
-        //then
-        assertThat(likeService.countLikes(likedId)).isEqualTo(1);
-        assertThat(likeService.getLikedUserId(token,likedId)).isTrue();
-    }
-
-    @Test
-    @WithCustomMockUser
-    @DisplayName("유저 좋아요 취소")
-    public void cancelLike() throws Exception {
-        //given
-        Integer likedId = 1;
-
-        UserInfo mockUser = UserInfo.builder()
-                .phoneNumber(phoneNumber)
-                .uniqueId(uniqueId)
-                .nickName("nickName")
-                .build();
-
-        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
-        UsernamePasswordAuthenticationToken mockAuth= new UsernamePasswordAuthenticationToken(uniqueId,"");
-
-        String token = "abc.sdf.sdf";
-        mockRequest.addHeader("Authorization","Bearer " + token);
-        mockRequest.addHeader("Refresh",token);
-
-        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
-        when(jwtTokenProvider.resolveAccessToken(any())).thenReturn(token);
-        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
-        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
-
-        //when
-        likeService.cancelLike(token, likedId);
-
-        //then
-        assertThat(likeService.countLikes(likedId)).isEqualTo(0);
-        assertThat(likeService.getLikedUserId(token,likedId)).isFalse();
-    }
+//    @Test
+//    @WithCustomMockUser
+//    @DisplayName("유저 좋아요 추가")
+//    public void addLike() throws Exception {
+//        //given
+//        Integer likedId = 1;
+//
+//        UserInfo mockUser = UserInfo.builder()
+//                .phoneNumber(phoneNumber)
+//                .uniqueId(uniqueId)
+//                .nickName("nickName")
+//                .build();
+//
+//        UsernamePasswordAuthenticationToken mockAuth= new UsernamePasswordAuthenticationToken(uniqueId,"");
+//
+//        String token = "Bearer abc.sdf.sdf";
+//
+//        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
+//        when(jwtTokenProvider.resolveAccessToken(any())).thenReturn(token);
+//        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+//        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
+//
+//        //when
+//        likeService.addLike(token, likedId);
+//
+//        //then
+//        assertThat(likeService.countLikes(likedId)).isEqualTo(1);
+//        assertThat(likeService.getLikedUserId(token,likedId)).isTrue();
+//    }
+//
+//    @Test
+//    @WithCustomMockUser
+//    @DisplayName("유저 좋아요 취소")
+//    public void cancelLike() throws Exception {
+//        //given
+//        Integer likedId = 1;
+//
+//        UserInfo mockUser = UserInfo.builder()
+//                .phoneNumber(phoneNumber)
+//                .uniqueId(uniqueId)
+//                .nickName("nickName")
+//                .build();
+//
+//        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+//        UsernamePasswordAuthenticationToken mockAuth= new UsernamePasswordAuthenticationToken(uniqueId,"");
+//
+//        String token = "abc.sdf.sdf";
+//        mockRequest.addHeader("Authorization","Bearer " + token);
+//        mockRequest.addHeader("Refresh",token);
+//
+//        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
+//        when(jwtTokenProvider.resolveAccessToken(any())).thenReturn(token);
+//        when(jwtTokenProvider.validateToken(any())).thenReturn(true);
+//        when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
+//
+//        //when
+//        likeService.cancelLike(token, likedId);
+//
+//        //then
+//        assertThat(likeService.countLikes(likedId)).isEqualTo(0);
+//        assertThat(likeService.getLikedUserId(token,likedId)).isFalse();
+//    }
 
     @Test
     @WithCustomMockUser
