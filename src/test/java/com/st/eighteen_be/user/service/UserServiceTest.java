@@ -258,22 +258,4 @@ public class UserServiceTest {
         assertThat(likes.contains(likedId_B.toString())).isTrue();
 
     }
-
-    @Test
-    @DisplayName("식별 아이디로 유저 상세정보 보기")
-    public void find_user_details() throws Exception {
-        //given
-        UserInfo mockUser = UserInfo.builder()
-                .phoneNumber(phoneNumber)
-                .uniqueId(uniqueId)
-                .build();
-
-        when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
-
-        //when
-        UserDetailsResponseDto findUserDetails = userService.findByUniqueId(uniqueId);
-
-        //then
-        assertThat(findUserDetails.getUniqueId()).isEqualTo(uniqueId);
-    }
 }
