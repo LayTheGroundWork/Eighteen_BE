@@ -170,12 +170,9 @@ public class UserServiceTest {
                 .nickName("nickName")
                 .build();
 
-        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         UsernamePasswordAuthenticationToken mockAuth= new UsernamePasswordAuthenticationToken(uniqueId,"");
 
-        String token = "abc.sdf.sdf";
-        mockRequest.addHeader("Authorization","Bearer " + token);
-        mockRequest.addHeader("Refresh",token);
+        String token = "Bearer abc.sdf.sdf";
 
         when(userRepository.findByUniqueId(uniqueId)).thenReturn(Optional.of(mockUser));
         when(jwtTokenProvider.resolveAccessToken(any())).thenReturn(token);
@@ -183,11 +180,11 @@ public class UserServiceTest {
         when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
 
         //when
-        likeService.addLike(mockRequest, likedId);
+        likeService.addLike(token, likedId);
 
         //then
         assertThat(likeService.countLikes(likedId)).isEqualTo(1);
-        assertThat(likeService.getLikedUserId(mockRequest,likedId)).isTrue();
+        assertThat(likeService.getLikedUserId(token,likedId)).isTrue();
     }
 
     @Test
@@ -216,11 +213,11 @@ public class UserServiceTest {
         when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
 
         //when
-        likeService.cancelLike(mockRequest, likedId);
+        likeService.cancelLike(token, likedId);
 
         //then
         assertThat(likeService.countLikes(likedId)).isEqualTo(0);
-        assertThat(likeService.getLikedUserId(mockRequest,likedId)).isFalse();
+        assertThat(likeService.getLikedUserId(token,likedId)).isFalse();
     }
 
     @Test
@@ -250,10 +247,10 @@ public class UserServiceTest {
         when(jwtTokenProvider.getAuthentication(any())).thenReturn(mockAuth);
 
         //when
-        likeService.addLike(mockRequest,likedId_A);
-        likeService.addLike(mockRequest,likedId_B);
+        likeService.addLike(token,likedId_A);
+        likeService.addLike(token,likedId_B);
 
-        Set<String> likes = likeService.getLikedUserIds(mockRequest);
+        Set<String> likes = likeService.getLikedUserIds(token);
 
         //then
         assertThat(likes.size()).isEqualTo(2);
