@@ -55,7 +55,7 @@ public class ChattingApiController {
     @GetMapping("/v1/api/chat/all/{senderNo}")
     public ApiResp<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(
             @PathVariable("senderNo")
-            @Parameter(description = "사용자 번호", example = "1")
+            @Parameter(description = "사용자 번호", example = "1", required = true)
             Long senderNo
     ) {
         log.info("findAllMyChatrooms.senderNo() = {}", senderNo);
@@ -72,12 +72,13 @@ public class ChattingApiController {
     @GetMapping("/v1/api/chat/enter/{chatroomInfoId}")
     public ApiResp<List<ChatMessageResponseDTO>> enterChatroom(
             @PathVariable
-            @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3b3")
+            @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3b3" ,required = true)
             String chatroomInfoId,
             
             @Parameter(description = "요청 시간", example = "2021-04-12T00:00:00")
             @RequestParam(required = true)
-            String requestTime) {
+            String requestTime
+    ) {
         log.info("enterChatroom.chatroomInfoId() = {} , requestTime = {}", chatroomInfoId, requestTime);
         
         return ApiResp.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(EnterChatRoomRequestDTO.of(chatroomInfoId, requestTime)));

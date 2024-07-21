@@ -12,6 +12,8 @@ import lombok.*;
 
 import java.util.List;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * packageName    : com.st.eighteen_be.tournament.api
  * fileName       : TournamentVoteRequestDTO
@@ -30,14 +32,14 @@ import java.util.List;
 @Builder
 public class TournamentVoteRequestDTO {
     @NotNull
-    @Schema(description = "투표 대상 토너먼트 ID", example = "1")
+    @Schema(description = "투표 대상 토너먼트 ID", example = "1", requiredMode = REQUIRED)
     private Long tournamentNo;
     
     @NotNull
-    @Schema(description = "누가 투표했는지 ID", example = "voter1")
+    @Schema(description = "누가 투표했는지 ID", example = "voter1", requiredMode = REQUIRED)
     private String voterId;
     
-    @ArraySchema(schema = @Schema(description = "참여자들의 아이디, 등수순으로", example = "[\"participant1\", \"participant2\", \"participant3\"]"))
+    @ArraySchema(schema = @Schema(description = "참여자들의 아이디, 등수순으로", example = "[\"participant1\", \"participant2\", \"participant3\"]", requiredMode = REQUIRED), uniqueItems = true)
     private List<String> participantIdsOrderByRank;
     
     public VoteEntity toEntity(TournamentEntity tournamentEntity, TournamentParticipantEntity participantEntity, int point) {
