@@ -47,10 +47,10 @@ public class TournamentApiController {
     })
     @GetMapping("/v1/api/tournament/search")
     public ApiResp<List<TournamentSearchResponseDTO>> search(
-            @Parameter(description = "페이지 번호", example = "1")
+            @Parameter(description = "페이지 번호", example = "1", required = true)
             @RequestParam(value = "page", defaultValue = "1") int page,
             
-            @Parameter(description = "페이지 크기", example = "10")
+            @Parameter(description = "페이지 크기", example = "10", required = true)
             @RequestParam(value = "size", defaultValue = "10") int size,
             
             @Parameter(description = "정렬 기준", example = "TOURNAMENT_NO")
@@ -95,7 +95,7 @@ public class TournamentApiController {
     })
     @GetMapping("/v1/api/tournament/final/result")
     public ApiResp<List<TournamentVoteResultResponseDTO>> showResult(
-            @Parameter(description = "토너먼트 번호", example = "1")
+            @Parameter(description = "토너먼트 번호", example = "1", required = true)
             @RequestParam(value = "tournamentNo") Long tournamentNo
     ) {
         return ApiResp.success(HttpStatus.OK, tournamentService.determineWinner(tournamentNo));
