@@ -18,6 +18,7 @@ import java.util.Optional;
 public class CreateTester {
 
     private static final String TESTER_PHONE_NUMBER = "01012345678";
+    private static final String TESTER_ENCRYPT_PHONE_NUMBER = "49 87 37 -20 56 2 107 68 54 120 -37 -100 -115 119 -61 -57 ";
     private static final String TESTER_NICKNAME = "tester1";
     private static final LocalDate TESTER_BIRTHDAY = LocalDate.of(1999, 12, 23);
     private static final SchoolData TESTER_SCHOOL_DATA = new SchoolData("테스터고등학교", "서울");
@@ -36,7 +37,7 @@ public class CreateTester {
         }
 
         UserInfo tester = UserInfo.builder()
-                .phoneNumber(TESTER_PHONE_NUMBER)
+                .phoneNumber(TESTER_ENCRYPT_PHONE_NUMBER)
                 .nickName(TESTER_NICKNAME)
                 .birthDay(TESTER_BIRTHDAY)
                 .schoolData(TESTER_SCHOOL_DATA)
