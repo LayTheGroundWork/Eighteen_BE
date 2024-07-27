@@ -5,7 +5,6 @@ import com.st.eighteen_be.user.dto.response.SnsLinksResponseDto;
 import com.st.eighteen_be.user.service.SnsLinkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,10 +23,10 @@ public class SnsLinkApiController {
 
     @Operation(summary = "회원 sns 링크 추가", description = "회원 sns 링크 추가")
     @PostMapping("/v1/api/user/sns-links/save")
-    public ApiResp<List<SnsLinksResponseDto>> save_snsLink(HttpServletRequest request,
+    public ApiResp<List<SnsLinksResponseDto>> save_snsLink(@RequestHeader("Authorization") String accessToken,
                                                            @RequestBody List<String> links){
 
-        return ApiResp.success(HttpStatus.OK, snsLinkService.addSnsLink(request,links));
+        return ApiResp.success(HttpStatus.OK, snsLinkService.addSnsLink(accessToken,links));
     }
 
     @Operation(summary = "회원 sns 링크 조회", description = "회원 sns 링크 조회")

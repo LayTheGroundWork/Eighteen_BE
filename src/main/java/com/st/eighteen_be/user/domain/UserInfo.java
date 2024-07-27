@@ -2,7 +2,10 @@ package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,7 +23,6 @@ public class UserInfo extends BaseEntity {
             unique = true, nullable = false)
     private Integer id;
 
-    // SNS 링크 정보 [학생(1) : 주소(N)]
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSnsLink> snsLinks = new ArrayList<>();
 
@@ -55,6 +57,9 @@ public class UserInfo extends BaseEntity {
     @Column(length = 4)
     private String mbti;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserLike> userLikes = new ArrayList<>();
+
     private int likeCount;
 
     // 10문 10답
@@ -74,6 +79,9 @@ public class UserInfo extends BaseEntity {
 
     public void update(){}
 
+    public void backupLikeCount(int likeCount){
+        this.likeCount = likeCount;
+    }
 
 }
 

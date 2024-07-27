@@ -9,10 +9,10 @@ import com.st.eighteen_be.user.domain.UserSnsLink;
 import com.st.eighteen_be.user.dto.response.SnsLinksResponseDto;
 import com.st.eighteen_be.user.repository.SnsLinkRepository;
 import com.st.eighteen_be.user.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,9 @@ public class SnsLinkService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public List<SnsLinksResponseDto> addSnsLink(HttpServletRequest request, List<String> snsLinks) {
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+    public List<SnsLinksResponseDto> addSnsLink(@RequestHeader("Authorization") String accessToken,
+                                                List<String> snsLinks) {
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
 
         if (!jwtTokenProvider.validateToken(requestAccessToken)) {
             throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);

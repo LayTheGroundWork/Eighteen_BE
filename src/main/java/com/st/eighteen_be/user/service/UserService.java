@@ -16,9 +16,9 @@ import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,8 +26,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,9 +42,9 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final EncryptService encryptService;
     private final TokenBlackList tokenBlackList;
+    private final LikeService likeService;
 
-
-    public UserInfo save(SignUpRequestDto requestDto) {
+    public UserInfo save(@NotNull SignUpRequestDto requestDto) {
         try {
             return userRepository.save(requestDto.toEntity(
                     encryptService.encryptPhoneNumber(requestDto.phoneNumber()))
@@ -56,12 +57,17 @@ public class UserService {
         }
     }
 
-    public JwtTokenDto signIn(SignInRequestDto requestDto) {
+    public JwtTokenDto signIn(@NotNull SignInRequestDto requestDto) {
+        String encryptPhoneNumber = encryptService.encryptPhoneNumber(requestDto.phoneNumber());
+        log.info("encryptPhoneNumber->{}",encryptPhoneNumber);
+
+        UserInfo userInfo = userRepository.findByPhoneNumber(encryptPhoneNumber)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+        );
 
         // 1. phoneNumber와 verificationCode를 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                //new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), smsUtil.verifySms(requestDto));
-                new UsernamePasswordAuthenticationToken(requestDto.phoneNumber(), "");
+                new UsernamePasswordAuthenticationToken(userInfo.getUniqueId(), "");
 
         log.info("UsernamePasswordAuthenticationToken-> {}", authenticationToken);
 
@@ -83,9 +89,9 @@ public class UserService {
         return token;
     }
 
-    public void signOut(HttpServletRequest request) {
+    public void signOut(String accessToken) {
 
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
 
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(requestAccessToken)) {
@@ -105,10 +111,10 @@ public class UserService {
 
     }
 
-    public JwtTokenDto reissue(HttpServletRequest request) {
+    public JwtTokenDto reissue(String accessToken, String refreshToken) {
 
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(request);
-        String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(request);
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
+        String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(refreshToken);
 
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(requestRefreshToken)) {
@@ -119,20 +125,28 @@ public class UserService {
         Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
         // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져옴
-        RefreshToken refreshToken = refreshTokenService.findRefreshTokenById(authentication.getName());
+        RefreshToken token = refreshTokenService.findRefreshTokenById(authentication.getName());
 
         // 4. Refresh Token 일치하는지 검사
-        if (!refreshToken.getRefreshToken().equals(requestRefreshToken)) {
+        if (!token.getRefreshToken().equals(requestRefreshToken)) {
             throw new AuthenticationException(ErrorCode.TOKEN_UNAUTHORIZED);
         }
 
         // 5. 새로운 토큰 생성
-        JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
+        JwtTokenDto newToken = jwtTokenProvider.generateToken(authentication);
 
         // 6. 저장소 정보 업데이트
         refreshTokenService.saveOrUpdate(authentication);
 
-        return token;
+        return newToken;
+    }
+
+    public UserDetailsResponseDto findById(Integer userId) {
+
+        UserInfo userInfo = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        return new UserDetailsResponseDto(userInfo,userInfo.getLikeCount());
     }
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
@@ -140,26 +154,30 @@ public class UserService {
         UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        return new UserDetailsResponseDto(userInfo);
+        int likeCount = likeService.countLikes(userInfo.getId());
+        return new UserDetailsResponseDto(userInfo,likeCount);
     }
 
-    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId) {
+    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId, String accessToken) {
         UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
-
-        return new UserProfileResponseDto(userInfo);
+        return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(accessToken,userInfo.getId()));
     }
 
-    public List<UserProfileResponseDto> findAll(){
+    public List<UserProfileResponseDto> getUserProfilesWithLikes(String accessToken) {
         List<UserInfo> users = userRepository.findAll();
-        List<UserProfileResponseDto> usersDto = new ArrayList<>();
+        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
 
-        for(UserInfo user : users){
-            usersDto.add(new UserProfileResponseDto(user));
-        }
-        return usersDto;
+        return users.stream()
+                .map(user -> toUserProfileResponseDto(user, likedUserIds))
+                .collect(Collectors.toList());
+    }
+
+    private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
+        boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
+        return new UserProfileResponseDto(user, isLiked);
     }
 
 }

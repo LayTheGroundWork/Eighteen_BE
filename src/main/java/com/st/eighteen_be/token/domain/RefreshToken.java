@@ -1,7 +1,7 @@
 package com.st.eighteen_be.token.domain;
 
-import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.TimeToLive;
 public class RefreshToken {
 
     @Id
-    private String id;
+    private String phoneNumber;
 
     private String refreshToken;
 
@@ -22,7 +22,7 @@ public class RefreshToken {
 
     public static RefreshToken from(String phoneNumber, String refreshToken, Long expiration) {
         return RefreshToken.builder()
-                .id(phoneNumber)
+                .phoneNumber(phoneNumber)
                 .refreshToken(refreshToken)
                 .expiration(expiration / 1000) // @TimeToLive 는 초 단위로 값을 받음
                 .build();
