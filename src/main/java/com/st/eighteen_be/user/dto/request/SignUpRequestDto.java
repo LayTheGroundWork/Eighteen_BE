@@ -10,8 +10,8 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * packageName    : com.st.eighteen_be.service.MemberService
@@ -62,7 +62,7 @@ public record SignUpRequestDto(
 
     public UserInfo toEntity(String encryptPhoneNumber) {
 
-        List<String> roles = new ArrayList<>();
+        Set<String> roles = new HashSet<>();
         roles.add("USER");
 
         return UserInfo.builder()

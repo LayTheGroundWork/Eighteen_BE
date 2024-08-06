@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -20,7 +21,7 @@ public class UserDetailsResponseDto {
     private LocalDate birthDay;
     private String location;
     private String schoolName;
-    private List<String> roles;
+    private Set<String> roles;
     private List<String> question;
 
     @Builder

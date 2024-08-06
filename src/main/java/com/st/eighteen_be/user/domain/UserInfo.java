@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -40,8 +42,9 @@ public class UserInfo extends BaseEntity {
     @Column(nullable = false)
     private LocalDate birthDay;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "user_roles")
+    private Set<String> roles = new HashSet<>();
 
     //private List<String> profileImg;
 
@@ -65,7 +68,7 @@ public class UserInfo extends BaseEntity {
     // 10문 10답
 
     @Builder
-    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, List<String> roles, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
+    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, Set<String> roles, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
         this.schoolData = schoolData;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;

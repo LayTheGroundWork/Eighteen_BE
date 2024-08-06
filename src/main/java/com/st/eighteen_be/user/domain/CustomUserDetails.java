@@ -8,7 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class CustomUserDetails extends UserInfo implements UserDetails {
     private Integer id;
     private String uniqueId;
-    private List<String> roles;
+    private Set<String> roles;
     private String password;
 
     private CustomUserDetails(UserInfo userInfo, String encodePassword) {
@@ -27,12 +27,12 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
         this.roles = userInfo.getRoles();
     }
 
-    private CustomUserDetails(String uniqueId, List<String> roles) {
+    private CustomUserDetails(String uniqueId, Set<String> roles) {
         this.uniqueId = uniqueId;
         this.roles = roles;
     }
 
-    private CustomUserDetails(String uniqueId, String password, List<String> roles) {
+    private CustomUserDetails(String uniqueId, String password, Set<String> roles) {
         this.uniqueId = uniqueId;
         this.password = password;
         this.roles = roles;
@@ -42,11 +42,11 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
         return new CustomUserDetails(userInfo,encodePassword);
     }
 
-    public static CustomUserDetails of(String phoneNumber, List<String> roles) {
+    public static CustomUserDetails of(String phoneNumber, Set<String> roles) {
         return new CustomUserDetails(phoneNumber, roles);
     }
 
-    public static CustomUserDetails of(String phoneNumber, String password, List<String> roles) {
+    public static CustomUserDetails of(String phoneNumber, String password, Set<String> roles) {
         return new CustomUserDetails(phoneNumber, password, roles);
     }
 
