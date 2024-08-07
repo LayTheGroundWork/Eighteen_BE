@@ -4,7 +4,6 @@ import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
-import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
@@ -118,10 +117,6 @@ public class UserApiController {
     public ApiResp<List<UserProfileResponseDto>> findAll(@RequestHeader("Authorization") String accessToken){
         return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(accessToken));
     }
-
-
-
-
 
     // Test API
     @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")

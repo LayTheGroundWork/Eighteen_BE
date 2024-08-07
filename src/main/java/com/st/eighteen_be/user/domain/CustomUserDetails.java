@@ -27,30 +27,13 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
         this.roles = roles;
     }
 
-    private CustomUserDetails(String uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
-    private CustomUserDetails(String uniqueId, String password) {
-        this.uniqueId = uniqueId;
-        this.password = password;
-    }
-
     public static CustomUserDetails of(UserInfo userInfo, String encodePassword, Set<UserRoles> roles) {
         return new CustomUserDetails(userInfo,encodePassword,roles);
     }
 
-    public static CustomUserDetails of(String phoneNumber) {
-        return new CustomUserDetails(phoneNumber);
-    }
-
-    public static CustomUserDetails of(String phoneNumber, String password) {
-        return new CustomUserDetails(phoneNumber, password);
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.getRoles().stream()
+        return this.roles.stream()
                 .map(userRoles -> new SimpleGrantedAuthority(userRoles.getRole().getKey()))
                 .collect(Collectors.toList());
     }
