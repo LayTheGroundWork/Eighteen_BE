@@ -48,6 +48,7 @@ public class CreateTester {
 
         UserRoles userRoles = UserRoles.builder()
                 .role(RolesType.USER)
+                .user(tester)
                 .build();
 
         tester.addRole(userRoles);
