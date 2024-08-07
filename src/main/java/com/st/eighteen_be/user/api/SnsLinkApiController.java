@@ -23,7 +23,7 @@ public class SnsLinkApiController {
 
     @Operation(summary = "회원 sns 링크 추가", description = "회원 sns 링크 추가")
     @PostMapping("/v1/api/user/sns-links/save")
-    public ApiResp<List<SnsLinksResponseDto>> save_snsLink(@RequestHeader("Authorization") String accessToken,
+    public ApiResp<List<String>> save_snsLink(@RequestHeader("Authorization") String accessToken,
                                                            @RequestBody List<String> links){
 
         return ApiResp.success(HttpStatus.OK, snsLinkService.addSnsLink(accessToken,links));

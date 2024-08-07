@@ -25,7 +25,6 @@ public class UserInfo extends BaseEntity {
             unique = true, nullable = false)
     private Integer id;
 
-    // TODO: snsLink 최대 3개로 제한이라 따로 테이블 만들 필요 없을 듯
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSnsLink> snsLinks = new ArrayList<>();
 
@@ -68,7 +67,8 @@ public class UserInfo extends BaseEntity {
     // 10문 10답
 
     @Builder
-    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
+    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, String nickName,
+                    String uniqueId, String introduction, String mbti, int likeCount) {
         this.schoolData = schoolData;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;
@@ -77,6 +77,11 @@ public class UserInfo extends BaseEntity {
         this.introduction = introduction;
         this.mbti = mbti;
         this.likeCount = likeCount;
+    }
+
+    public void addSnsLink(UserSnsLink snsLink) {
+        this.snsLinks.add(snsLink);
+        snsLink.setUser(this);
     }
 
     public void addRole(UserRoles userRole) {

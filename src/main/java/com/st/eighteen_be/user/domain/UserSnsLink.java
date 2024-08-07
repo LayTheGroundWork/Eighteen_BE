@@ -24,20 +24,17 @@ public class UserSnsLink extends BaseEntity {
 
     @Builder
     public UserSnsLink(UserInfo user, String link) {
-        this.user = user;
         this.link = link;
+        setUser(user);
     }
 
-    //== 생성 메서드 ==//
-    public static UserSnsLink addUserSnsLink(UserInfo user, String link) {
-        UserSnsLink userSnsLink = UserSnsLink.builder()
-                .user(user)
-                .link(link)
-                .build();
-
-        user.getSnsLinks().add(userSnsLink);
-
-        return userSnsLink;
+    //== 연관 관계 메서드 ==//
+    public void setUser(UserInfo user) {
+        if (this.user != null) {
+            this.user.getSnsLinks().remove(this);
+        }
+        this.user = user;
+        user.getSnsLinks().add(this);
     }
 
 }
