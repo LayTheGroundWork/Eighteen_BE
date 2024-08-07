@@ -2,6 +2,8 @@ package com.st.eighteen_be;
 
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserRoles;
+import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +44,13 @@ public class CreateTester {
                 .birthDay(TESTER_BIRTHDAY)
                 .schoolData(TESTER_SCHOOL_DATA)
                 .uniqueId(TESTER_UNIQUE_ID)
-                .roles(TESTER_ROLES)
                 .build();
+
+        UserRoles userRoles = UserRoles.builder()
+                .role(RolesType.USER)
+                .build();
+
+        tester.addRole(userRoles);
 
         try {
             userRepository.save(tester);

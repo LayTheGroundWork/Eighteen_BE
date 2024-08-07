@@ -17,43 +17,42 @@ import java.util.stream.Collectors;
 public class CustomUserDetails extends UserInfo implements UserDetails {
     private Integer id;
     private String uniqueId;
-    private Set<String> roles;
     private String password;
+    private Set<UserRoles> roles;
 
-    private CustomUserDetails(UserInfo userInfo, String encodePassword) {
+    private CustomUserDetails(UserInfo userInfo, String encodePassword, Set<UserRoles> roles) {
         this.id = userInfo.getId();
         this.uniqueId = userInfo.getUniqueId();
         this.password = encodePassword;
-        this.roles = userInfo.getRoles();
-    }
-
-    private CustomUserDetails(String uniqueId, Set<String> roles) {
-        this.uniqueId = uniqueId;
         this.roles = roles;
     }
 
-    private CustomUserDetails(String uniqueId, String password, Set<String> roles) {
+    private CustomUserDetails(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    private CustomUserDetails(String uniqueId, String password) {
         this.uniqueId = uniqueId;
         this.password = password;
-        this.roles = roles;
     }
 
-    public static CustomUserDetails of(UserInfo userInfo, String encodePassword) {
-        return new CustomUserDetails(userInfo,encodePassword);
+    public static CustomUserDetails of(UserInfo userInfo, String encodePassword, Set<UserRoles> roles) {
+        return new CustomUserDetails(userInfo,encodePassword,roles);
     }
 
-    public static CustomUserDetails of(String phoneNumber, Set<String> roles) {
-        return new CustomUserDetails(phoneNumber, roles);
+    public static CustomUserDetails of(String phoneNumber) {
+        return new CustomUserDetails(phoneNumber);
     }
 
-    public static CustomUserDetails of(String phoneNumber, String password, Set<String> roles) {
-        return new CustomUserDetails(phoneNumber, password, roles);
+    public static CustomUserDetails of(String phoneNumber, String password) {
+        return new CustomUserDetails(phoneNumber, password);
     }
 
+    // TODO: userRole.getRole().name -> null 이라서 Spring Security 에서 오류 발생
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
+        return this.getRoles().stream()
+                .map(userRoles -> new SimpleGrantedAuthority(userRoles.getRole().getKey()))
                 .collect(Collectors.toList());
     }
 

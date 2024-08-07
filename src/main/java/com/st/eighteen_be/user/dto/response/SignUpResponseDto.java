@@ -11,29 +11,27 @@ import java.util.Set;
 
 @Getter
 @NoArgsConstructor
-public class UserDetailsResponseDto {
+public class SignUpResponseDto {
 
     private Integer id;
     //private List<String> profileImages;
-    private int likeCount;
+    private Set<String> roles;
     private String nickName;
     private String uniqueId;
     private LocalDate birthDay;
     private String location;
     private String schoolName;
-    private List<String> question;
 
     @Builder
-    public UserDetailsResponseDto(UserInfo entity, int likeCount) {
+    public SignUpResponseDto(UserInfo entity, Set<String> roles){
         this.id = entity.getId();
         //this.profileImages = entity.getProfileImg();
-        this.likeCount = likeCount;
+        this.roles = roles;
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.birthDay = entity.getBirthDay();
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
-        //this.question = entity.getQuestion();
     }
 
 }

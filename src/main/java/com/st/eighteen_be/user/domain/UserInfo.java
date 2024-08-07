@@ -25,6 +25,7 @@ public class UserInfo extends BaseEntity {
             unique = true, nullable = false)
     private Integer id;
 
+    // TODO: snsLink 최대 3개로 제한이라 따로 테이블 만들 필요 없을 듯
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSnsLink> snsLinks = new ArrayList<>();
 
@@ -42,9 +43,8 @@ public class UserInfo extends BaseEntity {
     @Column(nullable = false)
     private LocalDate birthDay;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "user_roles")
-    private Set<String> roles = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRoles> roles = new HashSet<>();
 
     //private List<String> profileImg;
 
@@ -68,16 +68,20 @@ public class UserInfo extends BaseEntity {
     // 10문 10답
 
     @Builder
-    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, Set<String> roles, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
+    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
         this.schoolData = schoolData;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;
-        this.roles = roles;
         this.nickName = nickName;
         this.uniqueId = uniqueId;
         this.introduction = introduction;
         this.mbti = mbti;
         this.likeCount = likeCount;
+    }
+
+    public void addRole(UserRoles userRole) {
+        this.roles.add(userRole);
+        userRole.setUser(this);
     }
 
     public void update(){}
