@@ -34,7 +34,6 @@ services:
       - bash
       - -c
       - |
-        ./wait-for-it.sh mysql:3306 -s -t 30 -- echo 'MySQL is up' &&
         ./wait-for-it.sh mongodb:27017 -s -t 30 -- echo 'MongoDB is up' &&
         ./wait-for-it.sh kafka:9092 -s -t 30 -- echo 'Kafka is up' &&
         ./wait-for-it.sh redis-master:6379 -s -t 30 -- echo 'Redis is up' &&
