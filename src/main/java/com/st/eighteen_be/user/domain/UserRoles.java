@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserRoles extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "roles_id")
     private Integer id;
 
@@ -32,6 +32,9 @@ public class UserRoles extends BaseEntity {
 
     //== 연관 관계 메서드 ==//
     public void setUser(UserInfo user) {
+        if (this.user != null) {
+            this.user.getRoles().remove(this);
+        }
         this.user = user;
         user.getRoles().add(this);
     }
