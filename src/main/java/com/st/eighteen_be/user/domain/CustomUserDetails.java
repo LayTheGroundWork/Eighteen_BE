@@ -48,7 +48,6 @@ public class CustomUserDetails extends UserInfo implements UserDetails {
         return new CustomUserDetails(phoneNumber, password);
     }
 
-    // TODO: userRole.getRole().name -> null 이라서 Spring Security 에서 오류 발생
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.getRoles().stream()
