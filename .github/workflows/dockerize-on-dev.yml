@@ -69,7 +69,7 @@ jobs:
             git submodule foreach --recursive git checkout main
             git submodule foreach --recursive git pull origin main
             git pull
-            docker stop eighteen-be
-            docker rm eighteen-be
-            docker rmi eighteenbe/eighteen:0.0.1
-            docker-compose --env-file .env.dev up -d
+            sudo docker stop eighteen-be
+            sudo docker rm eighteen-be
+            sudo docker rmi eighteenbe/eighteen:0.0.1
+            sudo docker-compose --env-file .env.dev up -d
