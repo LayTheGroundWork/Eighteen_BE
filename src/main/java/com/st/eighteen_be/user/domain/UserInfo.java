@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -40,8 +42,8 @@ public class UserInfo extends BaseEntity {
     @Column(nullable = false)
     private LocalDate birthDay;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRoles> roles = new HashSet<>();
 
     //private List<String> profileImg;
 
@@ -65,16 +67,26 @@ public class UserInfo extends BaseEntity {
     // 10문 10답
 
     @Builder
-    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, List<String> roles, String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
+    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, String nickName,
+                    String uniqueId, String introduction, String mbti, int likeCount) {
         this.schoolData = schoolData;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;
-        this.roles = roles;
         this.nickName = nickName;
         this.uniqueId = uniqueId;
         this.introduction = introduction;
         this.mbti = mbti;
         this.likeCount = likeCount;
+    }
+
+    public void addSnsLink(UserSnsLink snsLink) {
+        this.snsLinks.add(snsLink);
+        snsLink.setUser(this);
+    }
+
+    public void addRole(UserRoles userRole) {
+        this.roles.add(userRole);
+        userRole.setUser(this);
     }
 
     public void update(){}

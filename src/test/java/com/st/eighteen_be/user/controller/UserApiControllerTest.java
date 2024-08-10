@@ -9,6 +9,7 @@ import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -119,7 +122,10 @@ class UserApiControllerTest {
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
         UserInfo userInfo = signUpRequestDto.toEntity("encryptPhoneNumber");
-        when(userService.save(signUpRequestDto)).thenReturn(userInfo);
+        Set<String> roles = new HashSet<>();
+        roles.add("USER");
+
+        when(userService.save(signUpRequestDto)).thenReturn(new SignUpResponseDto(userInfo,roles));
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)

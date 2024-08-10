@@ -10,10 +10,13 @@ import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,11 +48,20 @@ public class UserService {
     private final TokenBlackList tokenBlackList;
     private final LikeService likeService;
 
-    public UserInfo save(@NotNull SignUpRequestDto requestDto) {
+    public SignUpResponseDto save(@NotNull SignUpRequestDto requestDto) {
         try {
-            return userRepository.save(requestDto.toEntity(
-                    encryptService.encryptPhoneNumber(requestDto.phoneNumber()))
+            UserInfo user = requestDto.toEntity(
+                    encryptService.encryptPhoneNumber(requestDto.phoneNumber())
             );
+            UserRoles userRoles = UserRoles.builder()
+                    .role(RolesType.USER)
+                    .user(user)
+                    .build();
+
+            user.addRole(userRoles);
+
+            return new SignUpResponseDto(userRepository.save(user),getRoles(user));
+
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")) {
                 throw new OccupiedException(ErrorCode.EXISTS_USER);
@@ -81,9 +94,6 @@ public class UserService {
 
         // 4. RefreshToken 저장
         refreshTokenService.saveOrUpdate(authentication);
-
-        // RefreshToken Cookie에 저장
-        // jwtTokenProvider.setRefreshTokenAtCookie(refreshToken);
 
         // 5. 토큰 발급
         return token;
@@ -139,6 +149,17 @@ public class UserService {
         refreshTokenService.saveOrUpdate(authentication);
 
         return newToken;
+    }
+
+    public Set<String> getRoles(UserInfo userInfo){
+        Set<UserRoles> userRoles = userInfo.getRoles();
+        Set<String> roles = new HashSet<>();
+
+        for(UserRoles userRole : userRoles){
+            roles.add(userRole.getRole().getValue());
+        }
+
+        return roles;
     }
 
     public UserDetailsResponseDto findById(Integer userId) {

@@ -4,9 +4,9 @@ import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
-import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.service.LikeService;
@@ -49,7 +49,7 @@ public class UserApiController {
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
-    public ApiResp<UserInfo> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
+    public ApiResp<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
 
         return ApiResp.success(HttpStatus.OK, userService.save(requestDto));
     }
@@ -87,6 +87,10 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, jwtTokenDto);
     }
 
+
+//    @Operation(summary = "프로필 미디어 파일 업로드", description = "프로필 미디어 파일 업로드")
+//    @PostMapping("")
+
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
     @PostMapping("/v1/api/user/like")
     public ApiResp<String> like(@RequestHeader("Authorization") String accessToken, Integer likedId){
@@ -113,7 +117,6 @@ public class UserApiController {
     public ApiResp<List<UserProfileResponseDto>> findAll(@RequestHeader("Authorization") String accessToken){
         return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(accessToken));
     }
-
 
     // Test API
     @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")

@@ -8,7 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -17,43 +17,24 @@ import java.util.stream.Collectors;
 public class CustomUserDetails extends UserInfo implements UserDetails {
     private Integer id;
     private String uniqueId;
-    private List<String> roles;
     private String password;
+    private Set<UserRoles> roles;
 
-    private CustomUserDetails(UserInfo userInfo, String encodePassword) {
+    private CustomUserDetails(UserInfo userInfo, String encodePassword, Set<UserRoles> roles) {
         this.id = userInfo.getId();
         this.uniqueId = userInfo.getUniqueId();
         this.password = encodePassword;
-        this.roles = userInfo.getRoles();
-    }
-
-    private CustomUserDetails(String uniqueId, List<String> roles) {
-        this.uniqueId = uniqueId;
         this.roles = roles;
     }
 
-    private CustomUserDetails(String uniqueId, String password, List<String> roles) {
-        this.uniqueId = uniqueId;
-        this.password = password;
-        this.roles = roles;
-    }
-
-    public static CustomUserDetails of(UserInfo userInfo, String encodePassword) {
-        return new CustomUserDetails(userInfo,encodePassword);
-    }
-
-    public static CustomUserDetails of(String phoneNumber, List<String> roles) {
-        return new CustomUserDetails(phoneNumber, roles);
-    }
-
-    public static CustomUserDetails of(String phoneNumber, String password, List<String> roles) {
-        return new CustomUserDetails(phoneNumber, password, roles);
+    public static CustomUserDetails of(UserInfo userInfo, String encodePassword, Set<UserRoles> roles) {
+        return new CustomUserDetails(userInfo,encodePassword,roles);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(userRoles -> new SimpleGrantedAuthority(userRoles.getRole().getKey()))
                 .collect(Collectors.toList());
     }
 

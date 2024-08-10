@@ -27,7 +27,7 @@ public class SnsLinkService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public List<SnsLinksResponseDto> addSnsLink(@RequestHeader("Authorization") String accessToken,
+    public List<String> addSnsLink(@RequestHeader("Authorization") String accessToken,
                                                 List<String> snsLinks) {
         String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
 
@@ -35,25 +35,26 @@ public class SnsLinkService {
             throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
         }
 
-        String certificationValue = jwtTokenProvider.getAuthentication(requestAccessToken).getName();
+        String uniqueId = jwtTokenProvider.getAuthentication(requestAccessToken).getName();
 
-        UserInfo userInfo = userRepository.findByPhoneNumber(certificationValue).orElseThrow(
+        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
-        List<UserSnsLink> userSnsLinks = new ArrayList<>();
+        List<UserSnsLink> userSnsLinkList = new ArrayList<>();
         for(String link : snsLinks){
-            userSnsLinks.add(UserSnsLink.addUserSnsLink(userInfo, link));
+            UserSnsLink userSnsLink = UserSnsLink.builder()
+                    .link(link)
+                    .user(userInfo)
+                    .build();
+
+            userSnsLinkList.add(userSnsLink);
+            userInfo.addSnsLink(userSnsLink);
         }
 
-        // DTO로 변환
-        List<SnsLinksResponseDto> userSnsLinkDTOs = userSnsLinks.stream()
-                .map(userSnsLink -> new SnsLinksResponseDto(userSnsLink.getLink()))
-                .toList();
+        snsLinkRepository.saveAll(userSnsLinkList);
 
-        snsLinkRepository.saveAll(userSnsLinks);
-
-        return userSnsLinkDTOs;
+        return snsLinks;
     }
 
 
@@ -64,6 +65,7 @@ public class SnsLinkService {
 
         List<UserSnsLink> snsLinks = userInfo.getSnsLinks();
         List<SnsLinksResponseDto> snsLinksResponseDtoList = new ArrayList<>();
+
         for (UserSnsLink userSnsLink : snsLinks) {
             snsLinksResponseDtoList.add(new SnsLinksResponseDto(userSnsLink.getLink()));
         }
