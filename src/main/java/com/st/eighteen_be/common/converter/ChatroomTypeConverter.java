@@ -16,7 +16,7 @@ import jakarta.persistence.Converter;
  * 2024-04-01        ipeac       최초 생성
  */
 @Converter
-public class ChatroomConverter implements AttributeConverter<ChatroomType, String> {
+public class ChatroomTypeConverter implements AttributeConverter<ChatroomType, String> {
     @Override
     public String convertToDatabaseColumn(ChatroomType chatroomType) {
         if (chatroomType == null) {

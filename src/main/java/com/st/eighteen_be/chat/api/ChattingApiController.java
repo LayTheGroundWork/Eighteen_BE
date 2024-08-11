@@ -20,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -90,5 +87,20 @@ public class ChattingApiController {
         log.info("sendMessage.chatMessage.senderNo() = {} , chatMessage.receiverNo() = {}", chatMessage.getSenderNo(), chatMessage.getReceiverNo());
         
         chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage, chatroomId);
+    }
+    
+    @PutMapping("/v1/api/chat/{chatroom-id}/quit")
+    public ApiResp<Object> quitChatroom(
+            @PathVariable("chatroom-id")
+            @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3" ,required = true)
+            String chatroomId,
+            
+            @Parameter(description = "사용자 번호", example = "1", required = true)
+            @RequestParam(required = true)
+            Long userNo
+    ) {
+        chatroomFacade.quitChatroom(chatroomId, userNo);
+        
+        return ApiResp.success(HttpStatus.OK, "채팅방 나가기 성공");
     }
 }
