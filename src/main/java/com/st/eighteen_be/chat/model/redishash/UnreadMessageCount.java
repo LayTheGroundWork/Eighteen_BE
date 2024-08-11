@@ -3,6 +3,7 @@ package com.st.eighteen_be.chat.model.redishash;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.text.MessageFormat;
@@ -19,18 +20,19 @@ import java.text.MessageFormat;
  * 24. 5. 11.        ipeac       최초 생성
  */
 @Getter
+@NoArgsConstructor
 @RedisHash(value = "unreadMessageCount") // Time To Live => infinite
 public class UnreadMessageCount {
     private static final String UNREAD_MESSAGE_COUNT_KEY = "unreadMessageCount";
     
     @Id
     private String id;
-    private final Long senderNo;
-    private final Long receiverNo;
+    private Long senderNo;
+    private Long receiverNo;
     private long count;
     
     @Builder
-    private UnreadMessageCount(Long senderNo, Long receiverNo, Long count) {
+    public UnreadMessageCount(Long senderNo, Long receiverNo, Long count) {
         this.id = makeId(senderNo, receiverNo);
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
