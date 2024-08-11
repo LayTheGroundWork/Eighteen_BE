@@ -47,4 +47,9 @@ public class ChatroomFacade {
         
         return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getSenderNo(), chatroomInfoCollection.getReceiverNo(), enterChatRoomRequestDTO.requestTime());
     }
+    
+    @Transactional(readOnly = false)
+    public void quitChatroom(String chatroomId, Long userNo) {
+    
+    }
 }

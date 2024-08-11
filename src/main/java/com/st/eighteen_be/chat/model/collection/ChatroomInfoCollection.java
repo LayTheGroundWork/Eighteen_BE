@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.common.basetime.BaseDocument;
-import com.st.eighteen_be.common.converter.ChatroomConverter;
+import com.st.eighteen_be.common.converter.ChatroomTypeConverter;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import jakarta.persistence.Column;
@@ -22,7 +22,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * packageName    : com.st.eighteen_be.chat.model.vo
@@ -54,9 +56,12 @@ public class ChatroomInfoCollection extends BaseDocument {
     @Field(name = "receiverNo")
     private Long receiverNo;
     
-    @Convert(converter = ChatroomConverter.class)
+    @Convert(converter = ChatroomTypeConverter.class)
     @Column(name = "chatroomType", nullable = false)
     private ChatroomType chatroomType;
+    
+    @Field(name = "leftUsers")
+    private Set<Long> leftUsers = new HashSet<>();
     
     private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, Long senderNo, Long receiverNo, ChatroomType chatroomType) {
         super(createdAt, updatedAt);
