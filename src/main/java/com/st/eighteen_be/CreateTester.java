@@ -35,7 +35,7 @@ public class CreateTester {
 
         if (existingTester.isPresent()) {
             log.info("Tester already exists with unique ID: {}", TESTER_UNIQUE_ID);
-            return;
+            userRepository.deleteAll();
         }
 
         UserInfo tester = UserInfo.builder()
