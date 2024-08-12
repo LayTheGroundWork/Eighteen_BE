@@ -37,7 +37,7 @@ public class ChatroomFacade {
     private final RedisMessageService redisMessageService;
     
     @Transactional(readOnly = false)
-    public List<ChatMessageResponseDTO> getOrCreateChatroom(EnterChatRoomRequestDTO enterChatRoomRequestDTO) {
+    public List<ChatMessageResponseDTO> getChatroom(EnterChatRoomRequestDTO enterChatRoomRequestDTO) {
         log.info("========== getOrCreateChatroom ========== chatroomInfoId : {}, requestTime : {}", enterChatRoomRequestDTO.chatroomInfoId(), enterChatRoomRequestDTO.requestTime());
         
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(enterChatRoomRequestDTO.chatroomInfoId())
@@ -49,7 +49,12 @@ public class ChatroomFacade {
     }
     
     @Transactional(readOnly = false)
-    public void quitChatroom(String chatroomId, Long userNo) {
-    
+    public void quitChatroom(String chatroomId, Long quitUserNo) {
+        log.info("========== quitChatroom ========== chatroomId : {}, userNo : {}", chatroomId, quitUserNo);
+        
+        ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(chatroomId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM));
+        
+        chatroomService.quitChatroom(chatroomId, quitUserNo);
     }
 }

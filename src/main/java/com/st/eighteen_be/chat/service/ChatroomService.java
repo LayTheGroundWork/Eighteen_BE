@@ -56,4 +56,16 @@ public class ChatroomService {
         
         return allChatroomBySenderNo;
     }
+    
+    public void quitChatroom(String chatroomId, Long quitUserNo) {
+        log.info("========== quitChatroom ========== chatroomId : {}, userNo : {}", chatroomId, quitUserNo);
+        
+        chatroomInfoCollectionRepository.findById(chatroomId)
+                .ifPresent(chatroomInfoCollection -> {
+                    if (chatroomInfoCollection.isUserInChatroom(quitUserNo)) {
+                        chatroomInfoCollection.addLeftUser(quitUserNo);
+                        chatroomInfoCollectionRepository.save(chatroomInfoCollection);
+                    }
+                });
+    }
 }

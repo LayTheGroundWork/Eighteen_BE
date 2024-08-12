@@ -28,8 +28,11 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
      */
     @Aggregation(pipeline = {
             """
-                    { $match: { 'senderNo': ?0 } }
-                    """,
+                    { $match: {
+                        'senderNo': ?0,
+                        'leftUsers': { $nin: [?0] }
+                    } }
+           """,
             """
                     { $lookup: {
                         from: 'chat_message',
@@ -42,13 +45,13 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
                         ],
                         as: 'latestMessage'
                     } }
-                    """,
+            """,
             """
                     { $unwind: {
                         path: '$latestMessage',
                         preserveNullAndEmptyArrays: true
                     } }
-                    """,
+            """,
             """
                     { $project: {
                         '_id': 1,
@@ -60,7 +63,7 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
                         'message': '$latestMessage.message',
                         'messageCreatedAt': '$latestMessage.createdAt'
                     } }
-                    """
+            """
     })
     List<ChatroomWithLastestMessageDTO> findAllChatroomBySenderNo(Long senderNo);
 }
