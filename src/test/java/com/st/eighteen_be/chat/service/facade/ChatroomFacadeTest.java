@@ -116,7 +116,7 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
                 .build();
         
         // When
-        List<ChatMessageResponseDTO> actual = chatroomFacade.getOrCreateChatroom(enterChatRoomRequestDTO);
+        List<ChatMessageResponseDTO> actual = chatroomFacade.getChatroom(enterChatRoomRequestDTO);
         
         // Then
         assertThat(actual).isNotEmpty();
@@ -127,7 +127,7 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
     
     @Test
     @DisplayName("채팅방 조회시 REDIS 에서 읽지 않은 메시지 카운트 초기화")
-    void When_getOrCreateChatroom_Expect_ResetUnreadMessageCount() {
+    void When_getChatroom_Expect_ResetUnreadMessageCount() {
         //Given
         ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
         
@@ -140,7 +140,7 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
                 .build();
         
         // When
-        chatroomFacade.getOrCreateChatroom(enterChatRoomRequestDTO);
+        chatroomFacade.getChatroom(enterChatRoomRequestDTO);
         
         // Then
         assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L))).isEmpty();
@@ -158,7 +158,7 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
                 .build();
         
         // When
-        List<ChatMessageResponseDTO> actual = chatroomFacade.getOrCreateChatroom(enterChatRoomRequestDTO);
+        List<ChatMessageResponseDTO> actual = chatroomFacade.getChatroom(enterChatRoomRequestDTO);
         
         // Then
         assertThat(actual).isEmpty();
