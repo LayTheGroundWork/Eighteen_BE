@@ -3,6 +3,7 @@ package com.st.eighteen_be.chat.service.impl;
 import com.st.eighteen_be.chat.model.collection.ChatMessageCollection;
 import com.st.eighteen_be.chat.model.collection.ChatroomInfoCollection;
 import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
+import com.st.eighteen_be.chat.model.dto.response.ChatroomWithLastestMessageDTO;
 import com.st.eighteen_be.chat.model.redishash.UnreadMessageCount;
 import com.st.eighteen_be.chat.model.vo.ChatroomType;
 import com.st.eighteen_be.chat.repository.mongo.ChatroomInfoCollectionRepository;
@@ -23,6 +24,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -196,6 +198,34 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
             softAssertions.assertThat(chatrooms.get(1).getUnreadMessageCount()).isEqualTo(10L);
             softAssertions.assertThat(chatrooms.get(1).getMessageCreatedAt()).isNotNull();
         });
+    }
+    
+    @Test
+    @DisplayName("채팅방 나가기 테스트 - 채팅방 나가기 성공")
+    void When_QuitChatroom_Then_Success() {
+        // Given
+        ChatroomInfoCollection saved = mongoTemplate.save(savedChatroomInfoCollection);
+        
+        // When
+        chatroomService.quitChatroom(saved.get_id().toString(), 1L);
+        
+        // Then
+        ChatroomInfoCollection found = chatroomInfoCollectionRepository.findById(saved.get_id().toString()).get();
+        assertThat(found.getLeftUsers()).contains(1L);
+    }
+    
+    @Test
+    @DisplayName("채팅방 나가기 테스트 - 채팅방 나가기 성공 후 조회시 조회되지 않아야 한다.")
+    void When_QuitChatroom_Then_NotFound() {
+        // Given
+        ChatroomInfoCollection saved = mongoTemplate.save(savedChatroomInfoCollection);
+        
+        // When
+        chatroomService.quitChatroom(saved.get_id().toString(), savedChatroomInfoCollection.getSenderNo());
+        
+        // Then
+        List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(savedChatroomInfoCollection.getSenderNo());
+        assertThat(allChatroomBySenderNo).isEmpty();
     }
     
     @AfterEach
