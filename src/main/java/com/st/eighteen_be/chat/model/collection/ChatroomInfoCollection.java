@@ -65,9 +65,18 @@ public class ChatroomInfoCollection extends BaseDocument {
     
     private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, Long senderNo, Long receiverNo, ChatroomType chatroomType) {
         super(createdAt, updatedAt);
+        
         this.senderNo = senderNo;
         this.receiverNo = receiverNo;
         this.chatroomType = chatroomType;
+    }
+    
+    public boolean isUserInChatroom(Long userNo) {
+        return Objects.equals(senderNo, userNo) || Objects.equals(receiverNo, userNo);
+    }
+    
+    public void addLeftUser(Long userNo) {
+        leftUsers.add(userNo);
     }
     
     public static ChatroomInfoCollection of(Long senderNo, Long receiverNo, ChatroomType chatroomType) {

@@ -60,7 +60,7 @@ public class ChattingApiController {
         return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(FindChatRoomRequestDTO.of(senderNo)));
     }
     
-    @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다. 없으면 생성하고 조회합니다.")
+    @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "302", description = "INVALID REQUEST"),
@@ -78,7 +78,7 @@ public class ChattingApiController {
     ) {
         log.info("enterChatroom.chatroomInfoId() = {} , requestTime = {}", chatroomInfoId, requestTime);
         
-        return ApiResp.success(HttpStatus.OK, chatroomFacade.getOrCreateChatroom(EnterChatRoomRequestDTO.of(chatroomInfoId, requestTime)));
+        return ApiResp.success(HttpStatus.OK, chatroomFacade.getChatroom(EnterChatRoomRequestDTO.of(chatroomInfoId, requestTime)));
     }
     
     @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.", ignoreJsonView = true)
@@ -95,11 +95,11 @@ public class ChattingApiController {
             @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3" ,required = true)
             String chatroomId,
             
-            @Parameter(description = "사용자 번호", example = "1", required = true)
+            @Parameter(description = "나가는 사용자 번호", example = "1", required = true)
             @RequestParam(required = true)
-            Long userNo
+            Long quitUserNo
     ) {
-        chatroomFacade.quitChatroom(chatroomId, userNo);
+        chatroomFacade.quitChatroom(chatroomId, quitUserNo);
         
         return ApiResp.success(HttpStatus.OK, "채팅방 나가기 성공");
     }
