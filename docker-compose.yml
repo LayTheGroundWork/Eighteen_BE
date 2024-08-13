@@ -21,6 +21,7 @@ services:
       - redis-slave-2
       - redis-sentinel-1
       - redis-sentinel-2
+      - redis-sentinel-3
     depends_on:
       - mysql
       - mongodb
@@ -30,6 +31,7 @@ services:
       - redis-slave-2
       - redis-sentinel-1
       - redis-sentinel-2
+      - redis-sentinel-3
     command:
       - bash
       - -c
@@ -43,8 +45,6 @@ services:
       # MongoDB 환경 변수 추가
       SPRING_DATA_MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@host.docker.internal:27017/${MONGO_INITDB_DATABASE}?retryWrites=false&authSource=admin
       SPRING_DATA_MONGODB_DATABASE: ${MONGO_INITDB_DATABASE}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - app-tier
 
