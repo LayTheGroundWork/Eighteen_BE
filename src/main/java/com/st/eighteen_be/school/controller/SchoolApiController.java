@@ -26,7 +26,7 @@ public class SchoolApiController {
 
     @Operation(summary = "학교검색", description = "학교검색")
     @GetMapping("/v1/api/schools")
-    public ApiResp<List<SchoolsResponseDto>> searchSchools(@RequestParam String schoolName) {
+    public ApiResp<List<SchoolsResponseDto>> searchSchools(@RequestParam("schoolName") String schoolName) {
         return ApiResp.success(HttpStatus.OK, schoolService.searchSchools(schoolName).block());
     }
 }
