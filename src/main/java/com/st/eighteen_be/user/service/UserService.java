@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,12 @@ public class UserService {
     private final EncryptService encryptService;
     private final TokenBlackList tokenBlackList;
     private final LikeService likeService;
+
+    public boolean isDuplicationUniqueId(String uniqueId){
+        Optional<UserInfo> user = userRepository.findByUniqueId(uniqueId);
+
+        return user.isPresent();
+    }
 
     public SignUpResponseDto save(@NotNull SignUpRequestDto requestDto) {
         try {
