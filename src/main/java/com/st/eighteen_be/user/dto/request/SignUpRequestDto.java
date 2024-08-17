@@ -37,6 +37,7 @@ public record SignUpRequestDto(
         // 고유 아이디
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotNull(message = "식별아이디는 필수 입력 값 입니다.")
+        @Pattern(regexp = "^[A-Za-z0-9_\\-./]+$")
         @Schema(description = "회원가입자 고유식별 아이디", example = "@AB_D")
         String uniqueId,
 

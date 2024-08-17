@@ -24,7 +24,7 @@ public class CreateTester {
     private static final String TESTER_NICKNAME = "tester1";
     private static final LocalDate TESTER_BIRTHDAY = LocalDate.of(1999, 12, 23);
     private static final SchoolData TESTER_SCHOOL_DATA = new SchoolData("테스터고등학교", "서울");
-    private static final String TESTER_UNIQUE_ID = "@Tester";
+    private static final String TESTER_UNIQUE_ID = "Tester";
     private static final Set<String> TESTER_ROLES = Set.of("USER");
 
     private final UserRepository userRepository;
