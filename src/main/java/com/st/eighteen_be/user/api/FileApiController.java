@@ -25,7 +25,7 @@ public class FileApiController {
     @Operation(summary = "미디어 파일 업로드", description = "미디어 파일 업로드")
     @PostMapping("/v1/api/file/upload")
     public ApiResp<List<String>> fileUpload(@RequestPart("files") List<MultipartFile> files,
-                                                   @RequestParam("uniqueId") String uniqueId) throws IOException {
+                                            @RequestParam("uniqueId") String uniqueId) throws IOException {
 
         return ApiResp.success(HttpStatus.OK, s3Service.upload(files,uniqueId));
     }

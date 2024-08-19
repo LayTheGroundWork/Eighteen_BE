@@ -69,11 +69,16 @@ public class S3Service {
                 throw new IOException("Failed to upload file to S3", e);
             }
 
-            urls.add(s3Key);
+            urls.add(getFileUrl(s3Key));
         }
 
         // 업로드된 파일의 URL 반환
         return urls;
+    }
+
+    /* S3 객체 URL 반환 */
+    public String getFileUrl(String s3Key) {
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, awsRegion, s3Key);
     }
 
     private String generateStoreFilename(String originalFilename) {
