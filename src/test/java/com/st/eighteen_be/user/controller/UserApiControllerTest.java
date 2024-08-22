@@ -27,9 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -125,7 +123,9 @@ class UserApiControllerTest {
         Set<String> roles = new HashSet<>();
         roles.add("USER");
 
-        when(userService.save(signUpRequestDto)).thenReturn(new SignUpResponseDto(userInfo,roles));
+        List<String> keys = new ArrayList<>();
+
+        when(userService.save(signUpRequestDto,keys)).thenReturn(new SignUpResponseDto(userInfo,roles,keys));
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)

@@ -4,21 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,62 +39,82 @@ public class S3Service {
 
     private final S3Client s3Client;
 
-    public List<String> upload(List<MultipartFile> multipartFiles, String uniqueId) throws IOException {
+    public List<String[]> generateUploadPreSignedUrls(List<String> originalFilenames, String uniqueId) {
 
-        if (multipartFiles.isEmpty()) return Collections.emptyList();
+        List<String[]> preSignedUrlAndKeys = new ArrayList<>();
 
-        List<String> urls = new ArrayList<>();
+        for (String originalFilename : originalFilenames) {
+            String[] response = generateUploadPreSignedUrl(originalFilename, uniqueId);
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            String originalFilename = multipartFile.getOriginalFilename();
+            preSignedUrlAndKeys.add(response);
+        }
+
+        return preSignedUrlAndKeys;
+    }
+
+    public String[] generateUploadPreSignedUrl(String originalFilename, String uniqueId) {
+        try {
+            // Generate a unique filename using the original filename and a UUID
             String storeFilename = generateStoreFilename(originalFilename);
 
-            // 회원 아이디로 폴더 생성
+            // Construct the S3 key using the user's unique ID and the generated filename
             String s3Key = uniqueId + "/" + storeFilename;
 
-            // 메타데이터 생성
+            // Create a PUT object request with metadata such as content type
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(s3Key)
-                    .contentType(multipartFile.getContentType())
                     .build();
 
-            try {
-                s3Client.putObject(putObjectRequest,
-                        RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
-            } catch (S3Exception e) {
-                // S3 예외 처리
-                throw new IOException("Failed to upload file to S3", e);
-            }
+            // Create an S3Presigner instance
+            S3Presigner preSigner = createS3Presigner();
 
-            urls.add(getFileUrl(s3Key));
+            // Create a pre-signed URL for the PUT request
+            PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10))  // Set the duration for which the URL is valid
+                    .putObjectRequest(putObjectRequest)
+                    .build();
+
+            // Generate the pre-signed URL
+            PresignedPutObjectRequest presignedPutObjectRequest = preSigner.presignPutObject(putObjectPresignRequest);
+            preSigner.close();
+
+            return new String[]{presignedPutObjectRequest.url().toString(), storeFilename};
+
+        } catch (Exception e) {
+            log.error("Error generating preSigned URL for upload", e);
+            return new String[]{"Error generating preSigned URL",e.toString()};
         }
-
-        // 업로드된 파일의 URL 반환
-        return urls;
     }
 
-    /* S3 객체 URL 반환 */
-    public String getFileUrl(String s3Key) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, awsRegion, s3Key);
+    // 기존 S3Presigner 생성 메서드
+    private S3Presigner createS3Presigner() {
+        return S3Presigner.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)))
+                .build();
     }
 
+    // UUID를 이용해 저장 파일명을 생성하는 메서드
     private String generateStoreFilename(String originalFilename) {
         String ext = extractExt(originalFilename);
         return UUID.randomUUID() + "." + ext;
     }
 
+    // 확장자를 추출하는 메서드
     private String extractExt(String filename) {
         int pos = filename.lastIndexOf(".");
         return (pos > 0) ? filename.substring(pos + 1) : "";
     }
 
     /* 2. 파일 삭제 */
-    public void delete(String keyName) {
+    public void delete(String storeFilename, String uniqueId) {
         try {
+            String s3Key = uniqueId + "/" + storeFilename;
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(keyName)
+                    .key(s3Key)
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);
@@ -106,11 +124,12 @@ public class S3Service {
     }
 
     /* 3. 파일의 preSigned URL 반환 */
-    public String getPreSignedURL(String key) {
+    public String getPreSignedURL(String storeFilename, String uniqueId) {
         try {
+            String s3Key = uniqueId + "/" + storeFilename;
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(key)
+                    .key(s3Key)
                     .build();
 
             S3Presigner preSigner = createS3Presigner();  // S3Presigner 생성
@@ -175,14 +194,5 @@ public class S3Service {
         }
 
         return preSignedUrls;
-    }
-
-    // S3Presigner를 생성하는 메서드
-    private S3Presigner createS3Presigner() {
-        return S3Presigner.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
-                .build();
     }
 }

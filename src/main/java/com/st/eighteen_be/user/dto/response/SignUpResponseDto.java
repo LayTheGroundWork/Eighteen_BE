@@ -14,7 +14,7 @@ import java.util.Set;
 public class SignUpResponseDto {
 
     private Integer id;
-    //private List<String> profileImages;
+    private List<String> profiles;
     private Set<String> roles;
     private String nickName;
     private String uniqueId;
@@ -23,9 +23,9 @@ public class SignUpResponseDto {
     private String schoolName;
 
     @Builder
-    public SignUpResponseDto(UserInfo entity, Set<String> roles){
+    public SignUpResponseDto(UserInfo entity, Set<String> roles, List<String> profileKeys){
         this.id = entity.getId();
-        //this.profileImages = entity.getProfileImg();
+        this.profiles = profileKeys;
         this.roles = roles;
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();

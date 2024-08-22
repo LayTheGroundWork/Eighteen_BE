@@ -55,8 +55,9 @@ public class UserApiController {
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
-    public ApiResp<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
-        return ApiResp.success(HttpStatus.OK, userService.save(requestDto));
+    public ApiResp<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
+                                             @RequestParam("profileImageKeys") List<String> keys){
+        return ApiResp.success(HttpStatus.OK, userService.save(requestDto,keys));
     }
 
     @Operation(summary = "로그인", description = "로그인")
