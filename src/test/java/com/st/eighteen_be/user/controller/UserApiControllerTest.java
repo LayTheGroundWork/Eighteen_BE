@@ -124,12 +124,14 @@ class UserApiControllerTest {
         roles.add("USER");
 
         List<String> keys = new ArrayList<>();
+        keys.add("testKey");
 
         when(userService.save(signUpRequestDto,keys)).thenReturn(new SignUpResponseDto(userInfo,roles,keys));
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .param("profileImageKeys",keys.toArray(new String[0]))
                         .content(objectMapper.writeValueAsString(signUpRequestDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
