@@ -90,7 +90,7 @@ class UserApiControllerTest {
         LocalDate birthDay = LocalDate.of(2018, 12, 21);
         String phoneNumber = "01012341234";
         String verificationCode = "123456";
-        String unique_id = "@abs_sd";
+        String unique_id = "abs_sd";
         String nickName = "ehgur";
         String schoolName = "서울고등학교";
         String schoolLocation = "서울 송파구";
