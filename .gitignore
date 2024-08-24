@@ -41,6 +41,7 @@ out/
 
 ### YAML Settings ###
 /src/main/resources/*.yaml
+/src/test/resources/application-test.yaml
 
 ### Environment ###
 .env.*
