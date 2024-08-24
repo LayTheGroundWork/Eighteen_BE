@@ -10,6 +10,7 @@ import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserProfiles;
 import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
@@ -29,9 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,12 +46,20 @@ public class UserService {
     private final EncryptService encryptService;
     private final TokenBlackList tokenBlackList;
     private final LikeService likeService;
+    private final S3Service s3Service;
+    private final SnsLinkService snsLinkService;
 
-    public SignUpResponseDto save(@NotNull SignUpRequestDto requestDto) {
+    public boolean isDuplicationUniqueId(String uniqueId){
+        Optional<UserInfo> user = userRepository.findByUniqueId(uniqueId);
+
+        return user.isPresent();
+    }
+
+    public SignUpResponseDto save(@NotNull SignUpRequestDto requestDto, List<String> keys) {
         try {
             UserInfo user = requestDto.toEntity(
-                    encryptService.encryptPhoneNumber(requestDto.phoneNumber())
-            );
+                    encryptService.encryptPhoneNumber(requestDto.phoneNumber()));
+
             UserRoles userRoles = UserRoles.builder()
                     .role(RolesType.USER)
                     .user(user)
@@ -60,7 +67,18 @@ public class UserService {
 
             user.addRole(userRoles);
 
-            return new SignUpResponseDto(userRepository.save(user),getRoles(user));
+            //TODO: 업로드한 이미지가 없을 경우 기본 이미지 경로에 대한 key 값을 저장해야함
+            for(String key : keys){
+                UserProfiles userProfiles = UserProfiles.builder()
+                        .user(user)
+                        .imageKey(key)
+                        .build();
+
+                user.addProfile(userProfiles);
+            }
+            userRepository.save(user);
+
+            return new SignUpResponseDto(user,getRoles(user), keys);
 
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")) {
@@ -167,7 +185,11 @@ public class UserService {
         UserInfo userInfo = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        return new UserDetailsResponseDto(userInfo,userInfo.getLikeCount());
+        int likeCount = likeService.countLikes(userInfo.getId());
+        List<String> snsLinks = snsLinkService.readAll(userId);
+        List<String> images = s3Service.getPreSignedURLsForFolder(userInfo.getUniqueId());
+
+        return new UserDetailsResponseDto(userInfo,likeCount,images,snsLinks);
     }
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
@@ -176,7 +198,11 @@ public class UserService {
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         int likeCount = likeService.countLikes(userInfo.getId());
-        return new UserDetailsResponseDto(userInfo,likeCount);
+
+        List<String> snsLinks = snsLinkService.readAll(userInfo.getId());
+        List<String> images = s3Service.getPreSignedURLsForFolder(userInfo.getUniqueId());
+
+        return new UserDetailsResponseDto(userInfo,likeCount,images,snsLinks);
     }
 
     public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId, String accessToken) {
@@ -200,5 +226,4 @@ public class UserService {
         boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
         return new UserProfileResponseDto(user, isLiked);
     }
-
 }

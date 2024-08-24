@@ -47,11 +47,17 @@ public class UserApiController {
     private final UserService userService;
     private final LikeService likeService;
 
+    @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
+    @PostMapping("/v1/api/user/duplication-check")
+    public ApiResp<Boolean> duplicationCheck(@RequestParam("uniqueId") String uniqueId){
+        return ApiResp.success(HttpStatus.OK, userService.isDuplicationUniqueId(uniqueId));
+    }
+
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
-    public ApiResp<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto){
-
-        return ApiResp.success(HttpStatus.OK, userService.save(requestDto));
+    public ApiResp<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
+                                             @RequestParam("profileImageKeys") List<String> keys){
+        return ApiResp.success(HttpStatus.OK, userService.save(requestDto,keys));
     }
 
     @Operation(summary = "로그인", description = "로그인")
@@ -87,10 +93,6 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, jwtTokenDto);
     }
 
-
-//    @Operation(summary = "프로필 미디어 파일 업로드", description = "프로필 미디어 파일 업로드")
-//    @PostMapping("")
-
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
     @PostMapping("/v1/api/user/like")
     public ApiResp<String> like(@RequestHeader("Authorization") String accessToken, Integer likedId){
@@ -104,7 +106,6 @@ public class UserApiController {
         likeService.cancelLike(accessToken,likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 취소 완료");
     }
-
 
     @Operation(summary = "회원 상세 정보 보기", description = "회원 상세 정보 보기")
     @PostMapping("/v1/api/user/find/{unique-id}")

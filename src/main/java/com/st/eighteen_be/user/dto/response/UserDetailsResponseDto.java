@@ -7,32 +7,33 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @NoArgsConstructor
 public class UserDetailsResponseDto {
 
     private Integer id;
-    //private List<String> profileImages;
+    private List<String> profileImages;
     private int likeCount;
     private String nickName;
     private String uniqueId;
     private LocalDate birthDay;
     private String location;
     private String schoolName;
+    private List<String> snsLinks;
     private List<String> question;
 
     @Builder
-    public UserDetailsResponseDto(UserInfo entity, int likeCount) {
+    public UserDetailsResponseDto(UserInfo entity, int likeCount, List<String> images, List<String> snsLinks) {
         this.id = entity.getId();
-        //this.profileImages = entity.getProfileImg();
+        this.profileImages = images;
         this.likeCount = likeCount;
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.birthDay = entity.getBirthDay();
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
+        this.snsLinks = snsLinks;
         //this.question = entity.getQuestion();
     }
 

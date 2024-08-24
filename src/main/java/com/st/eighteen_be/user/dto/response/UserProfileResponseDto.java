@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserProfileResponseDto {
 
-    //private List<String> profileImages;
+    private String profileImages;
     private Integer id;
     private String nickName;
     private String uniqueId;
@@ -20,7 +20,7 @@ public class UserProfileResponseDto {
     @Builder
     public UserProfileResponseDto(UserInfo entity, boolean likeStatus) {
         this.id = entity.getId();
-        //this.profileImages = entity.getProfileImg();
+        this.profileImages = entity.getProfiles().get(0).getImageKey();
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.location = entity.getSchoolData().getSchoolLocation();

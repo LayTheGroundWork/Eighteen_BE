@@ -45,7 +45,8 @@ public class UserInfo extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRoles> roles = new HashSet<>();
 
-    //private List<String> profileImg;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserProfiles> profiles = new ArrayList<>();
 
     @Column(length = 50, nullable = false)
     private String nickName;
@@ -87,6 +88,11 @@ public class UserInfo extends BaseEntity {
     public void addRole(UserRoles userRole) {
         this.roles.add(userRole);
         userRole.setUser(this);
+    }
+
+    public void addProfile(UserProfiles userProfile){
+        this.profiles.add(userProfile);
+        userProfile.setUser(this);
     }
 
     public void update(){}

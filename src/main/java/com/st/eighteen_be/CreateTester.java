@@ -2,6 +2,7 @@ package com.st.eighteen_be;
 
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserProfiles;
 import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.UserRepository;
@@ -24,8 +25,9 @@ public class CreateTester {
     private static final String TESTER_NICKNAME = "tester1";
     private static final LocalDate TESTER_BIRTHDAY = LocalDate.of(1999, 12, 23);
     private static final SchoolData TESTER_SCHOOL_DATA = new SchoolData("테스터고등학교", "서울");
-    private static final String TESTER_UNIQUE_ID = "@Tester";
+    private static final String TESTER_UNIQUE_ID = "Tester";
     private static final Set<String> TESTER_ROLES = Set.of("USER");
+    private static final String imageKey = "testKey";
 
     private final UserRepository userRepository;
 
@@ -35,7 +37,7 @@ public class CreateTester {
 
         if (existingTester.isPresent()) {
             log.info("Tester already exists with unique ID: {}", TESTER_UNIQUE_ID);
-            return;
+            userRepository.deleteAll();
         }
 
         UserInfo tester = UserInfo.builder()
@@ -52,6 +54,13 @@ public class CreateTester {
                 .build();
 
         tester.addRole(userRoles);
+
+        UserProfiles userProfiles = UserProfiles.builder()
+                .imageKey(imageKey)
+                .user(tester)
+                .build();
+
+        tester.addProfile(userProfiles);
 
         try {
             userRepository.save(tester);

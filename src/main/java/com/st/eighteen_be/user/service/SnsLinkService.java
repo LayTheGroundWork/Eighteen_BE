@@ -6,7 +6,6 @@ import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotVal
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserSnsLink;
-import com.st.eighteen_be.user.dto.response.SnsLinksResponseDto;
 import com.st.eighteen_be.user.repository.SnsLinkRepository;
 import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,19 +57,19 @@ public class SnsLinkService {
     }
 
 
-    public List<SnsLinksResponseDto> readAll(Integer userId){
+    public List<String> readAll(Integer userId){
         UserInfo userInfo = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
         List<UserSnsLink> snsLinks = userInfo.getSnsLinks();
-        List<SnsLinksResponseDto> snsLinksResponseDtoList = new ArrayList<>();
+        List<String> snsLinkList = new ArrayList<>();
 
         for (UserSnsLink userSnsLink : snsLinks) {
-            snsLinksResponseDtoList.add(new SnsLinksResponseDto(userSnsLink.getLink()));
+            snsLinkList.add(userSnsLink.getLink());
         }
 
-        return snsLinksResponseDtoList;
+        return snsLinkList;
     }
 
 }

@@ -1,7 +1,6 @@
 package com.st.eighteen_be.user.api;
 
 import com.st.eighteen_be.common.response.ApiResp;
-import com.st.eighteen_be.user.dto.response.SnsLinksResponseDto;
 import com.st.eighteen_be.user.service.SnsLinkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@Tag(name = "유저 API", description = "유저 API")
+@Tag(name = "소셜링크 API", description = "소셜링크 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
@@ -31,7 +30,7 @@ public class SnsLinkApiController {
 
     @Operation(summary = "회원 sns 링크 조회", description = "회원 sns 링크 조회")
     @PostMapping("/v1/api/user/sns-link/read/{user-id}")
-    public ApiResp<List<SnsLinksResponseDto>> readAllSnsLink(@PathVariable("user-id") Integer userId){
+    public ApiResp<List<String>> readAllSnsLink(@PathVariable("user-id") Integer userId){
         return ApiResp.success(HttpStatus.OK,snsLinkService.readAll(userId));
     }
 }

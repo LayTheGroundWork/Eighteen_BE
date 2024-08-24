@@ -27,9 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -92,7 +90,7 @@ class UserApiControllerTest {
         LocalDate birthDay = LocalDate.of(2018, 12, 21);
         String phoneNumber = "01012341234";
         String verificationCode = "123456";
-        String unique_id = "@abs_sd";
+        String unique_id = "abs_sd";
         String nickName = "ehgur";
         String schoolName = "서울고등학교";
         String schoolLocation = "서울 송파구";
@@ -125,11 +123,15 @@ class UserApiControllerTest {
         Set<String> roles = new HashSet<>();
         roles.add("USER");
 
-        when(userService.save(signUpRequestDto)).thenReturn(new SignUpResponseDto(userInfo,roles));
+        List<String> keys = new ArrayList<>();
+        keys.add("testKey");
+
+        when(userService.save(signUpRequestDto,keys)).thenReturn(new SignUpResponseDto(userInfo,roles,keys));
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .param("profileImageKeys",keys.toArray(new String[0]))
                         .content(objectMapper.writeValueAsString(signUpRequestDto)))
                 .andDo(print())
                 .andExpect(status().isOk())

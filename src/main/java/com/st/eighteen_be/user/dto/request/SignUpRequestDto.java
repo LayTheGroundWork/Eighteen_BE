@@ -31,13 +31,14 @@ public record SignUpRequestDto(
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotNull(message = "전화번호는 필수 입력 값 입니다.")
         @Pattern(regexp = "^01(0|1|[6-9])[0-9]{3,4}[0-9]{4}$")
-        @Schema(description = "회원가입자 전화번호", example = "01012345678")
+        @Schema(description = "회원가입자 전화번호", example = "01012345679")
         String phoneNumber,
 
         // 고유 아이디
         @NotBlank(message = "공백으로 설정할 수 없습니다.")
         @NotNull(message = "식별아이디는 필수 입력 값 입니다.")
-        @Schema(description = "회원가입자 고유식별 아이디", example = "@AB_D")
+        @Pattern(regexp = "^[A-Za-z0-9_\\-./]+$")
+        @Schema(description = "회원가입자 고유식별 아이디", example = "AB")
         String uniqueId,
 
         // 닉네임
@@ -59,7 +60,6 @@ public record SignUpRequestDto(
 ) {
 
     public UserInfo toEntity(String encryptPhoneNumber) {
-
         return UserInfo.builder()
                 .phoneNumber(encryptPhoneNumber)
                 .uniqueId(uniqueId)
