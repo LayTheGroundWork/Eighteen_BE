@@ -44,4 +44,4 @@ out/
 /src/test/resources/application-test.yaml
 
 ### Environment ###
-.env.*
+/.env.*
