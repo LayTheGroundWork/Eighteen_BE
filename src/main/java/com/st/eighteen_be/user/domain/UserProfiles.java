@@ -7,10 +7,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserProfiles extends BaseEntity {
+    public static final String DEFAULT_IMAGE = "default";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profile_id")
@@ -34,5 +37,9 @@ public class UserProfiles extends BaseEntity {
 
         this.user = user;
         user.getProfiles().add(this);
+    }
+
+    public boolean isDefaultImage(){
+        return Objects.equals(imageKey, DEFAULT_IMAGE);
     }
 }

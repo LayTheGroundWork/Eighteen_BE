@@ -1,6 +1,7 @@
 package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
@@ -10,7 +11,8 @@ import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
-import com.st.eighteen_be.tournament.service.helper.TournamentHelperService;
+import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
+import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,63 +41,76 @@ public class TournamentService {
     private final TournamentEntityRepository tournamentEntityRepository;
     private final TournamentParticipantRepository tournamentParticipantEntityRepository;
     private final VoteEntityRepository voteEntityRepository;
-    
+
+    private final UserRepository userRepository;
+
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, TournamentCategoryEnums category) {
         log.info("search start category : {}", category);
-        
+
         return tournamentEntityRepository.findTournamentByCategoryAndPaging(category, pageRequest);
     }
-    
+
     @Transactional(readOnly = false)
     public void startTournament() {
         log.info("startTournament start");
-        
+
         //카테고리 별로 최신 시즌 조회 후 없으면 토너먼트를 생성한다.
         findLastestTournamentsGroupByCategory();
     }
-    
+
     private void findLastestTournamentsGroupByCategory() {
         log.info("findLastestTournamentsGroupByCategory start");
-        
+
         for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
             TournamentEntity lastestTournament = tournamentEntityRepository.findFirstByCategoryOrderByCreatedDateDesc(category)
                     .orElse(null);
-            
+
             int newSeason = lastestTournament == null ? 1 : lastestTournament.getSeason() + 1;
             createNewTournament(category, newSeason);
-            pickRandomUser();
+
+            //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다.
         }
     }
-    
-    private void pickRandomUser() {
+
+    public List<UserRandomResponseDto> pickRandomUser() {
         log.info("pickRandomUser start");
-        
-        //TODO : 토너먼트 참가자를 (미정)으로 선정한다.
-        tournamentParticipantEntityRepository.saveAll(TournamentHelperService.pickRandomUser());
+
+        //TODO 향후 : 참가자는 해당 카테고리에 맞는 사람들로 가져와야한다. 지금은 랜덤으로 16명을 그냥 뽑는 형식이다.
+        List<UserRandomResponseDto> randomUser = userRepository.findRandomUser();
+
+        validateRandomUserCount(randomUser);
+
+        return randomUser;
     }
-    
+
+    private static void validateRandomUserCount(List<UserRandomResponseDto> randomUser) {
+        if(randomUser.size() < 16) {
+            throw new BadRequestException(ErrorCode.NOT_ENOUGH_USER);
+        }
+    }
+
     @Transactional(readOnly = false)
     public TournamentEntity createNewTournament(TournamentCategoryEnums category, int season) {
         log.info("createNewTournament start category : {}", category);
-        
+
         TournamentEntity created = TournamentEntity.createTournamentEntity(category, season);
-        
+
         return tournamentEntityRepository.save(created);
     }
-    
+
     @Transactional(readOnly = false)
     public void endLastestTournaments() {
         log.info("endLastestTournaments start");
-        
+
         for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
             TournamentEntity foundTournamet = endTournamentByCategory(category);
             determineWinner(foundTournamet.getTournamentNo());
         }
     }
-    
+
     private TournamentEntity endTournamentByCategory(TournamentCategoryEnums category) {
         log.info("endTournamentByCategory start category : {}", category.getCategory());
-        
+
         return tournamentEntityRepository.findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(category)
                 .map(tournament -> {
                     tournament.endTournament();
@@ -103,30 +118,30 @@ public class TournamentService {
                 })
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CATEGORY));
     }
-    
+
     @Transactional(readOnly = false)
     public List<TournamentVoteResultResponseDTO> determineWinner(@NonNull Long tournamentNo) {
         log.info("determineWinner start");
-        
+
         List<TournamentVoteResultResponseDTO> voteResult = voteEntityRepository.findTournamentVoteResult(tournamentNo);
-        
+
         setRank(voteResult);
-        
+
         return voteResult;
     }
-    
+
     private void setRank(List<TournamentVoteResultResponseDTO> voteResult) {
         long rank = 1;
-        
+
         for (TournamentVoteResultResponseDTO tournamentVoteResultResponseDTO : voteResult) {
             tournamentVoteResultResponseDTO.setRank(rank++);
         }
     }
-    
+
     @Transactional(readOnly = false)
     public void processVote(TournamentVoteRequestDTO voteRequestDTO) {
         log.info("processVote start");
-        
+
         tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO);
         tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO);
     }

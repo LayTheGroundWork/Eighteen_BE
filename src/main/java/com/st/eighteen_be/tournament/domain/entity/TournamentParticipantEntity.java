@@ -21,28 +21,33 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Comment("토너먼트 참가자고유번호")
     @Column(name = "PARTICIPANT_NO")
     private Long participantNo;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @Comment("토너먼트 고유번호")
     @JoinColumn(name = "TOURNAMENT_NO")
     private TournamentEntity tournament;
-    
+
     @Size(max = 200)
     @Comment("토너먼트 참가자 ID")
     @Column(name = "USER_ID", length = 200)
     private String userId;
-    
+
+    @Size(max = 300)
+    @Comment("토너먼트 참가자 이미지 URL")
+    @Column(name = "USER_IMAGE_URL", length = 300)
+    private String userImageUrl;
+
     @Builder.Default
     @Comment("토너먼트 참가자 점수")
     @Column(name = "SCORE")
     private long score = 0;
-    
+
     public static TournamentParticipantEntity of(String userId) {
         return TournamentParticipantEntity.builder()
                 .userId(userId)
                 .build();
     }
-    
+
     public static TournamentParticipantEntity of(String userId, TournamentEntity tournament) {
         return TournamentParticipantEntity.builder()
                 .userId(userId)
