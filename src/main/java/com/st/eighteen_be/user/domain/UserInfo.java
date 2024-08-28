@@ -1,6 +1,8 @@
 package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
+import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -101,7 +103,16 @@ public class UserInfo extends BaseEntity {
         this.likeCount = likeCount;
     }
 
+
+    public boolean isMainProfileIsDefaultImage() {
+        return getMainProfile().isDefaultImage();
+    }
+
+    private UserProfiles getMainProfile() {
+        if (profiles.isEmpty()) {
+            throw new BadRequestException(ErrorCode.NOT_FOUND_PROFILE);
+        }
+
+        return profiles.get(0);
+    }
 }
-
-
-

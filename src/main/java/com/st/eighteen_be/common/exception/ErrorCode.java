@@ -31,6 +31,7 @@ public enum ErrorCode {
     NOT_FOUND_TOURNAMENT(HttpStatus.NOT_FOUND, "해당하는 토너먼트를 찾을 수 없습니다."),
     NOT_FOUND_TOURNAMENT_PARTICIPANT(HttpStatus.NOT_FOUND, "해당하는 토너먼트 참가자를 찾을 수 없습니다."),
     NOT_FOUND_VOTE_RESULT(HttpStatus.NOT_FOUND, "해당하는 투표 결과를 찾을 수 없습니다."),
+    NOT_ENOUGH_USER(HttpStatus.BAD_REQUEST, "유저 수가 부족합니다."),
 
     //common
     NOT_NULL(HttpStatus.BAD_REQUEST, "필수 값이 누락되었습니다."),
@@ -49,7 +50,9 @@ public enum ErrorCode {
     TOKEN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "자격 증명 실패"),
     TOKEN_FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다"),
 
-    ;
+    //profile
+    NOT_FOUND_PROFILE(HttpStatus.NOT_FOUND, "해당하는 프로필을 찾을 수 없습니다.");
+
     private final HttpStatus status;
     private final String message;
 
