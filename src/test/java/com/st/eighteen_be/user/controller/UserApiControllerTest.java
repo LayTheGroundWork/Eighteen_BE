@@ -9,7 +9,6 @@ import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
-import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,9 +61,6 @@ class UserApiControllerTest {
     @MockBean
     private UserService userService; // UserService를 Mocking
 
-    @MockBean
-    private UserRepository userRepository; // UserRepository를 Mocking
-
     private JwtTokenDto jwtTokenDto;
 
     private SignUpRequestDto signUpRequestDto; // 테스트에 사용할 SignUpRequestDto 객체
@@ -87,6 +83,7 @@ class UserApiControllerTest {
                 .build();
 
         LocalDate birthDay = LocalDate.of(2018, 12, 21);
+        String phoneNumber = "01012341234";
         String verificationCode = "123456";
         String unique_id = "abs_sd";
         String nickName = "ehgur";
