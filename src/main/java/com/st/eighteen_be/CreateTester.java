@@ -27,7 +27,7 @@ public class CreateTester {
     private static final SchoolData TESTER_SCHOOL_DATA = new SchoolData("테스터고등학교", "서울");
     private static final String TESTER_UNIQUE_ID = "Tester";
     private static final Set<String> TESTER_ROLES = Set.of("USER");
-    private static final String imageKey = "testKey";
+    private static final String IMAGE_KEY = "testKey";
 
     private final UserRepository userRepository;
 
@@ -56,7 +56,7 @@ public class CreateTester {
         tester.addRole(userRoles);
 
         UserProfiles userProfiles = UserProfiles.builder()
-                .imageKey(imageKey)
+                .imageKey(IMAGE_KEY)
                 .user(tester)
                 .build();
 

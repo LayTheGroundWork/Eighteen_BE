@@ -3,14 +3,12 @@ package com.st.eighteen_be.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.st.eighteen_be.jwt.JwtTokenDto;
-import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
-import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,9 +61,6 @@ class UserApiControllerTest {
     @MockBean
     private UserService userService; // UserService를 Mocking
 
-    @MockBean
-    private UserRepository userRepository; // UserRepository를 Mocking
-
     private JwtTokenDto jwtTokenDto;
 
     private SignUpRequestDto signUpRequestDto; // 테스트에 사용할 SignUpRequestDto 객체
@@ -73,9 +68,6 @@ class UserApiControllerTest {
     private SignInRequestDto signInRequestDto; // 테스트에 사용할 SignInRequestDto 객체
 
     private ObjectMapper objectMapper; // JSON 직렬화/역직렬화를 위한 ObjectMapper 객체
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {
