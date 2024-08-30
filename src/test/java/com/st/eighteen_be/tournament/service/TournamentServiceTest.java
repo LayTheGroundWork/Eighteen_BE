@@ -1,6 +1,7 @@
 package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.common.annotation.ServiceWithMySQLTest;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
@@ -8,10 +9,12 @@ import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
+import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,8 +23,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
@@ -31,7 +40,12 @@ import java.util.Objects;
 
 import static com.st.eighteen_be.tournament.domain.entity.TournamentEntity.THUMBNAIL_DEFAULT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.service
@@ -46,6 +60,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
  */
 @DisplayName("TournamentService 테스트")
 @ServiceWithMySQLTest
+@ExtendWith(MockitoExtension.class)
 class TournamentServiceTest {
     @PersistenceContext
     private EntityManager em;
@@ -64,9 +79,17 @@ class TournamentServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @MockBean
+    private RedisTemplate<String, RandomUser> redisTemplate;
+
+    @Mock
+    private ListOperations<String, RandomUser> listOperations;
+
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository);
+        tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, redisTemplate);
+
+        when(redisTemplate.opsForList()).thenReturn(listOperations);
     }
 
     @Test
@@ -128,6 +151,17 @@ class TournamentServiceTest {
                 TournamentParticipantEntity.of("user8")
         );
 
+        //redisTemplate.opsForList() 모킹
+        when(redisTemplate.opsForList().range(anyString(), anyLong(), anyLong())).thenReturn(List.of(
+                RandomUser.builder().userId("user1").build(),
+                RandomUser.builder().userId("user2").build(),
+                RandomUser.builder().userId("user3").build(),
+                RandomUser.builder().userId("user4").build(),
+                RandomUser.builder().userId("user5").build(),
+                RandomUser.builder().userId("user6").build(),
+                RandomUser.builder().userId("user7").build(),
+                RandomUser.builder().userId("user8").build()
+        ));
 
         // when
         tournamentService.startTournament();
@@ -159,6 +193,8 @@ class TournamentServiceTest {
         @DisplayName("토너먼트 시작시 토너먼트 참가자가 랜덤으로 선정되는지 확인한다.")
         void When_startTournament_Then_pickRandomUser() {
             // given
+            final int savedParticipantCount = 8 * TournamentCategoryEnums.values().length;
+
             TournamentEntity tournament = TournamentEntity.builder()
                                                   .category(TournamentCategoryEnums.GAME)
                                                   .season(1)
@@ -166,17 +202,17 @@ class TournamentServiceTest {
 
             em.persist(tournament);
 
-            List<TournamentParticipantEntity> tournamentParticipantEntities = List.of(
-                    TournamentParticipantEntity.of("user1", tournament),
-                    TournamentParticipantEntity.of("user2", tournament),
-                    TournamentParticipantEntity.of("user3", tournament),
-                    TournamentParticipantEntity.of("user4", tournament),
-                    TournamentParticipantEntity.of("user5", tournament),
-                    TournamentParticipantEntity.of("user6", tournament),
-                    TournamentParticipantEntity.of("user7", tournament),
-                    TournamentParticipantEntity.of("user8", tournament)
-            );
-
+            //토너먼트 참여자 선정 모킹 데이터 given
+            given(redisTemplate.opsForList().range("pickedRandomUser", 0, 15)).willReturn(List.of(
+                    RandomUser.builder().userId("user1").build(),
+                    RandomUser.builder().userId("user2").build(),
+                    RandomUser.builder().userId("user3").build(),
+                    RandomUser.builder().userId("user4").build(),
+                    RandomUser.builder().userId("user5").build(),
+                    RandomUser.builder().userId("user6").build(),
+                    RandomUser.builder().userId("user7").build(),
+                    RandomUser.builder().userId("user8").build()
+            ));
 
             // when
             tournamentService.startTournament();
@@ -186,7 +222,7 @@ class TournamentServiceTest {
 
             assertThat(foundAll)
                     .isNotEmpty()
-                    .hasSize(tournamentParticipantEntities.size());
+                    .hasSize( savedParticipantCount);
         }
 
         @Test
@@ -461,6 +497,64 @@ class TournamentServiceTest {
                                                        TournamentParticipantEntity user14,
                                                        TournamentParticipantEntity user15,
                                                        TournamentParticipantEntity user16) {
+        }
+    }
+
+    @Nested
+    @DisplayName("토너먼트 참가자 선정 테스트")
+    class PickRandomUserTest {
+        @Test
+        @DisplayName("랜덤 유저 선정시 유저가 16명 미만인 경우 예외를 발생시킨다.")
+        void When_pickRandomUser_Then_throwException() {
+            // given
+            List<UserInfo> userInfos = new ArrayList<>();
+
+            for (int i = 1; i <= 15; i++) {
+                UserInfo user = UserInfo.builder()
+                        .birthDay(LocalDate.now())
+                        .phoneNumber("010-1234-567" + i)
+                        .uniqueId("user" + i)
+                        .nickName("name" + i)
+                        .build();
+
+                userInfos.add(user);
+            }
+
+            userRepository.saveAll(userInfos);
+
+            // when
+            // then
+            assertThatThrownBy(() -> tournamentService.pickRandomUser())
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessageContaining("유저 수가 부족합니다");
+        }
+
+        @Test
+        @DisplayName("랜덤 유저 선정시 유저가 16명 이상인 경우 랜덤 유저를 선정한다.")
+        void When_pickRandomUser_Then_returnRandomUser() {
+            // given
+            List<UserInfo> userInfos = new ArrayList<>();
+
+            for (int i = 1; i <= 16; i++) {
+                UserInfo user = UserInfo.builder()
+                        .birthDay(LocalDate.now())
+                        .phoneNumber("010-1234-567" + i)
+                        .uniqueId("user" + i)
+                        .nickName("name" + i)
+                        .build();
+
+                userInfos.add(user);
+            }
+
+            userRepository.saveAll(userInfos);
+
+            // when
+            List<UserRandomResponseDto> actual = tournamentService.pickRandomUser();
+
+            // then
+            assertThat(actual)
+                    .isNotEmpty()
+                    .hasSize(16);
         }
     }
 }
