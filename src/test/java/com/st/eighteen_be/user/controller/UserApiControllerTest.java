@@ -3,12 +3,13 @@ package com.st.eighteen_be.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.st.eighteen_be.jwt.JwtTokenDto;
+import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
+import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,13 +62,19 @@ class UserApiControllerTest {
     @MockBean
     private UserService userService; // UserService를 Mocking
 
+    @MockBean
+    private UserRepository userRepository; // UserRepository를 Mocking
+
     private JwtTokenDto jwtTokenDto;
 
     private SignUpRequestDto signUpRequestDto; // 테스트에 사용할 SignUpRequestDto 객체
 
-    private SignInRequestDto signInRequestDto; // 테스트에 사용할 SignInRequestDto 객체
-
     private ObjectMapper objectMapper; // JSON 직렬화/역직렬화를 위한 ObjectMapper 객체
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    private final String phoneNumber = "01012341234";
 
     @BeforeEach
     void setUp() {
@@ -80,7 +87,6 @@ class UserApiControllerTest {
                 .build();
 
         LocalDate birthDay = LocalDate.of(2018, 12, 21);
-        String phoneNumber = "01012341234";
         String verificationCode = "123456";
         String unique_id = "abs_sd";
         String nickName = "ehgur";
@@ -95,11 +101,6 @@ class UserApiControllerTest {
                 .nickName(nickName)
                 .schoolData(schoolData)
                 .birthDay(birthDay)
-                .build();
-
-        signInRequestDto = SignInRequestDto.builder()
-                .phoneNumber(phoneNumber)
-                .verificationCode(verificationCode)
                 .build();
 
         // ObjectMapper에 JavaTimeModule 등록
@@ -137,12 +138,12 @@ class UserApiControllerTest {
     @DisplayName("회원 로그인")
     void user_sign_in() throws Exception {
         //given
-        when(userService.signIn(signInRequestDto)).thenReturn(jwtTokenDto);
+        when(userService.signIn(phoneNumber)).thenReturn(jwtTokenDto);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_IN_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signInRequestDto)))
+                        .param("phoneNumber", phoneNumber))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
