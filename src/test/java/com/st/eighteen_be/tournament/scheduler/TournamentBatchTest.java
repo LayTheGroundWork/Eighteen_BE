@@ -92,4 +92,34 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
 
         verify(tournamentService, times(1)).pickRandomUser();
     }
+
+    @Test
+    @DisplayName("pickRandomUser 스케쥴러의 경우 이미 들어간 데이터를 정상적으로 삭제시키는지 확인")
+    void When_pickRandomUser_Then_deletePreviousData() {
+        // given
+        List<UserRandomResponseDto> randomUsers = Collections.singletonList(
+                UserRandomResponseDto.of(1, "https://example.com/profile.jpg")
+        );
+        when(tournamentService.pickRandomUser()).thenReturn(randomUsers);
+
+        // when
+        tournamentScheduler.pickRandomUser();
+
+        // then
+        HashOperations<String, String, RandomUser> hashOperations = redisTemplate.opsForHash();
+        RandomUser storedUser = hashOperations.get("pickedRandomUser", "1");
+
+        assertThat(storedUser).isNotNull();
+        assertThat(storedUser.getUserId()).isEqualTo("1");
+        assertThat(storedUser.getProfileImageUrl()).isEqualTo("https://example.com/profile.jpg");
+
+        // when
+        tournamentScheduler.pickRandomUser();
+
+        // then
+        storedUser = hashOperations.get("pickedRandomUser", "1");
+        assertThat(storedUser).isNull();
+
+        verify(tournamentService, times(2)).pickRandomUser();
+    }
 }
