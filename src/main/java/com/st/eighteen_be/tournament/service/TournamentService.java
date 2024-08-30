@@ -7,7 +7,9 @@ import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
+import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
+import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
@@ -17,10 +19,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -43,6 +47,7 @@ public class TournamentService {
     private final VoteEntityRepository voteEntityRepository;
 
     private final UserRepository userRepository;
+    private final RedisTemplate<String, RandomUser> redisTemplate;
 
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, TournamentCategoryEnums category) {
         log.info("search start category : {}", category);
@@ -66,10 +71,17 @@ public class TournamentService {
                     .orElse(null);
 
             int newSeason = lastestTournament == null ? 1 : lastestTournament.getSeason() + 1;
-            createNewTournament(category, newSeason);
+            TournamentEntity newTournament = createNewTournament(category, newSeason);
 
-            //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다.
+            //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다. -- 현재는 랜덤 16명의 회원에 대해 카테고리별로 분류가 되어 있지 않기에, 그냥 16명을 전부 참가자로 설정하도록 되어 있다.
+            saveRandomParticipantsFromRedis(newTournament);
         }
+    }
+
+    private void saveRandomParticipantsFromRedis(TournamentEntity newTournament) {
+        Objects.requireNonNull(redisTemplate.opsForList().range("pickedRandomUser", 0, 15)).forEach(randomUser -> {
+            tournamentParticipantEntityRepository.save(TournamentParticipantEntity.of(randomUser.getUserId(), newTournament));
+        });
     }
 
     public List<UserRandomResponseDto> pickRandomUser() {

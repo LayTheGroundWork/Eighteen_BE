@@ -45,6 +45,9 @@ public class TournamentScheduler {
     @Async
     @Scheduled(cron = "0 0  0 * * ?")
     protected void pickRandomUser() {
+        // Redis에서 기존 값을 삭제합니다.
+        redisTemplate.delete("pickedRandomUser");
+
         List<UserRandomResponseDto> pickedRandomUser = tournamentService.pickRandomUser();
 
         for (UserRandomResponseDto user : pickedRandomUser) {
