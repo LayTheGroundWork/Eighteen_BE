@@ -12,7 +12,6 @@ import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserProfiles;
 import com.st.eighteen_be.user.domain.UserRoles;
-import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
@@ -30,7 +29,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,6 +80,8 @@ public class UserService {
             }
             userRepository.save(user);
 
+            signIn(requestDto.phoneNumber());
+
             return new SignUpResponseDto(user,getRoles(user), keys);
 
         } catch (DataIntegrityViolationException e) {
@@ -88,8 +92,8 @@ public class UserService {
         }
     }
 
-    public JwtTokenDto signIn(@NotNull SignInRequestDto requestDto) {
-        String encryptPhoneNumber = encryptService.encryptPhoneNumber(requestDto.phoneNumber());
+    public JwtTokenDto signIn(String phoneNumber) {
+        String encryptPhoneNumber = encryptService.encryptPhoneNumber(phoneNumber);
         log.info("encryptPhoneNumber->{}",encryptPhoneNumber);
 
         UserInfo userInfo = userRepository.findByPhoneNumber(encryptPhoneNumber)

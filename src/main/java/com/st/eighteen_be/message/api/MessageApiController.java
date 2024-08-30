@@ -3,7 +3,6 @@ package com.st.eighteen_be.message.api;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.message.dto.SmsCertificationRequestDto;
 import com.st.eighteen_be.message.service.SmsUtil;
-import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,7 +34,7 @@ public class MessageApiController {
     
     @Operation(summary = "SMS 인증", description = "SMS 인증번호를 확인합니다.")
     @PostMapping("/v1/api/message/confirms")
-    public ApiResp<String> smsVerification(@Valid @RequestBody SignInRequestDto requestDto) {
+    public ApiResp<String> smsVerification(@Valid @RequestBody SmsCertificationRequestDto requestDto) {
         
         smsUtil.verifySms(requestDto);
         

@@ -18,8 +18,14 @@ public class SmsCertificationRequestDto {
         @Schema(description = "메시지 수신자 전화번호", example = "01012345678")
         private String phoneNumber;
 
+        @NotNull(message = "인증번호는 필수 입력 값 입니다.")
+        @Pattern(regexp = "^\\d{6}$")
+        @Schema(description = "로그인 유저가 적은 인증번호", example = "123456")
+        private String verificationCode;
+
         @Builder
-        public SmsCertificationRequestDto(String phoneNumber) {
+        public SmsCertificationRequestDto(String phoneNumber, String verificationCode) {
                 this.phoneNumber = phoneNumber;
+                this.verificationCode = verificationCode;
         }
 }

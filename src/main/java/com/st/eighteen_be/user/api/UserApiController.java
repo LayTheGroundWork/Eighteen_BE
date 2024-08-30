@@ -4,7 +4,6 @@ import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
-import com.st.eighteen_be.user.dto.request.SignInRequestDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
@@ -12,6 +11,7 @@ import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -62,9 +62,11 @@ public class UserApiController {
 
     @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/v1/api/user/sign-in")
-    public ApiResp<JwtTokenDto> signIn(@Valid @RequestBody SignInRequestDto requestDto, HttpServletResponse response) {
+    public ApiResp<JwtTokenDto> signIn(@Valid @RequestParam("phoneNumber")
+                                           @Schema(example = "01012345679") String phoneNumber,
+                                       HttpServletResponse response) {
 
-        JwtTokenDto jwtTokenDto = userService.signIn(requestDto);
+        JwtTokenDto jwtTokenDto = userService.signIn(phoneNumber);
 
         // 응답 헤더에 토큰 추가
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
