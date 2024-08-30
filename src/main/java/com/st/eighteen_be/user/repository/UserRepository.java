@@ -20,9 +20,10 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 
     boolean existsByPhoneNumber(String phoneNumber);
 
-    @Query(value = "SELECT UI.user_id as `userId`, UP.image_key as `profileImageUrl` FROM USER_INFO AS 'UI' " +
-            "LEFT JOIN USER_PROFILES AS 'UP' ON UI.user_id = UP.user_id" +
-            " WHERE UP.image_key IS NULL OR UP.image_key != 'default_image'" +
-            " ORDER BY RAND() LIMIT 16", nativeQuery = true)
+    @Query("SELECT new com.st.eighteen_be.user.dto.response.UserRandomResponseDto(UI.id, UP.imageKey) "+
+            "FROM UserInfo AS UI " +
+            "LEFT JOIN UserProfiles AS UP ON UI.id = UP.user.id" +
+            " WHERE UP.imageKey IS NULL OR UP.imageKey != 'default_image'" +
+            " ORDER BY RAND() LIMIT 16")
     List<UserRandomResponseDto> findRandomUser();
 }
