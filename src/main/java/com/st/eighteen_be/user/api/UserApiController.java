@@ -5,7 +5,6 @@ import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
-import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.service.LikeService;
@@ -55,7 +54,7 @@ public class UserApiController {
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
-    public ApiResp<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
+    public ApiResp<JwtTokenDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
                                              @RequestParam("profileImageKeys") List<String> keys){
         return ApiResp.success(HttpStatus.OK, userService.save(requestDto,keys));
     }
