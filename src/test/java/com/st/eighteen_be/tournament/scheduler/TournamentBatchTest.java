@@ -10,15 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -38,7 +35,7 @@ import static org.mockito.Mockito.*;
 public class TournamentBatchTest extends RedisTestContainerExtenstion {
     private TournamentScheduler tournamentScheduler;
 
-    @Autowired
+    @MockBean
     private RedisTemplate<String, RandomUser> redisTemplate;
 
     @MockBean
@@ -47,7 +44,6 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
     @BeforeEach
     void setUp() {
         tournamentScheduler = new TournamentScheduler(tournamentService, redisTemplate);
-        redisTemplate.delete("pickedRandomUser");
     }
 
     @Test
@@ -77,45 +73,13 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
         List<UserRandomResponseDto> randomUsers = Collections.singletonList(
                 UserRandomResponseDto.of(1, "https://example.com/profile.jpg")
         );
-        when(tournamentService.pickRandomUser()).thenReturn(randomUsers);
+        when(tournamentService.saveRandomUser()).thenReturn(randomUsers);
 
         // when
         tournamentScheduler.pickRandomUser();
 
         // then
-        HashOperations<String, String, RandomUser> hashOperations = redisTemplate.opsForHash();
-        RandomUser storedUser = hashOperations.get("pickedRandomUser", "1");
 
-        assertThat(storedUser).isNotNull();
-        assertThat(storedUser.getUserId()).isEqualTo("1");
-        assertThat(storedUser.getProfileImageUrl()).isEqualTo("https://example.com/profile.jpg");
-
-        verify(tournamentService, times(1)).pickRandomUser();
+        verify(tournamentService, times(1)).saveRandomUser();
     }
-    
-    @Test
-    @DisplayName("pickRandomUser 스케쥴러의 경우 이미 들어간 데이터를 정상적으로 삭제시키는지 확인")
-    void When_pickRandomUser_Then_deletePreviousData() {
-        // given
-        List<UserRandomResponseDto> randomUsers = Collections.singletonList(
-                UserRandomResponseDto.of(1, "https://example.com/profile.jpg")
-        );
-        when(tournamentService.pickRandomUser()).thenReturn(randomUsers);
-        
-        RedisTemplate<String, RandomUser> spyRedisTemplate = spy(redisTemplate);
-        tournamentScheduler = new TournamentScheduler(tournamentService, spyRedisTemplate);
-        
-        // when
-        tournamentScheduler.pickRandomUser();
-        
-        // then
-        HashOperations<String, String, RandomUser> hashOperations = spyRedisTemplate.opsForHash();
-        RandomUser storedUser = hashOperations.get("pickedRandomUser", "1");
-        
-        assertThat(storedUser).isNotNull();
-        assertThat(storedUser.getUserId()).isEqualTo("1");
-        assertThat(storedUser.getProfileImageUrl()).isEqualTo("https://example.com/profile.jpg");
-        
-        //레디스 삭제 로직이 한번 동작했는지 확인한다.
-        verify(spyRedisTemplate, times(1)).delete("pickedRandomUser");
-    }}
+}

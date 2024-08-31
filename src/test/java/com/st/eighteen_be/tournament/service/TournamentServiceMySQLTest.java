@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -61,7 +62,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("TournamentService 테스트")
 @ServiceWithMySQLTest
 @ExtendWith(MockitoExtension.class)
-class TournamentServiceTest {
+class TournamentServiceMySQLTest {
     @PersistenceContext
     private EntityManager em;
 
@@ -85,11 +86,14 @@ class TournamentServiceTest {
     @Mock
     private ListOperations<String, RandomUser> listOperations;
 
+    @Mock
+    private HashOperations<String, String, RandomUser> hashOperations;
+
     @BeforeEach
     void setUp() {
         tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, redisTemplate);
 
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
+        given(redisTemplate.opsForList()).willReturn(listOperations);
     }
 
     @Test
@@ -153,14 +157,14 @@ class TournamentServiceTest {
 
         //redisTemplate.opsForList() 모킹
         when(redisTemplate.opsForList().range(anyString(), anyLong(), anyLong())).thenReturn(List.of(
-                RandomUser.builder().userId("user1").build(),
-                RandomUser.builder().userId("user2").build(),
-                RandomUser.builder().userId("user3").build(),
-                RandomUser.builder().userId("user4").build(),
-                RandomUser.builder().userId("user5").build(),
-                RandomUser.builder().userId("user6").build(),
-                RandomUser.builder().userId("user7").build(),
-                RandomUser.builder().userId("user8").build()
+                RandomUser.builder().uid("user1").build(),
+                RandomUser.builder().uid("user2").build(),
+                RandomUser.builder().uid("user3").build(),
+                RandomUser.builder().uid("user4").build(),
+                RandomUser.builder().uid("user5").build(),
+                RandomUser.builder().uid("user6").build(),
+                RandomUser.builder().uid("user7").build(),
+                RandomUser.builder().uid("user8").build()
         ));
 
         // when
@@ -204,14 +208,14 @@ class TournamentServiceTest {
 
             //토너먼트 참여자 선정 모킹 데이터 given
             given(redisTemplate.opsForList().range("pickedRandomUser", 0, 15)).willReturn(List.of(
-                    RandomUser.builder().userId("user1").build(),
-                    RandomUser.builder().userId("user2").build(),
-                    RandomUser.builder().userId("user3").build(),
-                    RandomUser.builder().userId("user4").build(),
-                    RandomUser.builder().userId("user5").build(),
-                    RandomUser.builder().userId("user6").build(),
-                    RandomUser.builder().userId("user7").build(),
-                    RandomUser.builder().userId("user8").build()
+                    RandomUser.builder().uid("user1").build(),
+                    RandomUser.builder().uid("user2").build(),
+                    RandomUser.builder().uid("user3").build(),
+                    RandomUser.builder().uid("user4").build(),
+                    RandomUser.builder().uid("user5").build(),
+                    RandomUser.builder().uid("user6").build(),
+                    RandomUser.builder().uid("user7").build(),
+                    RandomUser.builder().uid("user8").build()
             ));
 
             // when
@@ -524,15 +528,17 @@ class TournamentServiceTest {
 
             // when
             // then
-            assertThatThrownBy(() -> tournamentService.pickRandomUser())
+            assertThatThrownBy(() -> tournamentService.saveRandomUser())
                     .isInstanceOf(BadRequestException.class)
                     .hasMessageContaining("유저 수가 부족합니다");
         }
 
         @Test
-        @DisplayName("랜덤 유저 선정시 유저가 16명 이상인 경우 랜덤 유저를 선정한다.")
+        @DisplayName("랜덤 유저 선정시 유저가 16명 이상인 경우 랜덤 유저를 선정한다. - Redis 테스트")
         void When_pickRandomUser_Then_returnRandomUser() {
             // given
+            given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
+
             List<UserInfo> userInfos = new ArrayList<>();
 
             for (int i = 1; i <= 16; i++) {
@@ -549,7 +555,7 @@ class TournamentServiceTest {
             userRepository.saveAll(userInfos);
 
             // when
-            List<UserRandomResponseDto> actual = tournamentService.pickRandomUser();
+            List<UserRandomResponseDto> actual = tournamentService.saveRandomUser();
 
             // then
             assertThat(actual)
