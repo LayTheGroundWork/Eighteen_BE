@@ -13,7 +13,6 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserProfiles;
 import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
-import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.enums.RolesType;
@@ -57,7 +56,7 @@ public class UserService {
         return user.isPresent();
     }
 
-    public SignUpResponseDto save(@NotNull SignUpRequestDto requestDto, List<String> keys) {
+    public JwtTokenDto save(@NotNull SignUpRequestDto requestDto, List<String> keys) {
         try {
             UserInfo user = requestDto.toEntity(
                     encryptService.encryptPhoneNumber(requestDto.phoneNumber()));
@@ -80,9 +79,7 @@ public class UserService {
             }
             userRepository.save(user);
 
-            signIn(requestDto.phoneNumber());
-
-            return new SignUpResponseDto(user,getRoles(user), keys);
+            return signIn(requestDto.phoneNumber());
 
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().toUpperCase().contains("PHONE_NUMBER_UNIQUE")) {
