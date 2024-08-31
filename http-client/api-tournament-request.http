@@ -24,3 +24,6 @@ Content-Type: application/json
 
 ### 토너먼트 결과 조회
 GET http://{{host}}:{{port}}/v1/api/tournament/final/result?tournamentNo=1
+
+### 토너먼트 16인 강제 레디스에 올리기
+PUT http://{{host}}:{{port}}/v1/api/tournament/force-pick-random-user-to-redis

@@ -2,14 +2,11 @@ package com.st.eighteen_be.tournament.scheduler;
 
 import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
 import com.st.eighteen_be.tournament.service.TournamentService;
-import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.batch
@@ -44,15 +41,7 @@ public class TournamentScheduler {
     // 일단 방식은 회원 총 카운트중에 특정 회원번호
     @Async
     @Scheduled(cron = "0 0  0 * * ?")
-    protected void pickRandomUser() {
-        // Redis에서 기존 값을 삭제합니다.
-        redisTemplate.delete("pickedRandomUser");
-
-        List<UserRandomResponseDto> pickedRandomUser = tournamentService.pickRandomUser();
-
-        for (UserRandomResponseDto user : pickedRandomUser) {
-            RandomUser randomUser = user.toRandomUser();
-            redisTemplate.opsForHash().put("pickedRandomUser", randomUser.getUserId(), randomUser);
-        }
+    public void pickRandomUser() {
+        tournamentService.saveRandomUser();
     }
 }
