@@ -3,9 +3,7 @@ package com.st.eighteen_be.tournament.domain.redishash;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-
-import java.io.Serial;
-import java.io.Serializable;
+import org.springframework.data.redis.core.index.Indexed;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.domain.redishash
@@ -18,23 +16,28 @@ import java.io.Serializable;
  * -----------------------------------------------------------
  * 24. 8. 28.        ipeac       최초 생성
  */
-@RedisHash("RandomUser")
+@RedisHash("randomUser")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PUBLIC)
-public class RandomUser  implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class RandomUser {
     @Id
-    private String userId;
+    private String uid;
+
+    @Indexed
+    private Integer userNo;
     private String profileImageUrl;
 
-    public static RandomUser of(String userId, String profileImageUrl) {
+    public static RandomUser of(int userNo, String profileImageUrl) {
         return RandomUser.builder()
-                .userId(userId)
+                .uid(createUid(userNo))
+                .userNo(userNo)
                 .profileImageUrl(profileImageUrl)
                 .build();
+    }
+
+    public static String createUid(int userNo) {
+        return "randomUser:" + userNo;
     }
 }

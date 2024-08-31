@@ -42,6 +42,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class TournamentService {
+    public static final String RANDOM_USER_KEY = "randomUser";
     private final TournamentEntityRepository tournamentEntityRepository;
     private final TournamentParticipantRepository tournamentParticipantEntityRepository;
     private final VoteEntityRepository voteEntityRepository;
@@ -79,20 +80,40 @@ public class TournamentService {
     }
 
     private void saveRandomParticipantsFromRedis(TournamentEntity newTournament) {
-        Objects.requireNonNull(redisTemplate.opsForList().range("pickedRandomUser", 0, 15)).forEach(randomUser -> {
-            tournamentParticipantEntityRepository.save(TournamentParticipantEntity.of(randomUser.getUserId(), newTournament));
-        });
+        Objects.requireNonNull(redisTemplate.opsForHash().entries(RANDOM_USER_KEY))
+                .values()
+                .forEach(randomUser -> {
+                    TournamentParticipantEntity participant = TournamentParticipantEntity.from(newTournament, (RandomUser) randomUser);
+                    tournamentParticipantEntityRepository.save(participant);
+                });
     }
 
-    public List<UserRandomResponseDto> pickRandomUser() {
+    @Transactional(readOnly = false)
+    public List<UserRandomResponseDto> saveRandomUser() {
         log.info("pickRandomUser start");
 
+        // Redis에서 기존 값을 삭제합니다.
+        deleteAlreadyExistRamdomUserFromRedis();
+
         //TODO 향후 : 참가자는 해당 카테고리에 맞는 사람들로 가져와야한다. 지금은 랜덤으로 16명을 그냥 뽑는 형식이다.
-        List<UserRandomResponseDto> randomUser = userRepository.findRandomUser();
+        List<UserRandomResponseDto> pickedRandomUser = userRepository.findRandomUser();
 
-        validateRandomUserCount(randomUser);
+        validateRandomUserCount(pickedRandomUser);
 
-        return randomUser;
+        putRandomUserToRedis(pickedRandomUser);
+
+        return pickedRandomUser;
+    }
+
+    private void deleteAlreadyExistRamdomUserFromRedis() {
+        redisTemplate.delete(RANDOM_USER_KEY);
+    }
+
+    private void putRandomUserToRedis(List<UserRandomResponseDto> pickedRandomUser) {
+        for (UserRandomResponseDto user : pickedRandomUser) {
+            RandomUser randomUser = user.toRandomUser();
+            redisTemplate.opsForHash().put(RANDOM_USER_KEY, randomUser.getUid(), randomUser);
+        }
     }
 
     private static void validateRandomUserCount(List<UserRandomResponseDto> randomUser) {

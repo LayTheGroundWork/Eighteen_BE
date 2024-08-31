@@ -31,9 +31,6 @@ public class UserRandomResponseDto {
     }
 
     public RandomUser toRandomUser() {
-        return RandomUser.builder()
-                .userId(String.valueOf(userId))
-                .profileImageUrl(profileImageUrl)
-                .build();
+        return RandomUser.of(userId, profileImageUrl);
     }
 }
