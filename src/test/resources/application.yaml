@@ -1,5 +1,11 @@
 spring:
-
+  config:
+    import:
+      - optional:file:Eighteen_Be_Setting/application-jwt.yaml
+      - optional:file:Eighteen_Be_Setting/application-neis.yaml
+      - optional:file:Eighteen_Be_Setting/application-s3.yaml
+      - optional:file:Eighteen_Be_Setting/application-sms.yaml
+      - optional:file:Eighteen_Be_Setting/application-symmetric.yaml
   data:
     mongodb:
       uri: mongodb://localhost:27017/test
