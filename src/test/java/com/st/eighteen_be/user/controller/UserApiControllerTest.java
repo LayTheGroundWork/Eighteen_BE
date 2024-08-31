@@ -8,8 +8,6 @@ import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
-import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
-import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -116,7 +114,7 @@ class UserApiControllerTest {
         List<String> keys = new ArrayList<>();
         keys.add("testKey");
 
-        when(userService.save(signUpRequestDto,keys)).thenReturn(new SignUpResponseDto(userInfo,roles,keys));
+        when(userService.save(signUpRequestDto,keys)).thenReturn(jwtTokenDto);
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)
