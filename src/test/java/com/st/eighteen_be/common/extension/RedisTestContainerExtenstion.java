@@ -24,19 +24,21 @@ public class RedisTestContainerExtenstion implements AfterAllCallback {
             .withExposedPorts(6379)
             .withReuse(true)
             .withEnv("ALLOW_EMPTY_PASSWORD", "yes");
-    
+
     static {
         REDIS_CONTAINER.start();
     }
-    
+
     @DynamicPropertySource
     public static void overrideProps(DynamicPropertyRegistry registry) {
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
         registry.add("spring.data.redis.port", () -> "" + REDIS_CONTAINER.getMappedPort(6379));
     }
-    
+
     @Override
-    public void afterAll(ExtensionContext context) throws Exception {
-        REDIS_CONTAINER.stop();
+    public void afterAll(ExtensionContext context) {
+        if (REDIS_CONTAINER.isRunning()) {
+            REDIS_CONTAINER.stop();
+        }
     }
 }
