@@ -108,6 +108,6 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
             throw new BadRequestException(ErrorCode.INVALID_PARAMETER);
         }
         
-        return tournamentParticipantEntity.userId.eq(voteeId);
+        return tournamentParticipantEntity.userNo.eq(voteeId);
     }
 }

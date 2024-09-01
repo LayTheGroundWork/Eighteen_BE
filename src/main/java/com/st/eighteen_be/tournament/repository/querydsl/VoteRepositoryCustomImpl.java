@@ -23,7 +23,7 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
     public List<TournamentVoteResultResponseDTO> findTournamentVoteResult(Long tournamentNo) {
         
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
-                tournamentParticipantEntity.userId,
+                tournamentParticipantEntity.userNo,
                 tournamentParticipantEntity.score,
                 Expressions.constant("임의 프로필 값입니다. 추후 수정필요"));
         
@@ -46,7 +46,7 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
     }
     
     private static BooleanExpression getUserId() {
-        return tournamentParticipantEntity.userId.eq(userInfo.uniqueId);
+        return tournamentParticipantEntity.userNo.eq(userInfo.uniqueId);
     }
     
     private static BooleanExpression eqJoinParticipantNo() {

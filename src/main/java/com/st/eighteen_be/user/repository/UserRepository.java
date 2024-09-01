@@ -24,6 +24,6 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
             "FROM UserInfo AS UI " +
             "LEFT JOIN UserProfiles AS UP ON UI.id = UP.user.id" +
             " WHERE UP.imageKey IS NULL OR UP.imageKey != 'default_image'" +
-            " ORDER BY RAND() LIMIT 16")
+            " ORDER BY RAND() LIMIT 32")
     List<UserRandomResponseDto> findRandomUser();
 }
