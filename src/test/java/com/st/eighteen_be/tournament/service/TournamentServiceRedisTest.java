@@ -66,7 +66,7 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
     void When_saveRandomUser_Then_saveRandomUser() {
         //given
         List<UserRandomResponseDto> userRandomResponseDtos = new ArrayList<>();
-        for (int i = 1; i <= 16; i++) {
+        for (int i = 1; i <= 32; i++) {
             userRandomResponseDtos.add(UserRandomResponseDto.of(i, "http://test.com"));
         }
 
@@ -80,7 +80,7 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
         redisTemplate.opsForHash().entries(RANDOM_USER).forEach((k, v) -> {
             RandomUser randomUser = (RandomUser) v;
 
-            assertThat(randomUser.getUserNo()).isBetween(1, 16);
+            assertThat(randomUser.getUserNo()).isBetween(1, 32);
             assertThat(randomUser.getProfileImageUrl()).isEqualTo("http://test.com");
         });
     }

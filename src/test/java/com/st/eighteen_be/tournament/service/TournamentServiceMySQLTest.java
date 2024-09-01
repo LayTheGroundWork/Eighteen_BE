@@ -37,16 +37,17 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.st.eighteen_be.tournament.domain.entity.TournamentEntity.THUMBNAIL_DEFAULT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.service
@@ -92,8 +93,9 @@ class TournamentServiceMySQLTest {
     @BeforeEach
     void setUp() {
         tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, redisTemplate);
-
+        
         given(redisTemplate.opsForList()).willReturn(listOperations);
+        given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
     }
 
     @Test
@@ -156,16 +158,14 @@ class TournamentServiceMySQLTest {
         );
 
         //redisTemplate.opsForList() 모킹
-        when(redisTemplate.opsForList().range(anyString(), anyLong(), anyLong())).thenReturn(List.of(
-                RandomUser.builder().uid("user1").build(),
-                RandomUser.builder().uid("user2").build(),
-                RandomUser.builder().uid("user3").build(),
-                RandomUser.builder().uid("user4").build(),
-                RandomUser.builder().uid("user5").build(),
-                RandomUser.builder().uid("user6").build(),
-                RandomUser.builder().uid("user7").build(),
-                RandomUser.builder().uid("user8").build()
-        ));
+        Map<String, RandomUser> randomUsersMap = IntStream.range(0, 16)
+                                                         .boxed()
+                                                         .collect(Collectors.toMap(
+                                                                 String::valueOf,
+                                                                 i -> RandomUser.of(1, "http://test.com")
+                                                         ));
+        
+        given(hashOperations.entries(anyString())).willReturn( randomUsersMap);
 
         // when
         tournamentService.startTournament();
@@ -197,36 +197,28 @@ class TournamentServiceMySQLTest {
         @DisplayName("토너먼트 시작시 토너먼트 참가자가 랜덤으로 선정되는지 확인한다.")
         void When_startTournament_Then_pickRandomUser() {
             // given
-            final int savedParticipantCount = 8 * TournamentCategoryEnums.values().length;
-
-            TournamentEntity tournament = TournamentEntity.builder()
-                                                  .category(TournamentCategoryEnums.GAME)
-                                                  .season(1)
-                                                  .build();
-
-            em.persist(tournament);
-
+            final int savedParticipantCount = 32;
+            final int expectedCount = savedParticipantCount * TournamentCategoryEnums.values().length;
+            
             //토너먼트 참여자 선정 모킹 데이터 given
-            given(redisTemplate.opsForList().range("pickedRandomUser", 0, 15)).willReturn(List.of(
-                    RandomUser.builder().uid("user1").build(),
-                    RandomUser.builder().uid("user2").build(),
-                    RandomUser.builder().uid("user3").build(),
-                    RandomUser.builder().uid("user4").build(),
-                    RandomUser.builder().uid("user5").build(),
-                    RandomUser.builder().uid("user6").build(),
-                    RandomUser.builder().uid("user7").build(),
-                    RandomUser.builder().uid("user8").build()
-            ));
-
+            Map<String, RandomUser> randomUsersMap = IntStream.range(0, savedParticipantCount)
+                                                             .boxed()
+                                                             .collect(Collectors.toMap(
+                                                                     String::valueOf,
+                                                                     i -> RandomUser.of(i,"http://test.com")
+                                                             ));
+            
+            given(hashOperations.entries(anyString())).willReturn(randomUsersMap);
+            
             // when
             tournamentService.startTournament();
 
             // then
             List<TournamentParticipantEntity> foundAll = tournamentParticipantEntityRepository.findAll();
-
+            
             assertThat(foundAll)
                     .isNotEmpty()
-                    .hasSize( savedParticipantCount);
+                    .hasSize(expectedCount);
         }
 
         @Test
@@ -534,14 +526,16 @@ class TournamentServiceMySQLTest {
         }
 
         @Test
-        @DisplayName("랜덤 유저 선정시 유저가 16명 이상인 경우 랜덤 유저를 선정한다. - Redis 테스트")
+        @DisplayName("랜덤 유저 선정시 유저가 32명 이상인 경우 랜덤 유저를 선정한다. - Redis 테스트")
         void When_pickRandomUser_Then_returnRandomUser() {
             // given
+            final int pickedUserCount = 32;
+            
             given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
-
+            
             List<UserInfo> userInfos = new ArrayList<>();
-
-            for (int i = 1; i <= 16; i++) {
+            
+            for (int i = 1; i <= pickedUserCount; i++) {
                 UserInfo user = UserInfo.builder()
                         .birthDay(LocalDate.now())
                         .phoneNumber("010-1234-567" + i)
@@ -560,7 +554,7 @@ class TournamentServiceMySQLTest {
             // then
             assertThat(actual)
                     .isNotEmpty()
-                    .hasSize(16);
+                    .hasSize(pickedUserCount);
         }
     }
 }
