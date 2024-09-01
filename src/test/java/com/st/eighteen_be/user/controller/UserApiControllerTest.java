@@ -7,7 +7,6 @@ import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
-import com.st.eighteen_be.user.dto.response.SignUpResponseDto;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,9 +64,6 @@ class UserApiControllerTest {
     private SignUpRequestDto signUpRequestDto; // 테스트에 사용할 SignUpRequestDto 객체
 
     private ObjectMapper objectMapper; // JSON 직렬화/역직렬화를 위한 ObjectMapper 객체
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     private final String phoneNumber = "01012341234";
 
