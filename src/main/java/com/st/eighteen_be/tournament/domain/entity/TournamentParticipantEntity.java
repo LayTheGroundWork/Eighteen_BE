@@ -30,8 +30,8 @@ public class TournamentParticipantEntity extends BaseEntity {
 
     @Size(max = 200)
     @Comment("토너먼트 참가자 ID")
-    @Column(name = "USER_ID", length = 200)
-    private String userId;
+    @Column(name = "USER_NO", length = 200)
+    private String userNo;
 
     @Size(max = 300)
     @Comment("토너먼트 참가자 이미지 URL")
@@ -43,15 +43,15 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Column(name = "SCORE")
     private long score = 0;
 
-    public static TournamentParticipantEntity of(String userId) {
+    public static TournamentParticipantEntity of(String userNo) {
         return TournamentParticipantEntity.builder()
-                .userId(userId)
+                .userNo(userNo)
                 .build();
     }
 
-    public static TournamentParticipantEntity of(String userId, TournamentEntity tournament) {
+    public static TournamentParticipantEntity of(String userNo, TournamentEntity tournament) {
         return TournamentParticipantEntity.builder()
-                .userId(userId)
+                .userNo(userNo)
                 .tournament(tournament)
                 .build();
     }
@@ -59,7 +59,7 @@ public class TournamentParticipantEntity extends BaseEntity {
     public static TournamentParticipantEntity from(TournamentEntity newTournament, RandomUser randomUser) {
         return TournamentParticipantEntity.builder()
                 .tournament(newTournament)
-                .userId(String.valueOf(randomUser.getUserNo()))
+                .userNo(String.valueOf(randomUser.getUserNo()))
                 .userImageUrl(randomUser.getProfileImageUrl())
                 .build();
     }

@@ -20,7 +20,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PUBLIC)
+@Builder(access = AccessLevel.PRIVATE)
 public class RandomUser {
     @Id
     private String uid;

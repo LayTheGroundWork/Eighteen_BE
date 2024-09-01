@@ -74,7 +74,7 @@ public class TournamentService {
             int newSeason = lastestTournament == null ? 1 : lastestTournament.getSeason() + 1;
             TournamentEntity newTournament = createNewTournament(category, newSeason);
 
-            //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다. -- 현재는 랜덤 16명의 회원에 대해 카테고리별로 분류가 되어 있지 않기에, 그냥 16명을 전부 참가자로 설정하도록 되어 있다.
+            //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다. -- 현재는 랜덤 32명의 회원에 대해 카테고리별로 분류가 되어 있지 않기에, 그냥 16명을 전부 참가자로 설정하도록 되어 있다.
             saveRandomParticipantsFromRedis(newTournament);
         }
     }
@@ -95,7 +95,7 @@ public class TournamentService {
         // Redis에서 기존 값을 삭제합니다.
         deleteAlreadyExistRamdomUserFromRedis();
 
-        //TODO 향후 : 참가자는 해당 카테고리에 맞는 사람들로 가져와야한다. 지금은 랜덤으로 16명을 그냥 뽑는 형식이다.
+        //TODO 향후 : 참가자는 해당 카테고리에 맞는 사람들로 가져와야한다. 지금은 랜덤으로 32명을 그냥 뽑는 형식이다.
         List<UserRandomResponseDto> pickedRandomUser = userRepository.findRandomUser();
 
         validateRandomUserCount(pickedRandomUser);
@@ -117,7 +117,7 @@ public class TournamentService {
     }
 
     private static void validateRandomUserCount(List<UserRandomResponseDto> randomUser) {
-        if(randomUser.size() < 16) {
+        if(randomUser.size() != 32) {
             throw new BadRequestException(ErrorCode.NOT_ENOUGH_USER);
         }
     }
