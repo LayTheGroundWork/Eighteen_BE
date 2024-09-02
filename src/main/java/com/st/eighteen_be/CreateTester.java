@@ -4,6 +4,7 @@ import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserProfiles;
 import com.st.eighteen_be.user.domain.UserRoles;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -29,6 +30,7 @@ public class CreateTester {
     private static final Set<String> TESTER_ROLES = Set.of("USER");
     private static final String IMAGE_KEY = "testKey";
 
+
     private final UserRepository userRepository;
 
     @PostConstruct
@@ -46,6 +48,7 @@ public class CreateTester {
                 .birthDay(TESTER_BIRTHDAY)
                 .schoolData(TESTER_SCHOOL_DATA)
                 .uniqueId(TESTER_UNIQUE_ID)
+                .category(CategoryType.ETC)
                 .build();
 
         UserRoles userRoles = UserRoles.builder()

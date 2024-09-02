@@ -3,6 +3,7 @@ package com.st.eighteen_be.user.domain;
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
+import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -32,6 +33,10 @@ public class UserInfo extends BaseEntity {
 
     @Embedded
     private SchoolData schoolData;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CategoryType category;
 
     // 약관 정보 N:M
 
@@ -70,9 +75,10 @@ public class UserInfo extends BaseEntity {
     // 10문 10답
 
     @Builder
-    public UserInfo(SchoolData schoolData, String phoneNumber, LocalDate birthDay, String nickName,
-                    String uniqueId, String introduction, String mbti, int likeCount) {
+    public UserInfo(SchoolData schoolData, CategoryType category, String phoneNumber, LocalDate birthDay,
+                    String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
         this.schoolData = schoolData;
+        this.category = category;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;
         this.nickName = nickName;

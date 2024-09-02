@@ -5,8 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
-import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,6 +92,7 @@ class UserApiControllerTest {
                 .nickName(nickName)
                 .schoolData(schoolData)
                 .birthDay(birthDay)
+                .category(CategoryType.ETC.getCategory())
                 .build();
 
         // ObjectMapper에 JavaTimeModule 등록
@@ -103,7 +104,6 @@ class UserApiControllerTest {
     @DisplayName("회원 가입")
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
-        UserInfo userInfo = signUpRequestDto.toEntity("encryptPhoneNumber");
         Set<String> roles = new HashSet<>();
         roles.add("USER");
 
@@ -111,6 +111,7 @@ class UserApiControllerTest {
         keys.add("testKey");
 
         when(userService.save(signUpRequestDto,keys)).thenReturn(jwtTokenDto);
+        when(userService.signIn(phoneNumber)).thenReturn(jwtTokenDto);
 
         // when: 실제 API 호출
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(SIGN_UP_URL)
