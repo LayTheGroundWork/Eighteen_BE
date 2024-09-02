@@ -114,7 +114,7 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, userService.findByUniqueId(uniqueId));
     }
 
-    @Operation(summary = "회원 전체 조회", description = "회원 전체 조회")
+    @Operation(summary = "좋아요 여부 포함된 회원 전체 조회", description = "좋아요 여부 포함된 회원 전체 조회")
     @PostMapping("/v1/api/user/find-all")
     public ApiResp<List<UserProfileResponseDto>> findAll(@RequestHeader("Authorization") String accessToken){
         return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(accessToken));
