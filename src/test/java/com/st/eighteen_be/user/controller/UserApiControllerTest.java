@@ -7,6 +7,7 @@ import com.st.eighteen_be.user.WithCustomMockUser;
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -103,7 +104,7 @@ class UserApiControllerTest {
     @DisplayName("회원 가입")
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
-        UserInfo userInfo = signUpRequestDto.toEntity("encryptPhoneNumber");
+        UserInfo userInfo = signUpRequestDto.toEntity("encryptPhoneNumber", CategoryType.ETC);
         Set<String> roles = new HashSet<>();
         roles.add("USER");
 

@@ -21,12 +21,14 @@ public class UserDetailsResponseDto {
     private String location;
     private String schoolName;
     private List<String> snsLinks;
+    private String category;
     private List<String> question;
 
     @Builder
     public UserDetailsResponseDto(UserInfo entity, int likeCount, List<String> images, List<String> snsLinks) {
         this.id = entity.getId();
         this.profileImages = images;
+        this.category = entity.getCategory().getCategory();
         this.likeCount = likeCount;
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();

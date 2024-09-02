@@ -1,6 +1,7 @@
 package com.st.eighteen_be.user.dto.response;
 
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +22,10 @@ public class SignUpResponseDto {
     private LocalDate birthDay;
     private String location;
     private String schoolName;
+    private String category;
 
     @Builder
-    public SignUpResponseDto(UserInfo entity, Set<String> roles, List<String> profileKeys){
+    public SignUpResponseDto(UserInfo entity, Set<String> roles, List<String> profileKeys, CategoryType category){
         this.id = entity.getId();
         this.profiles = profileKeys;
         this.roles = roles;
@@ -32,6 +34,7 @@ public class SignUpResponseDto {
         this.birthDay = entity.getBirthDay();
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
+        this.category = category.getCategory();
     }
 
 }

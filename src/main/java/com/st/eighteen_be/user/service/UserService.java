@@ -15,6 +15,7 @@ import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
@@ -58,8 +59,10 @@ public class UserService {
 
     public JwtTokenDto save(@NotNull SignUpRequestDto requestDto, List<String> keys) {
         try {
+
             UserInfo user = requestDto.toEntity(
-                    encryptService.encryptPhoneNumber(requestDto.phoneNumber()));
+                    encryptService.encryptPhoneNumber(requestDto.phoneNumber()),
+                    CategoryType.of(requestDto.category()));
 
             UserRoles userRoles = UserRoles.builder()
                     .role(RolesType.USER)

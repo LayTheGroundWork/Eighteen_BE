@@ -2,6 +2,7 @@ package com.st.eighteen_be.user.dto.request;
 
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -56,16 +57,21 @@ public record SignUpRequestDto(
         @NotNull(message = "학교는 필수 입력 값 입니다.")
         @Schema(description = "회원가입자 학교정보",
                 example = "{\"schoolName\":\"서울고등학교\", \"schoolLocation\":\"서울\"}")
-        SchoolData schoolData
+        SchoolData schoolData,
+
+        @NotNull(message = "카테고리는 필수 입니다.")
+        @Schema(description = "회원가입자 카테고리", example = "기타")
+        String category
 ) {
 
-    public UserInfo toEntity(String encryptPhoneNumber) {
+    public UserInfo toEntity(String encryptPhoneNumber, CategoryType category) {
         return UserInfo.builder()
                 .phoneNumber(encryptPhoneNumber)
                 .uniqueId(uniqueId)
                 .nickName(nickName)
                 .schoolData(schoolData)
                 .birthDay(birthDay)
+                .category(category)
                 .build();
     }
 }
