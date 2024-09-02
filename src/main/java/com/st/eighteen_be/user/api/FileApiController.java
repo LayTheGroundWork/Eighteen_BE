@@ -21,7 +21,7 @@ public class FileApiController {
 
     private final S3Service s3Service;
 
-    @Operation(summary = "미디어 파일 업로드", description = "미디어 파일 업로드")
+    @Operation(summary = "preSignedUrl & 접근 key 생성", description = "s3에 이미지 업로드를 위한 url 및 접근 key 생성")
     @PostMapping("/v1/api/file/upload")
     public ApiResp<List<String[]>> fileUpload(@RequestParam("fileNames") List<String> fileNames,
                                             @RequestParam("uniqueId") String uniqueId) throws IOException {
@@ -29,20 +29,20 @@ public class FileApiController {
         return ApiResp.success(HttpStatus.OK, s3Service.generateUploadPreSignedUrls(fileNames,uniqueId));
     }
 
-    @Operation(summary = "미디어 파일 삭제", description = "미디어 파일 삭제")
+    @Operation(summary = "접근 key로 미디어 파일 삭제", description = "접근 key로 미디어 파일 삭제")
     @DeleteMapping("/v1/api/file/delete")
     public ApiResp<String> fileDelete(@RequestParam("key") String key, @RequestParam("uniqueId") String uniqueId){
         s3Service.delete(key,uniqueId);
         return ApiResp.success(HttpStatus.OK, "Delete Complete");
     }
 
-    @Operation(summary = "미디어 파일 조회", description = "미디어 파일 조회")
+    @Operation(summary = "접근 key로 미디어 파일 조회", description = "접근 key로 미디어 파일 조회")
     @GetMapping("/v1/api/file/view")
     public ApiResp<String> fileView(@RequestParam("key") String key, @RequestParam("uniqueId") String uniqueId) {
         return ApiResp.success(HttpStatus.OK,s3Service.getPreSignedURL(key,uniqueId));
     }
 
-    @Operation(summary = "미디어 파일 전체 조회", description = "미디어 파일 전체 조회")
+    @Operation(summary = "폴더명으로 미디어 파일 전체 조회", description = "폴더명으로 미디어 파일 전체 조회")
     @GetMapping("/v1/api/file/view-all")
     public ApiResp<List<String>> fileTotalView(@RequestParam("uniqueId") String uniqueId) {
         return ApiResp.success(HttpStatus.OK,s3Service.getPreSignedURLsForFolder(uniqueId));

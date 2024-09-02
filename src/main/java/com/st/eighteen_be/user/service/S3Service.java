@@ -2,6 +2,7 @@ package com.st.eighteen_be.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -58,7 +59,7 @@ public class S3Service {
             String storeFilename = generateStoreFilename(originalFilename);
 
             // Construct the S3 key using the user's unique ID and the generated filename
-            String s3Key = uniqueId + "/" + storeFilename;
+            String s3Key = getS3Key(uniqueId, storeFilename);
 
             // Create a PUT object request with metadata such as content type
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -87,6 +88,10 @@ public class S3Service {
         }
     }
 
+    private static @NotNull String getS3Key(String uniqueId, String storeFilename) {
+        return uniqueId + "/" + storeFilename;
+    }
+
     // 기존 S3Presigner 생성 메서드
     private S3Presigner createS3Presigner() {
         return S3Presigner.builder()
@@ -111,7 +116,7 @@ public class S3Service {
     /* 2. 파일 삭제 */
     public void delete(String storeFilename, String uniqueId) {
         try {
-            String s3Key = uniqueId + "/" + storeFilename;
+            String s3Key = getS3Key(uniqueId, storeFilename);
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
                     .key(s3Key)
@@ -126,7 +131,7 @@ public class S3Service {
     /* 3. 파일의 preSigned URL 반환 */
     public String getPreSignedURL(String storeFilename, String uniqueId) {
         try {
-            String s3Key = uniqueId + "/" + storeFilename;
+            String s3Key = getS3Key(uniqueId, storeFilename);
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
                     .key(s3Key)
