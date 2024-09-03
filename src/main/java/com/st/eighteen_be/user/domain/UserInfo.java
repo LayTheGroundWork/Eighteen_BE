@@ -38,11 +38,6 @@ public class UserInfo extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CategoryType category;
 
-    // 약관 정보 N:M
-
-    // 회원 신고 내역 N:M -> 연관테이블 : 신고내역 테이블
-
-
     @Column(nullable = false)
     private String phoneNumber;
 
@@ -70,9 +65,15 @@ public class UserInfo extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserLike> userLikes = new ArrayList<>();
 
+    // 10문 10답
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserQuestion> userQuestions = new ArrayList<>();
+
     private int likeCount;
 
-    // 10문 10답
+    // 약관 정보 N:M
+
+    // 회원 신고 내역 N:M -> 연관테이블 : 신고내역 테이블
 
     @Builder
     public UserInfo(SchoolData schoolData, CategoryType category, String phoneNumber, LocalDate birthDay,
@@ -101,6 +102,11 @@ public class UserInfo extends BaseEntity {
     public void addProfile(UserProfiles userProfile){
         this.profiles.add(userProfile);
         userProfile.setUser(this);
+    }
+
+    public void addQuestionAndAnswer(UserQuestion userQuestion) {
+        this.userQuestions.add(userQuestion);
+        userQuestion.setUser(this);
     }
 
     public void update(){}
