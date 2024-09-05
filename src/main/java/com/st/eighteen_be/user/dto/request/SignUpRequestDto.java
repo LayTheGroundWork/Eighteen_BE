@@ -24,7 +24,6 @@ import java.time.LocalDate;
  * 2024-04-18        ehgur             최초 생성
  */
 
-@Slf4j
 @Builder
 public record SignUpRequestDto(
 
