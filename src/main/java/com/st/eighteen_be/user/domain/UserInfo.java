@@ -63,6 +63,8 @@ public class UserInfo extends BaseEntity {
     @Column(length = 4)
     private String mbti;
 
+    private boolean tournamentJoin;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserLike> userLikes = new ArrayList<>();
 
@@ -78,7 +80,7 @@ public class UserInfo extends BaseEntity {
 
     @Builder
     public UserInfo(SchoolData schoolData, CategoryType category, String phoneNumber, LocalDate birthDay,
-                    String nickName, String uniqueId, String introduction, String mbti, int likeCount) {
+                    String nickName, String uniqueId, String introduction, String mbti, int likeCount, boolean tournamentJoin) {
         this.schoolData = schoolData;
         this.category = category;
         this.phoneNumber = phoneNumber;
@@ -86,6 +88,7 @@ public class UserInfo extends BaseEntity {
         this.nickName = nickName;
         this.uniqueId = uniqueId;
         this.introduction = introduction;
+        this.tournamentJoin = tournamentJoin;
         this.mbti = mbti;
         this.likeCount = likeCount;
     }
