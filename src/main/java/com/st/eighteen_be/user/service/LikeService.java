@@ -32,10 +32,14 @@ public class LikeService {
 
     public void addLike(String accessToken, Integer likedId){
         String likerId = getUserUniqueIdFromRequest(accessToken);
+
+        if(userRepository.findById(likedId).isEmpty()){
+            throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
+        }
+
         String userLikesKey = USER_LIKES_PREFIX + likerId;
 
         if (Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
-            //TODO: 레디스에 없지만 DB에는 있는지 확인하는 로직이 필요함
             throw new IllegalStateException("Already liked");
         }
 
