@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class UserInfo extends BaseEntity {
     @Column(length = 4)
     private String mbti;
 
+    @ColumnDefault("true")
     private boolean tournamentJoin;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -72,6 +74,7 @@ public class UserInfo extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserQuestion> userQuestions = new ArrayList<>();
 
+    @ColumnDefault("0")
     private int likeCount;
 
     // 약관 정보 N:M
@@ -88,9 +91,9 @@ public class UserInfo extends BaseEntity {
         this.nickName = nickName;
         this.uniqueId = uniqueId;
         this.introduction = introduction;
-        this.tournamentJoin = tournamentJoin;
         this.mbti = mbti;
         this.likeCount = likeCount;
+        this.tournamentJoin = tournamentJoin;
     }
 
     public void addSnsLink(UserSnsLink snsLink) {

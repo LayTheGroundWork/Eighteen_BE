@@ -83,6 +83,7 @@ class UserApiControllerTest {
         String nickName = "ehgur";
         String schoolName = "서울고등학교";
         String schoolLocation = "서울 송파구";
+        boolean tournament = true;
 
         SchoolData schoolData = new SchoolData(schoolName, schoolLocation);
 
@@ -93,6 +94,7 @@ class UserApiControllerTest {
                 .schoolData(schoolData)
                 .birthDay(birthDay)
                 .category(CategoryType.ETC.getCategory())
+                .tournamentJoin(tournament)
                 .build();
 
         // ObjectMapper에 JavaTimeModule 등록
