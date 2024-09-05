@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor
@@ -22,10 +23,10 @@ public class UserDetailsResponseDto {
     private String schoolName;
     private List<String> snsLinks;
     private String category;
-    private List<String> question;
+    private Map<String,String> question;
 
     @Builder
-    public UserDetailsResponseDto(UserInfo entity, int likeCount, List<String> images, List<String> snsLinks) {
+    public UserDetailsResponseDto(UserInfo entity, int likeCount, List<String> images, List<String> snsLinks, Map<String,String> question) {
         this.id = entity.getId();
         this.profileImages = images;
         this.category = entity.getCategory().getCategory();
@@ -36,7 +37,7 @@ public class UserDetailsResponseDto {
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
         this.snsLinks = snsLinks;
-        //this.question = entity.getQuestion();
+        this.question = question;
     }
 
 }

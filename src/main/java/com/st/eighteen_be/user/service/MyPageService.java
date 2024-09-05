@@ -1,8 +1,12 @@
 package com.st.eighteen_be.user.service;
 
-import com.st.eighteen_be.user.repository.UserRepository;
+import com.st.eighteen_be.jwt.JwtTokenProvider;
+import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
+import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,12 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MyPageService {
 
-    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
-    //TODO: mbti, 자기소개글, 질문리스트 작성(최소 3개) 추가 및 수정 기능 만들기
-    // 마이 페이지는 첫 단계에서는 프론트에서 넘어온 값만 저장하면 됨
-    // 이미 값이 존재하고 수정 api를 호출할 회원 id와 어떤 항목을 수정할건지 넘겨주면 됨
+    @Transactional(readOnly = true)
+    public UserDetailsResponseDto view(String accessToken){
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
+        return userService.findByUniqueId(authentication.getName());
+    }
 
+    public void update(MyPageRequestDto requestDto, String accessToken) {
 
+        UserInfo userInfo = userService.findByToken(accessToken);
+        userInfo.update(requestDto);
+    }
 }

@@ -3,6 +3,7 @@ package com.st.eighteen_be.user.domain;
 import com.st.eighteen_be.common.basetime.BaseEntity;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
+import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -109,7 +110,15 @@ public class UserInfo extends BaseEntity {
         userQuestion.setUser(this);
     }
 
-    public void update(){}
+    public void update(MyPageRequestDto requestDto){
+        this.mbti = requestDto.getMbti();
+        this.introduction = requestDto.getIntroduction();
+
+        this.userQuestions.clear();  // 기존 엔티티를 삭제하여 orphanRemoval이 작동하도록 함
+        for (UserQuestion question : requestDto.getQuestions()) {
+            addQuestionAndAnswer(question);
+        }
+    }
 
     public void backupLikeCount(int likeCount){
         this.likeCount = likeCount;
