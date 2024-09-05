@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 
@@ -60,7 +59,10 @@ public record SignUpRequestDto(
 
         @NotNull(message = "카테고리는 필수 입니다.")
         @Schema(description = "회원가입자 카테고리", example = "기타")
-        String category
+        String category,
+
+        @Schema(description = "회원가입자 토너먼트 참여 여부", example = "true")
+        boolean tournamentJoin
 ) {
 
     public UserInfo toEntity(String encryptPhoneNumber, CategoryType category) {
@@ -71,6 +73,7 @@ public record SignUpRequestDto(
                 .schoolData(schoolData)
                 .birthDay(birthDay)
                 .category(category)
+                .tournamentJoin(tournamentJoin)
                 .build();
     }
 }

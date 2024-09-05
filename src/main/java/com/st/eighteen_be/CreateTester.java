@@ -29,6 +29,7 @@ public class CreateTester {
     private static final String TESTER_UNIQUE_ID = "Tester";
     private static final Set<String> TESTER_ROLES = Set.of("USER");
     private static final String IMAGE_KEY = "testKey";
+    private static final boolean TOURNAMENT_JOIN = true;
 
 
     private final UserRepository userRepository;
@@ -49,6 +50,7 @@ public class CreateTester {
                 .schoolData(TESTER_SCHOOL_DATA)
                 .uniqueId(TESTER_UNIQUE_ID)
                 .category(CategoryType.ETC)
+                .tournamentJoin(TOURNAMENT_JOIN)
                 .build();
 
         UserRoles userRoles = UserRoles.builder()
