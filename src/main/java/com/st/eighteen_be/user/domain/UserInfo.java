@@ -64,6 +64,8 @@ public class UserInfo extends BaseEntity {
     @Column(length = 4)
     private String mbti;
 
+    private boolean tournamentJoin;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserLike> userLikes = new ArrayList<>();
 
@@ -91,6 +93,7 @@ public class UserInfo extends BaseEntity {
         this.nickName = nickName;
         this.uniqueId = uniqueId;
         this.introduction = introduction;
+        this.tournamentJoin = tournamentJoin;
         this.mbti = mbti;
         this.likeCount = likeCount;
         this.tournamentJoin = tournamentJoin;
