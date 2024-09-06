@@ -26,6 +26,7 @@ import java.util.UUID;
 @Service
 public class S3Service {
 
+    // TODO: lambda 써서 이미지 리사이징 해야함 - 메인화면 썸네일 용이랑 채팅에 쓰일 프로필 사진 용으로
     @Value("${cloud.aws.bucketName}")
     private String bucketName;
 
