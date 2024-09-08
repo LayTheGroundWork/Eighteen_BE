@@ -14,7 +14,7 @@ import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO
  * 24. 5. 27.        ipeac       최초 생성
  */
 public interface TournamentParticipantRepositoryCustom {
-    void updateVotePoints(TournamentVoteRequestDTO voteRequestDTOs);
-    
-    void insertVoteRecord(TournamentVoteRequestDTO voteRequestDTOs);
+    void updateVotePoints(TournamentVoteRequestDTO voteRequestDTOs, String loginedUserId);
+
+    void insertVoteRecord(TournamentVoteRequestDTO voteRequestDTOs, String loginedUserId);
 }

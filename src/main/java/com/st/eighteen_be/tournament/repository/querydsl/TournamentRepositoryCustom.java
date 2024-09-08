@@ -1,7 +1,7 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
+import com.st.eighteen_be.user.enums.CategoryType;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -18,5 +18,5 @@ import java.util.List;
  * 24. 5. 22.        ipeac       최초 생성
  */
 public interface TournamentRepositoryCustom {
-    List<TournamentSearchResponseDTO> findTournamentByCategoryAndPaging(TournamentCategoryEnums category, Pageable pageable);
+    List<TournamentSearchResponseDTO> findTournamentByCategoryAndPaging(CategoryType category, Pageable pageable);
 }

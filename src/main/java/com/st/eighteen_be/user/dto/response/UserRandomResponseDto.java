@@ -20,10 +20,10 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
 public class UserRandomResponseDto {
-    private Integer userId;
+    private String userId;
     private String profileImageUrl;
 
-    public static UserRandomResponseDto of(Integer userId, String profileImageUrl) {
+    public static UserRandomResponseDto of(String userId, String profileImageUrl) {
         return UserRandomResponseDto.builder()
                 .userId(userId)
                 .profileImageUrl(profileImageUrl)

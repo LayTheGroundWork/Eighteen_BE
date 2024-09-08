@@ -4,9 +4,9 @@ import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.scheduler.TournamentScheduler;
 import com.st.eighteen_be.tournament.service.TournamentService;
+import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -66,7 +67,7 @@ public class TournamentApiController {
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
-        List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, TournamentCategoryEnums.findByCategoryOrNull(category));
+        List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, CategoryType.of(category));
 
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }
@@ -76,7 +77,8 @@ public class TournamentApiController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = TournamentVoteRequestDTO.class))
-            )
+            ),
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
@@ -84,8 +86,8 @@ public class TournamentApiController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @PostMapping("/v1/api/tournament/final/vote")
-    public ApiResp<Object> vote(@RequestBody TournamentVoteRequestDTO voteRequest) {
-        tournamentService.processVote(voteRequest);
+    public ApiResp<Object> vote(@RequestBody TournamentVoteRequestDTO voteRequest, @RequestHeader("Authorization") String accessToken) {
+        tournamentService.processVote(voteRequest, accessToken);
 
         return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }

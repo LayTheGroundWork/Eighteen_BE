@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
+import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -31,7 +31,7 @@ public class TournamentRepositoryCustomImpl implements TournamentRepositoryCusto
     private final JPAQueryFactory qf;
 
     @Override
-    public List<TournamentSearchResponseDTO> findTournamentByCategoryAndPaging(TournamentCategoryEnums category, Pageable pageable) {
+    public List<TournamentSearchResponseDTO> findTournamentByCategoryAndPaging(CategoryType category, Pageable pageable) {
         return qf.select(
                         Projections.constructor(
                                 TournamentSearchResponseDTO.class,
@@ -49,7 +49,7 @@ public class TournamentRepositoryCustomImpl implements TournamentRepositoryCusto
                 .fetch();
     }
 
-    private static BooleanExpression eqCategory(TournamentCategoryEnums category) {
+    private static BooleanExpression eqCategory(CategoryType category) {
         if (category == null) {
             return null;
         }

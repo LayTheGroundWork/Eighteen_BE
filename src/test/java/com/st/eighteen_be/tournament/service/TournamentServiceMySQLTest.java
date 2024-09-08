@@ -8,14 +8,15 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultRes
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.repository.UserRepository;
+import com.st.eighteen_be.user.service.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.jetbrains.annotations.NotNull;
@@ -84,6 +85,9 @@ class TournamentServiceMySQLTest {
     @MockBean
     private RedisTemplate<String, RandomUser> redisTemplate;
 
+    @MockBean
+    private UserService userService;
+
     @Mock
     private ListOperations<String, RandomUser> listOperations;
 
@@ -92,8 +96,8 @@ class TournamentServiceMySQLTest {
 
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, redisTemplate);
-        
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, redisTemplate);
+
         given(redisTemplate.opsForList()).willReturn(listOperations);
         given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
     }
@@ -103,17 +107,17 @@ class TournamentServiceMySQLTest {
     void When_searchTournamentByCategory_Then_returnTournamentList() {
         // given
         TournamentEntity tournamentEntity = TournamentEntity.builder()
-                                                    .category(TournamentCategoryEnums.GAME)
+                .category(CategoryType.GAME)
                                                     .build();
 
         TournamentEntity tournamentEntity2 = TournamentEntity.builder()
-                                                     .category(TournamentCategoryEnums.MOVIE)
+                .category(CategoryType.SPORT)
                                                      .build();
 
         tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
 
         // when
-        List<TournamentSearchResponseDTO> actual = tournamentService.search(PageRequest.of(0, 2), TournamentCategoryEnums.GAME);
+        List<TournamentSearchResponseDTO> actual = tournamentService.search(PageRequest.of(0, 2), CategoryType.GAME);
 
         // then
         assertThat(actual).isNotEmpty();
@@ -126,17 +130,17 @@ class TournamentServiceMySQLTest {
     void When_searchTournamentByCategory_Then_returnEmptyList() {
         // given
         TournamentEntity tournamentEntity = TournamentEntity.builder()
-                                                    .category(TournamentCategoryEnums.GAME)
+                .category(CategoryType.GAME)
                                                     .build();
 
         TournamentEntity tournamentEntity2 = TournamentEntity.builder()
-                                                     .category(TournamentCategoryEnums.MOVIE)
+                .category(CategoryType.SPORT)
                                                      .build();
 
         tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
 
         // when
-        List<TournamentSearchResponseDTO> actual = tournamentService.search(PageRequest.of(0, 2), TournamentCategoryEnums.MUSIC);
+        List<TournamentSearchResponseDTO> actual = tournamentService.search(PageRequest.of(0, 2), CategoryType.ETC);
 
         // then
         assertThat(actual).isEmpty();
@@ -162,9 +166,9 @@ class TournamentServiceMySQLTest {
                                                          .boxed()
                                                          .collect(Collectors.toMap(
                                                                  String::valueOf,
-                                                                 i -> RandomUser.of(1, "http://test.com")
+                                                                 i -> RandomUser.of("qkrtkdwns3410", "http://test.com")
                                                          ));
-        
+
         given(hashOperations.entries(anyString())).willReturn( randomUsersMap);
 
         // when
@@ -173,7 +177,7 @@ class TournamentServiceMySQLTest {
         // then
         List<TournamentEntity> actual = tournamentEntityRepository.findAll();
 
-        assertThat(actual).isNotEmpty().hasSize(TournamentCategoryEnums.values().length);
+        assertThat(actual).isNotEmpty().hasSize(CategoryType.values().length);
     }
 
     @Nested
@@ -190,7 +194,7 @@ class TournamentServiceMySQLTest {
 
             assertThat(foundAll)
                     .isNotEmpty()
-                    .hasSize(TournamentCategoryEnums.values().length);
+                    .hasSize(CategoryType.values().length);
         }
 
         @Test
@@ -198,24 +202,24 @@ class TournamentServiceMySQLTest {
         void When_startTournament_Then_pickRandomUser() {
             // given
             final int savedParticipantCount = 32;
-            final int expectedCount = savedParticipantCount * TournamentCategoryEnums.values().length;
-            
+            final int expectedCount = savedParticipantCount * CategoryType.values().length;
+
             //토너먼트 참여자 선정 모킹 데이터 given
             Map<String, RandomUser> randomUsersMap = IntStream.range(0, savedParticipantCount)
                                                              .boxed()
                                                              .collect(Collectors.toMap(
                                                                      String::valueOf,
-                                                                     i -> RandomUser.of(i,"http://test.com")
+                                                                     i -> RandomUser.of("userId" + i, "http://test.com")
                                                              ));
-            
+
             given(hashOperations.entries(anyString())).willReturn(randomUsersMap);
-            
+
             // when
             tournamentService.startTournament();
 
             // then
             List<TournamentParticipantEntity> foundAll = tournamentParticipantEntityRepository.findAll();
-            
+
             assertThat(foundAll)
                     .isNotEmpty()
                     .hasSize(expectedCount);
@@ -227,7 +231,7 @@ class TournamentServiceMySQLTest {
             // given
             List<TournamentEntity> tournamentEntities = new ArrayList<>();
 
-            for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+            for (CategoryType category : CategoryType.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
                                                           .season(2)
                                                           .status(false)
@@ -250,7 +254,7 @@ class TournamentServiceMySQLTest {
 
             assertThat(activeTournaments)
                     .isNotEmpty()
-                    .hasSize(TournamentCategoryEnums.values().length);
+                    .hasSize(CategoryType.values().length);
 
             assertSoftly(
                     softly -> {
@@ -271,7 +275,7 @@ class TournamentServiceMySQLTest {
             // given
             List<TournamentEntity> tournamentEntities = new ArrayList<>();
 
-            for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+            for (CategoryType category : CategoryType.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
                                                           .category(category)
                                                           .build();
@@ -304,13 +308,14 @@ class TournamentServiceMySQLTest {
                                         .phoneNumber("010-1234-567" + i)
                                         .uniqueId("user" + i)
                                         .nickName("name" + i)
+                        .category(CategoryType.ART)
                                         .build();
 
                 em.persist(user);
             }
 
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                                                        .category(TournamentCategoryEnums.GAME)
+                    .category(CategoryType.GAME)
                                                         .build();
 
             tournamentEntityRepository.save(tournamentEntity);
@@ -358,21 +363,21 @@ class TournamentServiceMySQLTest {
             VoteEntity voter1 = VoteEntity.builder()
                                         .tournament(tournamentEntity)
                                         .participant(tournamentParticipantEntities.get(0))
-                                        .voterId("voter1")
+                    .voterId("user1")
                                         .votePoint(1)
                                         .build();
 
             VoteEntity voter2 = VoteEntity.builder()
                                         .tournament(tournamentEntity)
                                         .participant(tournamentParticipantEntities.get(0))
-                                        .voterId("voter2")
+                    .voterId("user2")
                                         .votePoint(1)
                                         .build();
 
             VoteEntity voter3 = VoteEntity.builder()
                                         .tournament(tournamentEntity)
                                         .participant(tournamentParticipantEntities.get(1))
-                                        .voterId("voter3")
+                    .voterId("user3")
                                         .votePoint(3)
                                         .build();
 
@@ -391,23 +396,24 @@ class TournamentServiceMySQLTest {
         void When_voteTournament_Then_processVote() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                                                        .category(TournamentCategoryEnums.GAME)
+                    .category(CategoryType.GAME)
                                                         .build();
 
             tournamentEntityRepository.save(tournamentEntity);
 
             TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
 
-            tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
+            tournamentParticipantEntityRepository.saveAll(result.participantEntities);
 
             TournamentVoteRequestDTO tournamentVoteRequestDTO = TournamentVoteRequestDTO.builder()
-                                                                        .tournamentNo(tournamentEntity.getTournamentNo())
-                                                                        .voterId("voter")
-                                                                        .participantIdsOrderByRank(List.of("user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12", "user13", "user14", "user15", "user16"))
-                                                                        .build();
+                    .tournamentNo(tournamentEntity.getTournamentNo())
+                    .participantIdsOrderByRank(result.participantEntities.stream().map(TournamentParticipantEntity::getUserId).collect(Collectors.toList()))
+                    .build();
+
+            given(userService.findByToken(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
 
             // when
-            tournamentService.processVote(tournamentVoteRequestDTO);
+            tournamentService.processVote(tournamentVoteRequestDTO, "accessToken");
 
             // then
             List<TournamentParticipantEntity> found = tournamentParticipantEntityRepository.findAll();
@@ -428,71 +434,45 @@ class TournamentServiceMySQLTest {
         void When_voteTournament_Then_insertVoteRecord() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                                                        .category(TournamentCategoryEnums.GAME)
+                    .category(CategoryType.GAME)
                                                         .build();
 
             tournamentEntityRepository.save(tournamentEntity);
 
             TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
 
-            tournamentParticipantEntityRepository.saveAll(List.of(result.user1(), result.user2(), result.user3(), result.user4(), result.user5(), result.user6(), result.user7(), result.user8(), result.user9(), result.user10(), result.user11(), result.user12(), result.user13(), result.user14(), result.user15(), result.user16()));
+            tournamentParticipantEntityRepository.saveAll(result.participantEntities);
 
             TournamentVoteRequestDTO tournamentVoteRequestDTO =
                     TournamentVoteRequestDTO.builder()
                             .tournamentNo(tournamentEntity.getTournamentNo())
-                            .voterId("voter")
-                            .participantIdsOrderByRank(List.of("user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12", "user13", "user14", "user15", "user16"))
+                            .participantIdsOrderByRank(result.participantEntities.stream().map(TournamentParticipantEntity::getUserId).collect(Collectors.toList()))
                             .build();
 
+
+            given(userService.findByToken(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
+
             // when
-            tournamentService.processVote(tournamentVoteRequestDTO);
+            tournamentService.processVote(tournamentVoteRequestDTO, "accessToken");
 
             // then
             List<VoteEntity> found = voteEntityRepository.findAll();
 
             assertThat(found)
                     .isNotEmpty()
-                    .hasSize(16);
+                    .hasSize(32);
         }
 
         private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult(TournamentEntity tournamentEntity) {
+            List<TournamentParticipantEntity> participants = IntStream.rangeClosed(1, 32)
+                    .mapToObj(i -> TournamentParticipantEntity.of("user" + i, tournamentEntity))
+                    .toList();
 
-            TournamentParticipantEntity user1 = TournamentParticipantEntity.of("user1", tournamentEntity);
-            TournamentParticipantEntity user2 = TournamentParticipantEntity.of("user2", tournamentEntity);
-            TournamentParticipantEntity user3 = TournamentParticipantEntity.of("user3", tournamentEntity);
-            TournamentParticipantEntity user4 = TournamentParticipantEntity.of("user4", tournamentEntity);
-            TournamentParticipantEntity user5 = TournamentParticipantEntity.of("user5", tournamentEntity);
-            TournamentParticipantEntity user6 = TournamentParticipantEntity.of("user6", tournamentEntity);
-            TournamentParticipantEntity user7 = TournamentParticipantEntity.of("user7", tournamentEntity);
-            TournamentParticipantEntity user8 = TournamentParticipantEntity.of("user8", tournamentEntity);
-            TournamentParticipantEntity user9 = TournamentParticipantEntity.of("user9", tournamentEntity);
-            TournamentParticipantEntity user10 = TournamentParticipantEntity.of("user10", tournamentEntity);
-            TournamentParticipantEntity user11 = TournamentParticipantEntity.of("user11", tournamentEntity);
-            TournamentParticipantEntity user12 = TournamentParticipantEntity.of("user12", tournamentEntity);
-            TournamentParticipantEntity user13 = TournamentParticipantEntity.of("user13", tournamentEntity);
-            TournamentParticipantEntity user14 = TournamentParticipantEntity.of("user14", tournamentEntity);
-            TournamentParticipantEntity user15 = TournamentParticipantEntity.of("user15", tournamentEntity);
-            TournamentParticipantEntity user16 = TournamentParticipantEntity.of("user16", tournamentEntity);
-
-            return new TournamentParticipantTestResult(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10, user11, user12, user13, user14, user15, user16);
+            return new TournamentParticipantTestResult(participants);
         }
 
-        private record TournamentParticipantTestResult(TournamentParticipantEntity user1,
-                                                       TournamentParticipantEntity user2,
-                                                       TournamentParticipantEntity user3,
-                                                       TournamentParticipantEntity user4,
-                                                       TournamentParticipantEntity user5,
-                                                       TournamentParticipantEntity user6,
-                                                       TournamentParticipantEntity user7,
-                                                       TournamentParticipantEntity user8,
-                                                       TournamentParticipantEntity user9,
-                                                       TournamentParticipantEntity user10,
-                                                       TournamentParticipantEntity user11,
-                                                       TournamentParticipantEntity user12,
-                                                       TournamentParticipantEntity user13,
-                                                       TournamentParticipantEntity user14,
-                                                       TournamentParticipantEntity user15,
-                                                       TournamentParticipantEntity user16) {
+        private record TournamentParticipantTestResult(List<TournamentParticipantEntity> participantEntities) {
+
         }
     }
 
@@ -500,7 +480,7 @@ class TournamentServiceMySQLTest {
     @DisplayName("토너먼트 참가자 선정 테스트")
     class PickRandomUserTest {
         @Test
-        @DisplayName("랜덤 유저 선정시 유저가 16명 미만인 경우 예외를 발생시킨다.")
+        @DisplayName("랜덤 유저 선정시 유저가 32명 미만인 경우 예외를 발생시킨다.")
         void When_pickRandomUser_Then_throwException() {
             // given
             List<UserInfo> userInfos = new ArrayList<>();
@@ -511,6 +491,7 @@ class TournamentServiceMySQLTest {
                         .phoneNumber("010-1234-567" + i)
                         .uniqueId("user" + i)
                         .nickName("name" + i)
+                        .category(CategoryType.ART)
                         .build();
 
                 userInfos.add(user);
@@ -530,17 +511,18 @@ class TournamentServiceMySQLTest {
         void When_pickRandomUser_Then_returnRandomUser() {
             // given
             final int pickedUserCount = 32;
-            
+
             given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
-            
+
             List<UserInfo> userInfos = new ArrayList<>();
-            
+
             for (int i = 1; i <= pickedUserCount; i++) {
                 UserInfo user = UserInfo.builder()
                         .birthDay(LocalDate.now())
                         .phoneNumber("010-1234-567" + i)
                         .uniqueId("user" + i)
                         .nickName("name" + i)
+                        .category(CategoryType.ART)
                         .build();
 
                 userInfos.add(user);

@@ -26,18 +26,18 @@ public class RandomUser {
     private String uid;
 
     @Indexed
-    private Integer userNo;
+    private String userId;
     private String profileImageUrl;
 
-    public static RandomUser of(int userNo, String profileImageUrl) {
+    public static RandomUser of(String userId, String profileImageUrl) {
         return RandomUser.builder()
-                .uid(createUid(userNo))
-                .userNo(userNo)
+                .uid(createUid(userId))
+                .userId(userId)
                 .profileImageUrl(profileImageUrl)
                 .build();
     }
 
-    public static String createUid(int userNo) {
-        return "randomUser:" + userNo;
+    public static String createUid(String userId) {
+        return "randomUser:" + userId;
     }
 }
