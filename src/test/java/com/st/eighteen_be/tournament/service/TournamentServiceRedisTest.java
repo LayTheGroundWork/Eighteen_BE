@@ -8,6 +8,7 @@ import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import com.st.eighteen_be.user.repository.UserRepository;
+import com.st.eighteen_be.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,11 +55,14 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
     private VoteEntityRepository voteEntityRepository;
 
     @MockBean
+    private UserService userService;
+
+    @MockBean
     private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(tournamentEntityRepository, tournamentParticipantRepository, voteEntityRepository, userRepository, redisTemplate);
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, voteEntityRepository, userRepository, redisTemplate);
     }
 
     @Test
@@ -67,7 +71,7 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
         //given
         List<UserRandomResponseDto> userRandomResponseDtos = new ArrayList<>();
         for (int i = 1; i <= 32; i++) {
-            userRandomResponseDtos.add(UserRandomResponseDto.of(i, "http://test.com"));
+            userRandomResponseDtos.add(UserRandomResponseDto.of("userId" + i, "http://test.com"));
         }
 
         given(userRepository.findRandomUser()).willReturn(userRandomResponseDtos);
@@ -76,11 +80,12 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
         tournamentService.saveRandomUser();
 
         //then
-        //userRandomResponseDtos 16개가 redis 에 저장되었는지 확인
+        //userRandomResponseDtos 32개가 redis 에 저장되었는지 확인
         redisTemplate.opsForHash().entries(RANDOM_USER).forEach((k, v) -> {
             RandomUser randomUser = (RandomUser) v;
 
-            assertThat(randomUser.getUserNo()).isBetween(1, 32);
+            //randomUser userId는  userId1 ~ 32 사이의 값이어야 함
+            assertThat(randomUser.getUserId()).isEqualTo(k);
             assertThat(randomUser.getProfileImageUrl()).isEqualTo("http://test.com");
         });
     }

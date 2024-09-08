@@ -30,12 +30,12 @@ public class VoteEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARTICIPANT_NO", nullable = false)
     private TournamentParticipantEntity participant;
-    
-    @Size(max = 200)
+
     @Comment("투표자 유저 아이디")
-    @Column(name = "VOTER_ID", length = 200)
+    @Size(max = 50)
+    @Column(name = "VOTER_ID", nullable = false)
     private String voterId;
-    
+
     @Comment("투표 점수")
     @Column(name = "VOTE_POINT")
     private Integer votePoint;

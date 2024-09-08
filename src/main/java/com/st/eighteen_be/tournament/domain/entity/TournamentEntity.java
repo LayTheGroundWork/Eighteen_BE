@@ -1,9 +1,8 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import com.st.eighteen_be.common.converter.TournamentCategoryConverter;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
+import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -31,9 +30,9 @@ public class TournamentEntity extends BaseEntity {
 
     @NotNull
     @Comment("카테고리")
-    @Convert(converter = TournamentCategoryConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "CATEGORY", nullable = false, length = 100)
-    private TournamentCategoryEnums category;
+    private CategoryType category;
 
     @Lob
     @Builder.Default
@@ -63,7 +62,7 @@ public class TournamentEntity extends BaseEntity {
         this.endDate = LocalDateTime.now();
     }
 
-    public static TournamentEntity createTournamentEntity(TournamentCategoryEnums category, int season) {
+    public static TournamentEntity createTournamentEntity(CategoryType category, int season) {
         return TournamentEntity.builder()
                 .category(category)
                 .startDate(LocalDateTime.now())

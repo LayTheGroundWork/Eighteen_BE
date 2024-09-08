@@ -71,7 +71,7 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
     void When_pickRandomUser_Then_pickRandomUser() {
         // given
         List<UserRandomResponseDto> randomUsers = Collections.singletonList(
-                UserRandomResponseDto.of(1, "https://example.com/profile.jpg")
+                UserRandomResponseDto.of("qkrtkdwns3410", "https://example.com/profile.jpg")
         );
         when(tournamentService.saveRandomUser()).thenReturn(randomUsers);
 

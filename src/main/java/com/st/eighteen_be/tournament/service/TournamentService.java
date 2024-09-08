@@ -8,13 +8,15 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchRespons
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
-import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryEnums;
 import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
+import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.repository.UserRepository;
+import com.st.eighteen_be.user.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +45,9 @@ import java.util.Objects;
 @Slf4j
 public class TournamentService {
     public static final String RANDOM_USER_KEY = "randomUser";
+
+    private final UserService userService;
+
     private final TournamentEntityRepository tournamentEntityRepository;
     private final TournamentParticipantRepository tournamentParticipantEntityRepository;
     private final VoteEntityRepository voteEntityRepository;
@@ -50,7 +55,7 @@ public class TournamentService {
     private final UserRepository userRepository;
     private final RedisTemplate<String, RandomUser> redisTemplate;
 
-    public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, TournamentCategoryEnums category) {
+    public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, CategoryType category) {
         log.info("search start category : {}", category);
 
         return tournamentEntityRepository.findTournamentByCategoryAndPaging(category, pageRequest);
@@ -67,7 +72,7 @@ public class TournamentService {
     private void findLastestTournamentsGroupByCategory() {
         log.info("findLastestTournamentsGroupByCategory start");
 
-        for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+        for (CategoryType category : CategoryType.values()) {
             TournamentEntity lastestTournament = tournamentEntityRepository.findFirstByCategoryOrderByCreatedDateDesc(category)
                     .orElse(null);
 
@@ -112,7 +117,7 @@ public class TournamentService {
     private void putRandomUserToRedis(List<UserRandomResponseDto> pickedRandomUser) {
         for (UserRandomResponseDto user : pickedRandomUser) {
             RandomUser randomUser = user.toRandomUser();
-            redisTemplate.opsForHash().put(RANDOM_USER_KEY, randomUser.getUid(), randomUser);
+            redisTemplate.opsForHash().put(RANDOM_USER_KEY, randomUser.getUserId(), randomUser);
         }
     }
 
@@ -123,7 +128,7 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = false)
-    public TournamentEntity createNewTournament(TournamentCategoryEnums category, int season) {
+    public TournamentEntity createNewTournament(CategoryType category, int season) {
         log.info("createNewTournament start category : {}", category);
 
         TournamentEntity created = TournamentEntity.createTournamentEntity(category, season);
@@ -135,13 +140,13 @@ public class TournamentService {
     public void endLastestTournaments() {
         log.info("endLastestTournaments start");
 
-        for (TournamentCategoryEnums category : TournamentCategoryEnums.values()) {
+        for (CategoryType category : CategoryType.values()) {
             TournamentEntity foundTournamet = endTournamentByCategory(category);
             determineWinner(foundTournamet.getTournamentNo());
         }
     }
 
-    private TournamentEntity endTournamentByCategory(TournamentCategoryEnums category) {
+    private TournamentEntity endTournamentByCategory(CategoryType category) {
         log.info("endTournamentByCategory start category : {}", category.getCategory());
 
         return tournamentEntityRepository.findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(category)
@@ -172,10 +177,12 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = false)
-    public void processVote(TournamentVoteRequestDTO voteRequestDTO) {
+    public void processVote(TournamentVoteRequestDTO voteRequestDTO, String accessToken) {
         log.info("processVote start");
 
-        tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO);
-        tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO);
+        UserInfo loginedUser = userService.findByToken(accessToken);
+
+        tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO, loginedUser.getUniqueId());
+        tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO, loginedUser.getUniqueId());
     }
 }
