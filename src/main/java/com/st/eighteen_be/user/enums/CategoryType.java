@@ -25,6 +25,10 @@ public enum CategoryType {
     private final String description;
 
     public static CategoryType of(final String category) {
+        if(category == null) {
+            return null;
+        }
+
         return CategoryType.valueOf(CATEGORIES_MAP.get(category));
     }
 }
