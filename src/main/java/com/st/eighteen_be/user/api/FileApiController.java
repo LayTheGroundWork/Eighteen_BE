@@ -21,6 +21,7 @@ public class FileApiController {
 
     private final S3Service s3Service;
 
+    // TODO: 썸네일용 이미지 조회 및 원본 사진 삭제 시 리사이징 사진도 같이 지워져야함
     @Operation(summary = "preSignedUrl & 접근 key 생성", description = "s3에 이미지 업로드를 위한 url 및 접근 key 생성")
     @PostMapping("/v1/api/file/upload")
     public ApiResp<List<String[]>> fileUpload(@RequestParam("fileNames") List<String> fileNames,
