@@ -37,6 +37,12 @@ public class FileApiController {
         return ApiResp.success(HttpStatus.OK, "Delete Complete");
     }
 
+    @Operation(summary = "접근 key로 썸네일 조회", description = "접근 key로 썸네일 조회")
+    @GetMapping("/v1/api/thumbnail/view")
+    public ApiResp<String> thumbnailView(@RequestParam("key") String key, @RequestParam("uniqueId") String uniqueId) {
+        return ApiResp.success(HttpStatus.OK, s3Service.getThumbnailPreSignedURL(key, uniqueId));
+    }
+
     @Operation(summary = "접근 key로 미디어 파일 조회", description = "접근 key로 미디어 파일 조회")
     @GetMapping("/v1/api/file/view")
     public ApiResp<String> fileView(@RequestParam("key") String key, @RequestParam("uniqueId") String uniqueId) {

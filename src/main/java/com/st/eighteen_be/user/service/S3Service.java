@@ -27,8 +27,11 @@ import java.util.UUID;
 public class S3Service {
 
     // TODO: lambda 써서 이미지 리사이징 해야함 - 메인화면 썸네일 용이랑 채팅에 쓰일 프로필 사진 용으로
-    @Value("${cloud.aws.bucketName}")
-    private String bucketName;
+    @Value("${cloud.aws.imageBucketName}")
+    private String imageBucketName;
+    
+    @Value("${cloud.aws.resizeBucketName}")
+    private String resizeBucketName;
 
     @Value("${cloud.aws.region.static}")
     private String awsRegion;  // 리전 정보를 가져옴
@@ -64,7 +67,7 @@ public class S3Service {
 
             // Create a PUT object request with metadata such as content type
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(imageBucketName)
                     .key(s3Key)
                     .build();
 
@@ -87,10 +90,6 @@ public class S3Service {
             log.error("Error generating preSigned URL for upload", e);
             return new String[]{"Error generating preSigned URL",e.toString()};
         }
-    }
-
-    private static @NotNull String getS3Key(String uniqueId, String storeFilename) {
-        return uniqueId + "/" + storeFilename;
     }
 
     // 기존 S3Presigner 생성 메서드
@@ -119,7 +118,7 @@ public class S3Service {
         try {
             String s3Key = getS3Key(uniqueId, storeFilename);
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(imageBucketName)
                     .key(s3Key)
                     .build();
 
@@ -128,13 +127,41 @@ public class S3Service {
             log.error(e.awsErrorDetails().errorMessage());
         }
     }
+    
+    /* 3. 썸네일의 preSigned URL 반환 */
+    public String getThumbnailPreSignedURL(String storeFilename, String uniqueId) {
+        try {
+            String s3Key = getS3Key(uniqueId, storeFilename);
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(resizeBucketName)
+                    .key(s3Key)
+                    .build();
 
-    /* 3. 파일의 preSigned URL 반환 */
+            S3Presigner preSigner = createS3Presigner();  // S3Presigner 생성
+
+            GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(2))
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+
+            PresignedGetObjectRequest presignedGetObjectRequest = preSigner.presignGetObject(getObjectPresignRequest);
+
+            preSigner.close();  // 사용 후 S3Presigner 리소스 해제
+
+            return presignedGetObjectRequest.url().toString();
+
+        } catch (Exception e) {
+            log.error(e.toString());
+            return "Error generating thumbnail preSigned URL";
+        }
+    }
+
+    /* 4. 파일의 preSigned URL 반환 */
     public String getPreSignedURL(String storeFilename, String uniqueId) {
         try {
             String s3Key = getS3Key(uniqueId, storeFilename);
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(imageBucketName)
                     .key(s3Key)
                     .build();
 
@@ -157,7 +184,7 @@ public class S3Service {
         }
     }
 
-    /* 4. 폴더의 preSigned URL들 반환 */
+    /* 5. 폴더의 preSigned URL들 반환 */
     public List<String> getPreSignedURLsForFolder(String folder) {
 
         List<String> preSignedUrls = new ArrayList<>();
@@ -165,7 +192,7 @@ public class S3Service {
         try {
             // S3에서 해당 폴더의 모든 객체 리스트 가져오기
             ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
-                    .bucket(bucketName)
+                    .bucket(imageBucketName)
                     .prefix(folder + "/")
                     .build();
 
@@ -178,7 +205,7 @@ public class S3Service {
                 String keyName = s3Object.key();
 
                 GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                        .bucket(bucketName)
+                        .bucket(imageBucketName)
                         .key(keyName)
                         .build();
 
@@ -200,5 +227,9 @@ public class S3Service {
         }
 
         return preSignedUrls;
+    }
+    
+    private static @NotNull String getS3Key(String uniqueId, String storeFilename) {
+        return uniqueId + "/" + storeFilename;
     }
 }
