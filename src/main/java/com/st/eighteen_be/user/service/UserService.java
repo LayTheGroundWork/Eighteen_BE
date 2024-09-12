@@ -11,11 +11,8 @@ import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserProfiles;
-import com.st.eighteen_be.user.domain.UserQuestion;
 import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
-import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
-import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.TokenBlackList;
@@ -30,8 +27,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -44,9 +43,6 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final EncryptService encryptService;
     private final TokenBlackList tokenBlackList;
-    private final LikeService likeService;
-    private final S3Service s3Service;
-    private final SnsLinkService snsLinkService;
 
     public boolean isDuplicationUniqueId(String uniqueId){
         Optional<UserInfo> user = userRepository.findByUniqueId(uniqueId);
@@ -190,63 +186,33 @@ public class UserService {
         );
     }
 
-    public UserDetailsResponseDto findById(Integer userId) {
-
-        UserInfo userInfo = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
-
-        int likeCount = likeService.countLikes(userInfo.getId());
-        List<String> snsLinks = snsLinkService.readAll(userId);
-
-        return getUserDetailsResponseDto(userInfo, likeCount, snsLinks);
-    }
-
-    public UserDetailsResponseDto findByUniqueId(String uniqueId) {
-
-        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
-
-        int likeCount = likeService.countLikes(userInfo.getId());
-        List<String> snsLinks = snsLinkService.readAll(userInfo.getId());
-
-        return getUserDetailsResponseDto(userInfo, likeCount, snsLinks);
-    }
-
-    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId, String accessToken) {
-        UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
+    public UserInfo findByUniqueIdToEntity(String uniqueId){
+        return userRepository.findByUniqueId(uniqueId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
-
-        return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(accessToken,userInfo.getId()));
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithLikes(String accessToken) {
-        List<UserInfo> users = userRepository.findAll();
-        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
-
-        return users.stream()
-                .map(user -> toUserProfileResponseDto(user, likedUserIds))
-                .collect(Collectors.toList());
+    public UserInfo findByIdToEntity(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
+        );
     }
 
-    private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
-        boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
-        return new UserProfileResponseDto(user, isLiked);
+    public UserInfo findById(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
     }
 
-    @NotNull
-    private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount, List<String> snsLinks) {
-        List<String> images = getImages(userInfo);
-        Map<String,String> qna = new HashMap<>();
-
-        for(UserQuestion question : userInfo.getUserQuestions()){
-            qna.put(question.getQuestion().getQuestion(),question.getAnswer());
-        }
-
-        return new UserDetailsResponseDto(userInfo,likeCount,images,snsLinks,qna);
+    public UserInfo findByUniqueId(String uniqueId) {
+        return userRepository.findByUniqueId(uniqueId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
     }
 
-    private List<String> getImages(UserInfo userInfo) {
-        return s3Service.getPreSignedURLsForFolder(userInfo.getUniqueId());
+    public List<UserInfo> findAll(){
+        return userRepository.findAll();
+    }
+
+    int findLikeCountById(Integer id) {
+        return userRepository.findById(id).map(UserInfo::getLikeCount).orElse(0);
     }
 }

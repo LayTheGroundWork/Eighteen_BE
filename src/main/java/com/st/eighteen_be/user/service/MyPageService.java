@@ -18,13 +18,14 @@ public class MyPageService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final UserDtoService userDtoService;
 
     @Transactional(readOnly = true)
     public UserDetailsResponseDto view(String accessToken){
         String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
         Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
-        return userService.findByUniqueId(authentication.getName());
+        return userDtoService.findByUniqueId(authentication.getName());
     }
 
     public void update(MyPageRequestDto requestDto, String accessToken) {

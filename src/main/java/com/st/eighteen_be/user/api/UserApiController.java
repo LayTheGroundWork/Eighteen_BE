@@ -8,6 +8,7 @@ import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.service.LikeService;
+import com.st.eighteen_be.user.service.UserDtoService;
 import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,6 +46,7 @@ public class UserApiController {
 
     private final UserService userService;
     private final LikeService likeService;
+    private final UserDtoService userDtoService;
 
     @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
     @PostMapping("/v1/api/user/duplication-check")
@@ -111,13 +113,13 @@ public class UserApiController {
     @Operation(summary = "회원 상세 정보 보기", description = "회원 상세 정보 보기")
     @PostMapping("/v1/api/user/find/{unique-id}")
     public ApiResp<UserDetailsResponseDto> find(@PathVariable("unique-id") String uniqueId) {
-        return ApiResp.success(HttpStatus.OK, userService.findByUniqueId(uniqueId));
+        return ApiResp.success(HttpStatus.OK, userDtoService.findByUniqueId(uniqueId));
     }
 
     @Operation(summary = "좋아요 여부 포함된 회원 전체 조회", description = "좋아요 여부 포함된 회원 전체 조회")
     @PostMapping("/v1/api/user/find-all")
     public ApiResp<List<UserProfileResponseDto>> findAll(@RequestHeader("Authorization") String accessToken){
-        return ApiResp.success(HttpStatus.OK, userService.getUserProfilesWithLikes(accessToken));
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikes(accessToken));
     }
 
     // Test API
