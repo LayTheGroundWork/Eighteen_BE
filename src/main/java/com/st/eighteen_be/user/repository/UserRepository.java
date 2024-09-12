@@ -10,10 +10,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 
-    default int findLikeCountById(Integer id) {
-        return findById(id).map(UserInfo::getLikeCount).orElse(0);
-    }
-
     Optional<UserInfo> findByUniqueId(String uniqueId);
 
     Optional<UserInfo> findByPhoneNumber(String phoneNumber);

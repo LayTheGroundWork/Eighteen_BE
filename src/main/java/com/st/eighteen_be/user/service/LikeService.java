@@ -1,12 +1,10 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserLike;
-import com.st.eighteen_be.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,7 +22,7 @@ public class LikeService {
 
     private final RedisTemplate<String,String> redisLikeTemplate;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public static final String LIKE_COUNT_PREFIX = "likeCount:";
     public static final String USER_LIKES_PREFIX = "userLikes:";
@@ -32,10 +30,6 @@ public class LikeService {
 
     public void addLike(String accessToken, Integer likedId){
         String likerId = getUserUniqueIdFromRequest(accessToken);
-
-        if(userRepository.findById(likedId).isEmpty()){
-            throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
-        }
 
         String userLikesKey = USER_LIKES_PREFIX + likerId;
 
@@ -65,7 +59,7 @@ public class LikeService {
         String count = redisLikeTemplate.opsForValue().get(likeCountKey);
         if (count == null) {
             // Redis에 값이 없으면 데이터베이스에서 가져와 Redis에 저장
-            int likeCount = userRepository.findLikeCountById(userId);
+            int likeCount = userService.findLikeCountById(userId);
             redisLikeTemplate.opsForValue().set(likeCountKey, String.valueOf(likeCount));
             return likeCount;
         }
@@ -106,9 +100,7 @@ public class LikeService {
             for (String redisUserId : userLikesRedisKey) {
                 String uniqueId = redisUserId.split(":")[1];
 
-                UserInfo userInfo = userRepository.findByUniqueId(uniqueId).orElseThrow(
-                        () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
-                );
+                UserInfo userInfo = userService.findByUniqueIdToEntity(uniqueId);
 
                 Set<String> likedUser = Objects.requireNonNull(redisLikeTemplate.opsForSet().members(redisUserId));
 
@@ -132,9 +124,7 @@ public class LikeService {
 
                 if (redisLikeTemplate.opsForValue().get(data) == null) break;
 
-                UserInfo userInfo = userRepository.findById(userId).orElseThrow(
-                        () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
-                );
+                UserInfo userInfo = userService.findByIdToEntity(userId);
 
                 int likeCount = Integer.parseInt(Objects.requireNonNull(redisLikeTemplate.opsForValue().get(data)));
                 userInfo.backupLikeCount(likeCount);
