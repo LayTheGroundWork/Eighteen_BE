@@ -44,6 +44,7 @@ public class S3Service {
 
     private final S3Client s3Client;
 
+    // preSigned url 및 접근 키 반환
     public List<String[]> generateUploadPreSignedUrls(List<String> originalFilenames, String uniqueId) {
 
         List<String[]> preSignedUrlAndKeys = new ArrayList<>();
@@ -57,6 +58,7 @@ public class S3Service {
         return preSignedUrlAndKeys;
     }
 
+    // preSigned Url 생성
     public String[] generateUploadPreSignedUrl(String originalFilename, String uniqueId) {
         try {
             // Generate a unique filename using the original filename and a UUID
@@ -129,9 +131,9 @@ public class S3Service {
     }
     
     /* 3. 썸네일의 preSigned URL 반환 */
-    public String getThumbnailPreSignedURL(String storeFilename, String uniqueId) {
+    public String getThumbnailPreSignedURL(String key, String uniqueId) {
         try {
-            String s3Key = getS3Key(uniqueId, storeFilename);
+            String s3Key = getS3Key(uniqueId, key);
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(resizeBucketName)
                     .key(s3Key)
@@ -157,9 +159,9 @@ public class S3Service {
     }
 
     /* 4. 파일의 preSigned URL 반환 */
-    public String getPreSignedURL(String storeFilename, String uniqueId) {
+    public String getPreSignedURL(String key, String uniqueId) {
         try {
-            String s3Key = getS3Key(uniqueId, storeFilename);
+            String s3Key = getS3Key(uniqueId, key);
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(imageBucketName)
                     .key(s3Key)
