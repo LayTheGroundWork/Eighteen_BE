@@ -1,5 +1,6 @@
 package com.st.eighteen_be.user.dto.request;
 
+import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -10,6 +11,11 @@ import java.util.List;
 @Getter
 public class MyPageRequestDto {
 
+    @Schema(description = "회원 닉네임")
+    private String nickName;
+
+    @Schema(description = "회원 학교 정보")
+    private SchoolData schoolData;
 
     @Schema(description = "회원 mbti", example = "infp")
     private String mbti;
@@ -24,7 +30,10 @@ public class MyPageRequestDto {
     private List<UserQuestion> questions;
 
     @Builder
-    public MyPageRequestDto(String mbti, String introduction, List<UserQuestion> questions) {
+    public MyPageRequestDto(String nickName, SchoolData schoolData ,String mbti,
+                            String introduction, List<UserQuestion> questions) {
+        this.nickName = nickName;
+        this.schoolData = schoolData;
         this.mbti = mbti;
         this.introduction = introduction;
         this.questions = questions;

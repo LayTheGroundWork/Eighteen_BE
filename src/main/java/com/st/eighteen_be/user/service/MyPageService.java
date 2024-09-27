@@ -31,6 +31,6 @@ public class MyPageService {
     public void update(MyPageRequestDto requestDto, String accessToken) {
 
         UserInfo userInfo = userService.findByToken(accessToken);
-        userInfo.update(requestDto);
+        userInfo.myPageUpdate(requestDto);
     }
 }
