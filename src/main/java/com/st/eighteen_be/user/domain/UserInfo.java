@@ -116,7 +116,9 @@ public class UserInfo extends BaseEntity {
         userQuestion.setUser(this);
     }
 
-    public void update(MyPageRequestDto requestDto){
+    public void myPageUpdate(MyPageRequestDto requestDto){
+        this.nickName = requestDto.getNickName();
+        this.schoolData = requestDto.getSchoolData();
         this.mbti = requestDto.getMbti();
         this.introduction = requestDto.getIntroduction();
 
