@@ -1,6 +1,7 @@
 package com.st.eighteen_be.user.dto.request;
 
 import com.st.eighteen_be.user.domain.SchoolData;
+import com.st.eighteen_be.user.domain.SnsPlatform;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -17,6 +18,10 @@ public class MyPageRequestDto {
     @Schema(description = "회원 학교 정보")
     private SchoolData schoolData;
 
+    @Schema(description = "회원 소셜 플랫폼 아이디",
+            example = "{\"instagram\":\"@test\", \"x\":\"test(x)\", \"tiktok\":\"test(tiktok)\", \"youtube\":\"user-test-@\"}")
+    private SnsPlatform snsPlatform;
+
     @Schema(description = "회원 mbti", example = "infp")
     private String mbti;
 
@@ -30,10 +35,11 @@ public class MyPageRequestDto {
     private List<UserQuestion> questions;
 
     @Builder
-    public MyPageRequestDto(String nickName, SchoolData schoolData ,String mbti,
+    public MyPageRequestDto(String nickName, SchoolData schoolData , SnsPlatform snsPlatform, String mbti,
                             String introduction, List<UserQuestion> questions) {
         this.nickName = nickName;
         this.schoolData = schoolData;
+        this.snsPlatform = snsPlatform;
         this.mbti = mbti;
         this.introduction = introduction;
         this.questions = questions;

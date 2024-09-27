@@ -30,8 +30,8 @@ public class UserInfo extends BaseEntity {
             unique = true, nullable = false)
     private Integer id;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSnsLink> snsLinks = new ArrayList<>();
+    @Embedded
+    private SnsPlatform snsPlatform;
 
     @Embedded
     private SchoolData schoolData;
@@ -82,9 +82,10 @@ public class UserInfo extends BaseEntity {
     // 회원 신고 내역 N:M -> 연관테이블 : 신고내역 테이블
 
     @Builder
-    public UserInfo(SchoolData schoolData, CategoryType category, String phoneNumber, LocalDate birthDay,
+    public UserInfo(SchoolData schoolData, SnsPlatform snsPlatform, CategoryType category, String phoneNumber, LocalDate birthDay,
                     String nickName, String uniqueId, String introduction, String mbti, int likeCount, boolean tournamentJoin) {
         this.schoolData = schoolData;
+        this.snsPlatform = snsPlatform;
         this.category = category;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;
@@ -94,11 +95,6 @@ public class UserInfo extends BaseEntity {
         this.mbti = mbti;
         this.likeCount = likeCount;
         this.tournamentJoin = tournamentJoin;
-    }
-
-    public void addSnsLink(UserSnsLink snsLink) {
-        this.snsLinks.add(snsLink);
-        snsLink.setUser(this);
     }
 
     public void addRole(UserRoles userRole) {
@@ -119,6 +115,7 @@ public class UserInfo extends BaseEntity {
     public void myPageUpdate(MyPageRequestDto requestDto){
         this.nickName = requestDto.getNickName();
         this.schoolData = requestDto.getSchoolData();
+        this.snsPlatform = requestDto.getSnsPlatform();
         this.mbti = requestDto.getMbti();
         this.introduction = requestDto.getIntroduction();
 
