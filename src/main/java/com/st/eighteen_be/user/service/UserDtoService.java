@@ -4,9 +4,9 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +62,16 @@ public class UserDtoService {
                 .collect(Collectors.toList());
     }
 
-    @NotNull
+    public List<UserProfileResponseDto> getUserProfilesWithCategory(String accessToken, String category){
+        List<UserInfo> users = userService.findAllByCategory(CategoryType.of(category));
+        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
+
+        return users.stream()
+                .map(user -> toUserProfileResponseDto(user, likedUserIds))
+                .collect(Collectors.toList());
+
+    }
+
     private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount, List<String> snsLinks) {
         List<String> images = getImages(userInfo);
         Map<String,String> qna = new HashMap<>();

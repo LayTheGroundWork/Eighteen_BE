@@ -212,6 +212,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public List<UserInfo> findAllByCategory(CategoryType category){
+        return userRepository.findAllByCategory(category);
+    }
+
     int findLikeCountById(Integer id) {
         return userRepository.findById(id).map(UserInfo::getLikeCount).orElse(0);
     }

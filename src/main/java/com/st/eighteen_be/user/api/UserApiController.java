@@ -122,6 +122,13 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikes(accessToken));
     }
 
+    @Operation(summary = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회", description = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회")
+    @PostMapping("/v1/api/user/find-all-by-category")
+    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@RequestHeader("Authorization") String accessToken,
+                                                                   @RequestParam("category") String category){
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(accessToken,category));
+    }
+
     // Test API
     @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")
     @GetMapping("/v1/api/user/like/force-start")
