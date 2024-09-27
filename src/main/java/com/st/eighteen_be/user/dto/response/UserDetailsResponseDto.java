@@ -18,6 +18,8 @@ public class UserDetailsResponseDto {
     private int likeCount;
     private String nickName;
     private String uniqueId;
+    private String mbti;
+    private String introduction;
     private LocalDate birthDay;
     private String location;
     private String schoolName;
@@ -33,6 +35,8 @@ public class UserDetailsResponseDto {
         this.likeCount = likeCount;
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
+        this.mbti = entity.getMbti();
+        this.introduction = entity.getIntroduction();
         this.birthDay = entity.getBirthDay();
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
