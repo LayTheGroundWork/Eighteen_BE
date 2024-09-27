@@ -21,6 +21,7 @@ public class FileApiController {
 
     private final S3Service s3Service;
 
+    // TODO: 썸네일용 이미지 조회 및 원본 사진 삭제 시 리사이징 사진도 같이 지워져야함
     @Operation(summary = "preSignedUrl & 접근 key 생성", description = "s3에 이미지 업로드를 위한 url 및 접근 key 생성")
     @PostMapping("/v1/api/file/upload")
     public ApiResp<List<String[]>> fileUpload(@RequestParam("fileNames") List<String> fileNames,
@@ -34,6 +35,12 @@ public class FileApiController {
     public ApiResp<String> fileDelete(@RequestParam("key") String key, @RequestParam("uniqueId") String uniqueId){
         s3Service.delete(key,uniqueId);
         return ApiResp.success(HttpStatus.OK, "Delete Complete");
+    }
+
+    @Operation(summary = "접근 key로 썸네일 조회", description = "접근 key로 썸네일 조회")
+    @GetMapping("/v1/api/thumbnail/view")
+    public ApiResp<String> thumbnailView(@RequestParam("key") String key, @RequestParam("uniqueId") String uniqueId) {
+        return ApiResp.success(HttpStatus.OK, s3Service.getThumbnailPreSignedURL(key, uniqueId));
     }
 
     @Operation(summary = "접근 key로 미디어 파일 조회", description = "접근 key로 미디어 파일 조회")
