@@ -24,7 +24,6 @@ public class UserDtoService {
 
     private final UserService userService;
     private final LikeService likeService;
-    private final SnsLinkService snsLinkService;
     private final S3Service s3Service;
 
     public UserDetailsResponseDto findById(Integer userId) {
@@ -32,9 +31,8 @@ public class UserDtoService {
         UserInfo userInfo = userService.findById(userId);
 
         int likeCount = likeService.countLikes(userInfo.getId());
-        List<String> snsLinks = snsLinkService.readAll(userId);
 
-        return getUserDetailsResponseDto(userInfo, likeCount, snsLinks);
+        return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
@@ -42,9 +40,8 @@ public class UserDtoService {
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
 
         int likeCount = likeService.countLikes(userInfo.getId());
-        List<String> snsLinks = snsLinkService.readAll(userInfo.getId());
 
-        return getUserDetailsResponseDto(userInfo, likeCount, snsLinks);
+        return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
     public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId, String accessToken) {
@@ -72,7 +69,7 @@ public class UserDtoService {
 
     }
 
-    private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount, List<String> snsLinks) {
+    private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {
         List<String> images = getImages(userInfo);
         Map<String,String> qna = new HashMap<>();
 
@@ -80,7 +77,7 @@ public class UserDtoService {
             qna.put(question.getQuestion().getQuestion(),question.getAnswer());
         }
 
-        return new UserDetailsResponseDto(userInfo,likeCount,images,snsLinks,qna);
+        return new UserDetailsResponseDto(userInfo,likeCount,images,qna);
     }
 
     private List<String> getImages(UserInfo userInfo) {
