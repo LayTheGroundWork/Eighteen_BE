@@ -27,18 +27,14 @@ public class UserDtoService {
     private final S3Service s3Service;
 
     public UserDetailsResponseDto findById(Integer userId) {
-
         UserInfo userInfo = userService.findById(userId);
-
         int likeCount = likeService.countLikes(userInfo.getId());
 
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
-
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
-
         int likeCount = likeService.countLikes(userInfo.getId());
 
         return getUserDetailsResponseDto(userInfo, likeCount);
@@ -86,6 +82,7 @@ public class UserDtoService {
 
     private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
         boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
+
         return new UserProfileResponseDto(user, isLiked);
     }
 }
