@@ -12,11 +12,11 @@ import java.util.Objects;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserProfiles extends BaseEntity {
+public class UserMediaData extends BaseEntity {
     public static final String DEFAULT_IMAGE = "default";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "profile_id")
+    @Column(name = "media_data_id")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,18 +25,25 @@ public class UserProfiles extends BaseEntity {
 
     private String imageKey;
 
+    private boolean isThumbnail;
+
     @Builder
-    public UserProfiles(UserInfo user, String imageKey){
+    public UserMediaData(UserInfo user, String imageKey, boolean isThumbnail){
         this.imageKey = imageKey;
+        this.isThumbnail = isThumbnail;
         setUser(user);
     }
 
     public void setUser(UserInfo user){
         if(this.user != null)
-            this.user.getProfiles().remove(this);
+            this.user.getMediaDataList().remove(this);
 
         this.user = user;
-        user.getProfiles().add(this);
+        user.getMediaDataList().add(this);
+    }
+
+    public void thumbnailFlagUpdate(){
+        isThumbnail = !isThumbnail;
     }
 
     public boolean isDefaultImage(){

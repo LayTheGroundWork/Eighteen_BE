@@ -2,7 +2,7 @@ package com.st.eighteen_be;
 
 import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.domain.UserProfiles;
+import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.enums.RolesType;
@@ -28,7 +28,11 @@ public class CreateTester {
     private static final SchoolData TESTER_SCHOOL_DATA = new SchoolData("테스터고등학교", "서울");
     private static final String TESTER_UNIQUE_ID = "Tester";
     private static final Set<String> TESTER_ROLES = Set.of("USER");
+
     private static final String IMAGE_KEY = "testKey";
+    private static final String THUMBNAIL_IMAGE_KEY = "thumbnail_testKey";
+    private static final boolean IS_THUMBNAIL = true;
+
     private static final boolean TOURNAMENT_JOIN = true;
 
 
@@ -44,6 +48,7 @@ public class CreateTester {
         }
 
         UserInfo tester = UserInfo.builder()
+                .thumbnail(THUMBNAIL_IMAGE_KEY)
                 .phoneNumber(TESTER_ENCRYPT_PHONE_NUMBER)
                 .nickName(TESTER_NICKNAME)
                 .birthDay(TESTER_BIRTHDAY)
@@ -60,12 +65,13 @@ public class CreateTester {
 
         tester.addRole(userRoles);
 
-        UserProfiles userProfiles = UserProfiles.builder()
+        UserMediaData userMediaData = UserMediaData.builder()
                 .imageKey(IMAGE_KEY)
+                .isThumbnail(IS_THUMBNAIL)
                 .user(tester)
                 .build();
 
-        tester.addProfile(userProfiles);
+        tester.addMediaData(userMediaData);
 
         try {
             userRepository.save(tester);

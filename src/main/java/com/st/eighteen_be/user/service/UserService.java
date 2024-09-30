@@ -10,7 +10,7 @@ import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.domain.UserProfiles;
+import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.domain.UserRoles;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.enums.CategoryType;
@@ -65,14 +65,8 @@ public class UserService {
             user.addRole(userRoles);
 
             //TODO: 업로드한 이미지가 없을 경우 기본 이미지 경로에 대한 key 값을 저장해야함
-            for(String key : keys){
-                UserProfiles userProfiles = UserProfiles.builder()
-                        .user(user)
-                        .imageKey(key)
-                        .build();
+            addMediaData(user,keys);
 
-                user.addProfile(userProfiles);
-            }
             userRepository.save(user);
 
             return signIn(requestDto.phoneNumber());
@@ -177,6 +171,18 @@ public class UserService {
         return roles;
     }
 
+    public void addMediaData(UserInfo user, List<String> keys){
+        for(String imageKey : keys){
+            UserMediaData userMediaData = UserMediaData.builder()
+                    .imageKey(imageKey)
+                    .user(user)
+                    .isThumbnail(false)
+                    .build();
+
+            user.addMediaData(userMediaData);
+        }
+    }
+
     public UserInfo findByToken(String accessToken) {
         String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
         Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
@@ -215,6 +221,10 @@ public class UserService {
     public List<UserInfo> findAllByCategory(CategoryType category){
         return userRepository.findAllByCategory(category);
     }
+
+//    public UserMediaData findByImageKey(String imageKey){
+//        return userRepository.findByImageKey(imageKey);
+//    }
 
     int findLikeCountById(Integer id) {
         return userRepository.findById(id).map(UserInfo::getLikeCount).orElse(0);

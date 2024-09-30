@@ -1,6 +1,7 @@
 package com.st.eighteen_be.user.api;
 
 import com.st.eighteen_be.common.response.ApiResp;
+import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.service.MyPageService;
@@ -28,9 +29,17 @@ public class MyPageApiController {
 
     @Operation(summary = "myPage 수정", description = "myPage 수정")
     @PostMapping("/v1/api/my-page/update")
-    public ApiResp<String> update(@RequestBody MyPageRequestDto request,
-                                                @RequestHeader("Authorization") String accessToken) {
+    public ApiResp<String> update(@RequestHeader("Authorization") String accessToken,
+                                  @RequestBody MyPageRequestDto request) {
         myPageService.update(request,accessToken);
         return ApiResp.success(HttpStatus.OK, "수정되었습니다.");
+    }
+
+    @Operation(summary = "대표 이미지 수정", description = "대표 이미지 수정")
+    @PostMapping("/v1/api/my-page/main-image-upadte")
+    public ApiResp<String> mainImageUpdate(@RequestHeader("Authorization") String accessToken,
+                                           @RequestBody UserMediaData userMediaData){
+        myPageService.thumbnailUpdate(accessToken,userMediaData);
+        return ApiResp.success(HttpStatus.OK, "대표이미지 설정 완료");
     }
 }
