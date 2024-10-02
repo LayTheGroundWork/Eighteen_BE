@@ -99,18 +99,15 @@ public class UserInfo extends BaseEntity {
     }
 
     public void addRole(UserRoles userRole) {
-        this.roles.add(userRole);
-        userRole.setUser(this);
+        roles.add(userRole);
     }
 
     public void addMediaData(UserMediaData userProfile){
-        this.mediaDataList.add(userProfile);
-        userProfile.setUser(this);
+        mediaDataList.add(userProfile);
     }
 
     public void addQuestionAndAnswer(UserQuestion userQuestion) {
-        this.userQuestions.add(userQuestion);
-        userQuestion.setUser(this);
+        userQuestions.add(userQuestion);
     }
 
     public void thumbnailUpdate(UserMediaData userMediaData) {
@@ -126,7 +123,7 @@ public class UserInfo extends BaseEntity {
 
         this.userQuestions.clear();  // 기존 엔티티를 삭제하여 orphanRemoval이 작동하도록 함
         for (UserQuestion question : requestDto.getQuestions()) {
-            addQuestionAndAnswer(question);
+            question.setUser(this);
         }
     }
 

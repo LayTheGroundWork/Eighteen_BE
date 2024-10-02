@@ -59,10 +59,9 @@ public class UserService {
 
             UserRoles userRoles = UserRoles.builder()
                     .role(RolesType.USER)
-                    .user(user)
                     .build();
 
-            user.addRole(userRoles);
+            userRoles.setUser(user);
 
             //TODO: 업로드한 이미지가 없을 경우 기본 이미지 경로에 대한 key 값을 저장해야함
             addMediaData(user,keys);
@@ -175,11 +174,10 @@ public class UserService {
         for(String imageKey : keys){
             UserMediaData userMediaData = UserMediaData.builder()
                     .imageKey(imageKey)
-                    .user(user)
                     .isThumbnail(false)
                     .build();
 
-            user.addMediaData(userMediaData);
+            userMediaData.setUser(user);
         }
     }
 

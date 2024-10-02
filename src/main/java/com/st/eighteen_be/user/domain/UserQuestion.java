@@ -28,16 +28,13 @@ public class UserQuestion extends BaseEntity {
     private String answer;
 
     @Builder
-    public UserQuestion(UserInfo user, QuestionsType question, String answer) {
+    public UserQuestion(QuestionsType question, String answer) {
         this.question = question;
         this.answer = answer;
-        this.user = setUser(user);
     }
 
-    public UserInfo setUser(UserInfo user) {
+    public void setUser(UserInfo user) {
         this.user = user;
-        user.getUserQuestions().add(this);
-
-        return user;
+        user.addQuestionAndAnswer(this);
     }
 }

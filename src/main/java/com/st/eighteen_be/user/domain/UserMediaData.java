@@ -28,10 +28,9 @@ public class UserMediaData extends BaseEntity {
     private boolean isThumbnail;
 
     @Builder
-    public UserMediaData(UserInfo user, String imageKey, boolean isThumbnail){
+    public UserMediaData(String imageKey, boolean isThumbnail){
         this.imageKey = imageKey;
         this.isThumbnail = isThumbnail;
-        setUser(user);
     }
 
     public void setUser(UserInfo user){
@@ -39,7 +38,7 @@ public class UserMediaData extends BaseEntity {
             this.user.getMediaDataList().remove(this);
 
         this.user = user;
-        user.getMediaDataList().add(this);
+        user.addMediaData(this);
     }
 
     public void thumbnailFlagUpdate(){

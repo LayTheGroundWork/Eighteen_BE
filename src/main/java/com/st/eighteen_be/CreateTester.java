@@ -60,18 +60,16 @@ public class CreateTester {
 
         UserRoles userRoles = UserRoles.builder()
                 .role(RolesType.USER)
-                .user(tester)
                 .build();
 
-        tester.addRole(userRoles);
+        userRoles.setUser(tester);
 
         UserMediaData userMediaData = UserMediaData.builder()
                 .imageKey(IMAGE_KEY)
                 .isThumbnail(IS_THUMBNAIL)
-                .user(tester)
                 .build();
 
-        tester.addMediaData(userMediaData);
+        userMediaData.setUser(tester);
 
         try {
             userRepository.save(tester);
