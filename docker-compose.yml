@@ -63,6 +63,7 @@ services:
     command: --lower_case_table_names=1  --character-set-server=utf8mb4
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
     ports:
       - "3307:3306"
     networks:
