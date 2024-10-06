@@ -63,12 +63,17 @@ jobs:
             git config --global user.email "qkrtkdwns3410@gmail.com"
             git config --global user.name "qkrtkdwns3410"
             git config --global url.https://${{ secrets.PAT }}@github.com/.insteadOf https://github.com/
-            git checkout dev
-            git submodule update --init --recursive
-            git submodule update --init --recursive
-            git submodule foreach --recursive git checkout main
-            git submodule foreach --recursive git pull origin main
-            git pull
+            # 메인 프로젝트 강제 최신화
+            git fetch --all
+            git reset --hard origin/dev
+      
+            # 서브모듈 강제 최신화
+            git submodule foreach 'git fetch && git reset --hard origin/$(git symbolic-ref --short HEAD)'
+            
+            # 서브모듈을 다시 초기화하고 재귀적으로 업데이트
+            git submodule update --init --recursive --force
+            
+            # 도커 컨테이너 재배포
             sudo docker stop eighteen-be
             sudo docker rm eighteen-be
             sudo docker rmi eighteenbe/eighteen:0.0.1
