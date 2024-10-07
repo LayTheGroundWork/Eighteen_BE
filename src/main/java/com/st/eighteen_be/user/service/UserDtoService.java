@@ -4,15 +4,14 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.dto.response.UserQuestionResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,18 +26,14 @@ public class UserDtoService {
     private final S3Service s3Service;
 
     public UserDetailsResponseDto findById(Integer userId) {
-
         UserInfo userInfo = userService.findById(userId);
-
         int likeCount = likeService.countLikes(userInfo.getId());
 
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
-
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
-
         int likeCount = likeService.countLikes(userInfo.getId());
 
         return getUserDetailsResponseDto(userInfo, likeCount);
@@ -71,13 +66,13 @@ public class UserDtoService {
 
     private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {
         List<String> images = getImages(userInfo);
-        Map<String,String> qna = new HashMap<>();
+        List<UserQuestion> questions = userInfo.getUserQuestions();
 
-        for(UserQuestion question : userInfo.getUserQuestions()){
-            qna.put(question.getQuestion().getQuestion(),question.getAnswer());
-        }
+        List<UserQuestionResponseDto> responseDtoList = questions.stream()
+                .map(UserQuestionResponseDto::new)
+                .toList();
 
-        return new UserDetailsResponseDto(userInfo,likeCount,images,qna);
+        return new UserDetailsResponseDto(userInfo,likeCount,images,responseDtoList);
     }
 
     private List<String> getImages(UserInfo userInfo) {
@@ -86,6 +81,7 @@ public class UserDtoService {
 
     private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
         boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
+
         return new UserProfileResponseDto(user, isLiked);
     }
 }

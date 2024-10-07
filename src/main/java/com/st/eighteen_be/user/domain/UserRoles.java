@@ -25,9 +25,8 @@ public class UserRoles extends BaseEntity {
     private UserInfo user;
 
     @Builder
-    public UserRoles(RolesType role, UserInfo user) {
+    public UserRoles(RolesType role) {
         this.role = role;
-        setUser(user);
     }
 
     //== 연관 관계 메서드 ==//
@@ -36,6 +35,6 @@ public class UserRoles extends BaseEntity {
             this.user.getRoles().remove(this);
         }
         this.user = user;
-        user.getRoles().add(this);
+        user.addRole(this);
     }
 }

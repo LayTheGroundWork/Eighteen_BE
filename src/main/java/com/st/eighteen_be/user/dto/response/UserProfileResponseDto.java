@@ -4,7 +4,9 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @NoArgsConstructor
 public class UserProfileResponseDto {
@@ -20,7 +22,7 @@ public class UserProfileResponseDto {
     @Builder
     public UserProfileResponseDto(UserInfo entity, boolean likeStatus) {
         this.id = entity.getId();
-        this.profileImages = entity.getProfiles().get(0).getImageKey();
+        this.profileImages = entity.getThumbnail();
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.location = entity.getSchoolData().getSchoolLocation();

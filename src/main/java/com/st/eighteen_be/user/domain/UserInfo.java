@@ -13,10 +13,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -50,7 +47,9 @@ public class UserInfo extends BaseEntity {
     private Set<UserRoles> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserProfiles> profiles = new ArrayList<>();
+    private List<UserMediaData> mediaDataList = new LinkedList<>();
+
+    private String thumbnail;
 
     @Column(length = 50, nullable = false)
     private String nickName;
@@ -82,11 +81,13 @@ public class UserInfo extends BaseEntity {
     // 회원 신고 내역 N:M -> 연관테이블 : 신고내역 테이블
 
     @Builder
-    public UserInfo(SchoolData schoolData, SnsPlatform snsPlatform, CategoryType category, String phoneNumber, LocalDate birthDay,
-                    String nickName, String uniqueId, String introduction, String mbti, int likeCount, boolean tournamentJoin) {
+    public UserInfo(SchoolData schoolData, SnsPlatform snsPlatform, CategoryType category, String thumbnail,
+                    String phoneNumber, LocalDate birthDay, String nickName, String uniqueId, String introduction,
+                    String mbti, int likeCount, boolean tournamentJoin) {
         this.schoolData = schoolData;
         this.snsPlatform = snsPlatform;
         this.category = category;
+        this.thumbnail = thumbnail;
         this.phoneNumber = phoneNumber;
         this.birthDay = birthDay;
         this.nickName = nickName;
@@ -98,18 +99,19 @@ public class UserInfo extends BaseEntity {
     }
 
     public void addRole(UserRoles userRole) {
-        this.roles.add(userRole);
-        userRole.setUser(this);
+        roles.add(userRole);
     }
 
-    public void addProfile(UserProfiles userProfile){
-        this.profiles.add(userProfile);
-        userProfile.setUser(this);
+    public void addMediaData(UserMediaData userProfile){
+        mediaDataList.add(userProfile);
     }
 
     public void addQuestionAndAnswer(UserQuestion userQuestion) {
-        this.userQuestions.add(userQuestion);
-        userQuestion.setUser(this);
+        userQuestions.add(userQuestion);
+    }
+
+    public void thumbnailUpdate(UserMediaData userMediaData) {
+        this.thumbnail = userMediaData.getImageKey();
     }
 
     public void myPageUpdate(MyPageRequestDto requestDto){
@@ -121,7 +123,7 @@ public class UserInfo extends BaseEntity {
 
         this.userQuestions.clear();  // 기존 엔티티를 삭제하여 orphanRemoval이 작동하도록 함
         for (UserQuestion question : requestDto.getQuestions()) {
-            addQuestionAndAnswer(question);
+            question.setUser(this);
         }
     }
 
@@ -134,11 +136,11 @@ public class UserInfo extends BaseEntity {
         return getMainProfile().isDefaultImage();
     }
 
-    private UserProfiles getMainProfile() {
-        if (profiles.isEmpty()) {
+    private UserMediaData getMainProfile() {
+        if (mediaDataList.isEmpty()) {
             throw new BadRequestException(ErrorCode.NOT_FOUND_PROFILE);
         }
 
-        return profiles.get(0);
+        return mediaDataList.get(0);
     }
 }
