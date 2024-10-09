@@ -22,25 +22,33 @@ import lombok.*;
 public class TournamentVoteResultResponseDTO {
     @Schema(description = "랭커 ID", example = "user1")
     private String rankerId;
+
+    @Schema(description = "랭커 닉네임", example = "강서구 페더러")
+    private String rankerNickName;
+
     @Schema(description = "랭크", example = "1")
     private Long rank;
+
     @Schema(description = "투표 수", example = "10")
     private Long voteCount;
+
     @Schema(description = "프로필 이미지 URL", example = "https://picsum.photos/200")
     private String profileImageUrl;
-    
+
     @Builder
     @QueryProjection
-    public TournamentVoteResultResponseDTO(String rankerId, Long voteCount, String profileImageUrl) {
+    public TournamentVoteResultResponseDTO(String rankerId, Long voteCount, String profileImageUrl, String rankerNickName) {
         this.rankerId = rankerId;
         this.voteCount = voteCount;
         this.profileImageUrl = profileImageUrl;
+        this.rankerNickName = rankerNickName;
     }
-    
-    public static TournamentVoteResultResponseDTO of(String rankerId, Long voteCount) {
+
+    public static TournamentVoteResultResponseDTO of(String rankerId, Long voteCount, String rankerNickName) {
         return TournamentVoteResultResponseDTO.builder()
-                       .rankerId(rankerId)
-                       .voteCount(voteCount)
-                       .build();
+                .rankerId(rankerId)
+                .rankerNickName("강서구 페더러")
+                .voteCount(voteCount)
+                .build();
     }
 }

@@ -1,7 +1,6 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.st.eighteen_be.tournament.domain.dto.response.QTournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
@@ -13,6 +12,7 @@ import java.util.List;
 import static com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity.tournamentParticipantEntity;
 import static com.st.eighteen_be.tournament.domain.entity.QVoteEntity.voteEntity;
 import static com.st.eighteen_be.user.domain.QUserInfo.userInfo;
+import static com.st.eighteen_be.user.domain.QUserMediaData.userMediaData;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,31 +25,40 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
                 tournamentParticipantEntity.userId,
                 tournamentParticipantEntity.score,
-                Expressions.constant("임의 프로필 값입니다. 추후 수정필요"));
+                userMediaData.imageKey,
+                userInfo.nickName
+                );
 
         //토너먼트 참여자에 대한 썸네일 이미지등도 가져와야 한다.
         return qf.select(dto)
-                       .from(voteEntity)
+                .from(voteEntity)
 
-                       .leftJoin(tournamentParticipantEntity)
-                       .on(eqJoinParticipantNo())
+                .leftJoin(tournamentParticipantEntity)
+                .on(onVoteParticipantNo())
 
-                       .leftJoin(userInfo)
-                       .on(getUserId())
+                .leftJoin(userInfo)
+                .on(onTournamentParticipantId())
 
-                       .where(eqTournamentNo(tournamentNo))
+                .leftJoin(userMediaData)
+                .on(onUserMediaDataId())
 
-                       .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant)
+                .where(eqTournamentNo(tournamentNo))
 
-                       .orderBy(tournamentParticipantEntity.score.desc())
-                       .fetch();
+                .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant, userMediaData.imageKey, userInfo.nickName)
+
+                .orderBy(tournamentParticipantEntity.score.desc())
+                .fetch();
     }
 
-    private static BooleanExpression getUserId() {
+    private static BooleanExpression onUserMediaDataId() {
+        return userMediaData.user.id.eq(userInfo.id);
+    }
+
+    private static BooleanExpression onTournamentParticipantId() {
         return tournamentParticipantEntity.userId.eq(userInfo.uniqueId);
     }
 
-    private static BooleanExpression eqJoinParticipantNo() {
+    private static BooleanExpression onVoteParticipantNo() {
         return voteEntity.participant.participantNo.eq(tournamentParticipantEntity.participantNo);
     }
 

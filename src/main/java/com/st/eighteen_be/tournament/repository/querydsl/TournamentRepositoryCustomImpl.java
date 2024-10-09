@@ -1,8 +1,8 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.st.eighteen_be.tournament.domain.dto.response.QTournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.RequiredArgsConstructor;
@@ -32,16 +32,9 @@ public class TournamentRepositoryCustomImpl implements TournamentRepositoryCusto
 
     @Override
     public List<TournamentSearchResponseDTO> findTournamentByCategoryAndPaging(CategoryType category, Pageable pageable) {
-        return qf.select(
-                        Projections.constructor(
-                                TournamentSearchResponseDTO.class,
-                                tournamentEntity.tournamentNo,
-                                tournamentEntity.thumbnailUrl,
-                                tournamentEntity.status,
-                                tournamentEntity.startDate,
-                                tournamentEntity.endDate
-                                )
-                )
+        QTournamentSearchResponseDTO dto = new QTournamentSearchResponseDTO(tournamentEntity.tournamentNo, tournamentEntity.thumbnailUrl, tournamentEntity.status, tournamentEntity.category, tournamentEntity.startDate, tournamentEntity.endDate);
+
+        return qf.select(dto)
                 .from(tournamentEntity)
                 .where(eqCategory(category))
                 .offset(pageable.getOffset())

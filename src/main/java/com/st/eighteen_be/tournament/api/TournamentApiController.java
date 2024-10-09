@@ -9,7 +9,6 @@ import com.st.eighteen_be.tournament.service.TournamentService;
 import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +44,7 @@ public class TournamentApiController {
 
     @Operation(summary = "토너먼트 검색", description = "토너먼트를 조건에 맞게 검색하고, 페이징 처리하여 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TournamentSearchResponseDTO.class)), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @GetMapping("/v1/api/tournament/search")
@@ -81,7 +80,7 @@ public class TournamentApiController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
@@ -99,7 +98,7 @@ public class TournamentApiController {
                             schema = @Schema(implementation = TournamentVoteRequestDTO.class))
             ))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TournamentVoteResultResponseDTO.class)), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
     })
     @GetMapping("/v1/api/tournament/final/result")
@@ -112,7 +111,7 @@ public class TournamentApiController {
 
     @Operation(summary = "토너먼트 강제 시작", description = "토너먼트를 강제로 시작합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK"),
     })
     @PostMapping("/v1/api/tournament/force-start")
     public ApiResp<Object> startTournament() {
@@ -123,7 +122,7 @@ public class TournamentApiController {
 
     @Operation(summary = "토너먼트 강제 종료", description = "토너먼트를 강제로 종료합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @PostMapping("/v1/api/tournament/force-end")
@@ -135,8 +134,7 @@ public class TournamentApiController {
 
     @Operation(summary = "메모리에 강제로 랜덤 유저를 올립니다.", description = "메모리에 강제로 랜덤 유저를 올립니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType
-                    = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK"),
     })
     @PutMapping("/v1/api/tournament/force-pick-random-user-to-redis")
     public ApiResp<Object> pickRandomUser() {

@@ -74,7 +74,7 @@ public class TournamentEntity extends BaseEntity {
     public TournamentSearchResponseDTO toTournamentSearchResponseDTO() {
         return TournamentSearchResponseDTO.builder()
                 .tournamentNo(tournamentNo)
-                .tournamentThumbnailUrl(thumbnailUrl)
+                .thumbnailUrl(thumbnailUrl)
                 .status(status)
                 .startDate(startDate)
                 .endDate(endDate)
