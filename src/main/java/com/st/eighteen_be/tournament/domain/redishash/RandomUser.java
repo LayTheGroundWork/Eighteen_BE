@@ -24,20 +24,25 @@ import org.springframework.data.redis.core.index.Indexed;
 public class RandomUser {
     @Id
     private String uid;
-
+    
     @Indexed
     private String userId;
+    
+    @Indexed
+    private String category;
+    
     private String profileImageUrl;
-
-    public static RandomUser of(String userId, String profileImageUrl) {
+    
+    public static RandomUser of(String userId, String profileImageUrl, String category) {
         return RandomUser.builder()
-                .uid(createUid(userId))
-                .userId(userId)
-                .profileImageUrl(profileImageUrl)
-                .build();
+                       .uid(createUid(userId, category))
+                       .userId(userId)
+                       .category(category)
+                       .profileImageUrl(profileImageUrl)
+                       .build();
     }
 
-    public static String createUid(String userId) {
-        return "randomUser:" + userId;
+    public static String createUid(String userId, String category) {
+        return "randomUser:" + userId + ":" + category;
     }
 }

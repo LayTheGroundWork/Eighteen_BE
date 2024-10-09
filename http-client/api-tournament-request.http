@@ -1,16 +1,17 @@
 ### 토너먼트 강제 시작
-POST http://{{host}}:{{port}}/v1/api/tournament/force-start
+POST {{url}}/v1/api/tournament/force-start
 
 ### 토너먼트 강제 종료
-POST http://{{host}}:{{port}}/v1/api/tournament/force-end
+POST {{url}}/v1/api/tournament/force-end
 
 ### 토너먼트 검색
-GET http://{{host}}:{{port}}/v1/api/tournament/search?size=10&page=0&sort=TOURNAMENT_NO&sortDirection=DESC
+GET {{url}}/v1/api/tournament/search?size=10&page=0&sort=TOURNAMENT_NO&sortDirection=DESC
 Content-Type: application/json
 
 ### 토너먼트 투표
-POST http://{{host}}:{{port}}/v1/api/tournament/final/vote
+POST {{url}}/v1/api/tournament/final/vote
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "voterId": "voter1",
@@ -23,7 +24,7 @@ Content-Type: application/json
 }
 
 ### 토너먼트 결과 조회
-GET http://{{host}}:{{port}}/v1/api/tournament/final/result?tournamentNo=1
+GET {{url}}/v1/api/tournament/final/result?tournamentNo=1
 
 ### 토너먼트 32인 강제 레디스에 올리기
-PUT http://{{host}}:{{port}}/v1/api/tournament/force-pick-random-user-to-redis
+PUT {{url}}/v1/api/tournament/force-pick-random-user-to-redis

@@ -7,8 +7,8 @@ import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
-import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
@@ -25,8 +25,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -51,10 +52,12 @@ public class TournamentService {
     private final TournamentEntityRepository tournamentEntityRepository;
     private final TournamentParticipantRepository tournamentParticipantEntityRepository;
     private final VoteEntityRepository voteEntityRepository;
-
+    
     private final UserRepository userRepository;
+    
+    private final RandomUserRedisRepository randomUserRedisRepository;
     private final RedisTemplate<String, RandomUser> redisTemplate;
-
+    
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, CategoryType category) {
         log.info("search start category : {}", category);
 
@@ -80,44 +83,51 @@ public class TournamentService {
             TournamentEntity newTournament = createNewTournament(category, newSeason);
 
             //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다. -- 현재는 랜덤 32명의 회원에 대해 카테고리별로 분류가 되어 있지 않기에, 그냥 16명을 전부 참가자로 설정하도록 되어 있다.
-            saveRandomParticipantsFromRedis(newTournament);
+            saveRandomParticipantsFromRedis(newTournament,category);
         }
     }
-
-    private void saveRandomParticipantsFromRedis(TournamentEntity newTournament) {
-        Objects.requireNonNull(redisTemplate.opsForHash().entries(RANDOM_USER_KEY))
-                .values()
-                .forEach(randomUser -> {
-                    TournamentParticipantEntity participant = TournamentParticipantEntity.from(newTournament, (RandomUser) randomUser);
-                    tournamentParticipantEntityRepository.save(participant);
-                });
+    
+    private void saveRandomParticipantsFromRedis(TournamentEntity newTournament, CategoryType category) {
+        String categoryKey = String.format(RANDOM_USER_KEY + ":%s", category.getCategory());
+        
+        List<RandomUser> findByRedis = redisTemplate.opsForList().range(categoryKey, 0, 32);
+        
+        List<Object> list = findByRedis.stream().map(RandomUser::toTournamentParticipantEntity).toList();
+        
+        tournamentParticipantEntityRepository.saveAll(participant);
     }
 
     @Transactional(readOnly = false)
-    public List<UserRandomResponseDto> saveRandomUser() {
-        log.info("pickRandomUser start");
-
+    public Set<UserRandomResponseDto> saveRandomUser() {
         // Redis에서 기존 값을 삭제합니다.
         deleteAlreadyExistRamdomUserFromRedis();
+        
+        Set<UserRandomResponseDto> showedRandomUser = new HashSet<>();
+        
+        for (CategoryType category : CategoryType.values()) {
+            List<UserRandomResponseDto> pickedRandomUser = userRepository.findRandomUser(category);
+            
+            //TODO 일단 주석처리 -> 검증이 필요한지 생각해봐야할듯.
+            // validateRandomUserCount(pickedRandomUser);
+            
+            putRandomUserToRedis(pickedRandomUser, category);
+            
+            showedRandomUser.addAll(pickedRandomUser);
+        }
 
-        //TODO 향후 : 참가자는 해당 카테고리에 맞는 사람들로 가져와야한다. 지금은 랜덤으로 32명을 그냥 뽑는 형식이다.
-        List<UserRandomResponseDto> pickedRandomUser = userRepository.findRandomUser();
-
-        validateRandomUserCount(pickedRandomUser);
-
-        putRandomUserToRedis(pickedRandomUser);
-
-        return pickedRandomUser;
+        return showedRandomUser;
     }
-
+    
     private void deleteAlreadyExistRamdomUserFromRedis() {
-        redisTemplate.delete(RANDOM_USER_KEY);
+        randomUserRedisRepository.deleteAll();
     }
-
-    private void putRandomUserToRedis(List<UserRandomResponseDto> pickedRandomUser) {
+    
+    private void putRandomUserToRedis(List<UserRandomResponseDto> pickedRandomUser, CategoryType category) {
+        String categoryKey = String.format(RANDOM_USER_KEY +":%s", category.getCategory());
+        
         for (UserRandomResponseDto user : pickedRandomUser) {
-            RandomUser randomUser = user.toRandomUser();
-            redisTemplate.opsForHash().put(RANDOM_USER_KEY, randomUser.getUserId(), randomUser);
+            RandomUser randomUser = user.toRandomUser(categoryKey);
+            redisTemplate.opsForHash().put(categoryKey, randomUser.getUserId(), randomUser);
         }
     }
 

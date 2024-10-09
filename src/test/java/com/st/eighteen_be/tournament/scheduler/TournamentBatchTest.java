@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -70,9 +70,8 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
     @DisplayName("pickRandomUser 스케쥴러 정상 동작 테스트")
     void When_pickRandomUser_Then_pickRandomUser() {
         // given
-        List<UserRandomResponseDto> randomUsers = Collections.singletonList(
-                UserRandomResponseDto.of("qkrtkdwns3410", "https://example.com/profile.jpg")
-        );
+        Set<UserRandomResponseDto> randomUsers = Collections.singleton(UserRandomResponseDto.of("qkrtkdwns3410", "https://example.com/profile.jpg"));
+        
         when(tournamentService.saveRandomUser()).thenReturn(randomUsers);
 
         // when

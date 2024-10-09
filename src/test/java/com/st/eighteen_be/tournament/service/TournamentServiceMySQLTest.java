@@ -9,6 +9,7 @@ import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
 import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
@@ -36,10 +37,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -93,10 +91,13 @@ class TournamentServiceMySQLTest {
 
     @Mock
     private HashOperations<String, String, RandomUser> hashOperations;
-
+    @Autowired
+    private RandomUserRedisRepository randomUserRedisRepository;
+    
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, redisTemplate);
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, randomUserRedisRepository,
+                redisTemplate);
 
         given(redisTemplate.opsForList()).willReturn(listOperations);
         given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
@@ -166,7 +167,7 @@ class TournamentServiceMySQLTest {
                                                          .boxed()
                                                          .collect(Collectors.toMap(
                                                                  String::valueOf,
-                                                                 i -> RandomUser.of("qkrtkdwns3410", "http://test.com")
+                                                                 i -> RandomUser.of("qkrtkdwns3410", "http://test.com", "예술")
                                                          ));
 
         given(hashOperations.entries(anyString())).willReturn( randomUsersMap);
@@ -209,7 +210,7 @@ class TournamentServiceMySQLTest {
                                                              .boxed()
                                                              .collect(Collectors.toMap(
                                                                      String::valueOf,
-                                                                     i -> RandomUser.of("userId" + i, "http://test.com")
+                                                                     i -> RandomUser.of("userId" + i, "http://test.com", "예술")
                                                              ));
 
             given(hashOperations.entries(anyString())).willReturn(randomUsersMap);
@@ -531,7 +532,7 @@ class TournamentServiceMySQLTest {
             userRepository.saveAll(userInfos);
 
             // when
-            List<UserRandomResponseDto> actual = tournamentService.saveRandomUser();
+            Set<UserRandomResponseDto> actual = tournamentService.saveRandomUser();
 
             // then
             assertThat(actual)

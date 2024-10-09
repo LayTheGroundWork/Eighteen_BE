@@ -6,7 +6,6 @@ import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,9 +28,9 @@ class SnsLinkServiceTest {
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    @InjectMocks
-    private SnsLinkService snsLinkService;
+    // @Autowired
+    // @InjectMocks
+    // private SnsLinkService snsLinkService;
 
     @Autowired
     private EncryptService encryptService;

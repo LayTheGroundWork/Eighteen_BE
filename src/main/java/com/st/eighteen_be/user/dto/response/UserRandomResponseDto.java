@@ -30,7 +30,7 @@ public class UserRandomResponseDto {
                 .build();
     }
 
-    public RandomUser toRandomUser() {
-        return RandomUser.of(userId, profileImageUrl);
+    public RandomUser toRandomUser(String category) {
+        return RandomUser.of(userId, profileImageUrl, category);
     }
 }

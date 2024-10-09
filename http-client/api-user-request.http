@@ -1,0 +1,50 @@
+### 회원 가입
+< {%
+    const datas = [];
+
+    for (let i = 0; i < 32; i++) {
+        const generatePhoneNumber = (i) => {
+            const baseNumber = 1099997777 - i;
+            return "0" + baseNumber.toString().padStart(9, '0');
+        };
+
+        const phoneNumber = generatePhoneNumber(i);
+        const uniqueId = "user" + i;
+        const data = {
+            "phoneNumber": phoneNumber,
+            "uniqueId": uniqueId,
+            "nickName": "ehgur",
+            "schoolData": {
+                "schoolName": "서울고등학교",
+                "schoolLocation": "서울"
+            },
+            "birthDay": "2024-12-23",
+            "category": "예술",
+            "tournamentJoin": true
+        };
+
+        datas.push(data);
+    }
+
+    request.variables.set("clients", datas);
+%}
+
+POST {{url}}/v1/api/user/sign-up?profileImageKeys=["testKey"]
+Content-Type: application/json
+
+{
+    "phoneNumber": "{{$.clients..phoneNumber}}",
+    "uniqueId": "{{$.clients..uniqueId}}",
+    "nickName": "{{$.clients..nickName}}",
+    "schoolData": {
+        "schoolName": "{{$.clients..schoolData.schoolName}}",
+        "schoolLocation": "{{$.clients..schoolData.schoolLocation}}"
+    },
+    "birthDay": "{{$.clients..birthDay}}",
+    "category": "{{$.clients..category}}",
+    "tournamentJoin": {{$.clients..tournamentJoin}}
+}
+
+### 로그인
+POST {{url}}/v1/api/user/sign-in?phoneNumber=01099997777
+Content-Type: application/json
