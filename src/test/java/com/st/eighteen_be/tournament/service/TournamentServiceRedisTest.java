@@ -3,6 +3,7 @@ package com.st.eighteen_be.tournament.service;
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
 import com.st.eighteen_be.common.extension.RedisTestContainerExtenstion;
 import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 
@@ -59,10 +61,12 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
 
     @MockBean
     private UserRepository userRepository;
-
+    @Autowired
+    private RandomUserRedisRepository randomUserRedisRepository;
+    
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, voteEntityRepository, userRepository, redisTemplate);
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, voteEntityRepository, userRepository, randomUserRedisRepository, redisTemplate);
     }
 
     @Test
@@ -73,8 +77,8 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
         for (int i = 1; i <= 32; i++) {
             userRandomResponseDtos.add(UserRandomResponseDto.of("userId" + i, "http://test.com"));
         }
-
-        given(userRepository.findRandomUser()).willReturn(userRandomResponseDtos);
+        
+        given(userRepository.findRandomUser(any())).willReturn(userRandomResponseDtos);
 
         //when
         tournamentService.saveRandomUser();
