@@ -92,9 +92,14 @@ public class TournamentApiController {
         return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }
 
-    @Operation(summary = "토너먼트 최종 결과 조회", description = "토너먼트의 최종 결과를 조회합니다.")
+    @Operation(summary = "토너먼트 최종 결과 조회",
+            description = "토너먼트의 최종 결과를 조회합니다.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = TournamentVoteRequestDTO.class))
+            ))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema, schema = @Schema(implementation = TournamentVoteResultResponseDTO.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TournamentVoteResultResponseDTO.class)), mediaType = MediaType.APPLICATION_JSON_VALUE)),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
     })
     @GetMapping("/v1/api/tournament/final/result")
