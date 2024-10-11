@@ -38,7 +38,8 @@ public class JwtTokenProvider {
     private long refreshTokenExpireTime;
 
     private static final String TOKEN_TYPE = "Bearer";
-    public static final String BEARER_PREFIX = "Bearer-";
+    public static final String BEARER_PREFIX_A = "Bearer-";
+    public static final String BEARER_PREFIX_B = "Bearer ";
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String REFRESH_HEADER = "Refresh";
     private static final String AUTHORITIES_KEY = "auth";
@@ -157,7 +158,7 @@ public class JwtTokenProvider {
 
     // Request Header에 Access Token 정보를 추출하는 메서드
     public String resolveAccessToken(String accessToken) {
-        if (StringUtils.hasText(accessToken) && accessToken.startsWith(BEARER_PREFIX)) {
+        if (StringUtils.hasText(accessToken) && (accessToken.startsWith(BEARER_PREFIX_A) || accessToken.startsWith(BEARER_PREFIX_B))) {
             return accessToken.substring(7);
         }
         return null;
