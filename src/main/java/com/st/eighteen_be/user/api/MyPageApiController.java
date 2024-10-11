@@ -29,7 +29,7 @@ public class MyPageApiController {
 
     @Operation(summary = "myPage 수정", description = "myPage 수정")
     @PostMapping("/v1/api/my-page/update")
-    public ApiResp<String> update(@RequestParam String accessToken,
+    public ApiResp<String> update(@RequestHeader("Authorization") String accessToken,
                                   @RequestBody MyPageRequestDto request) {
         myPageService.update(request,accessToken);
 
