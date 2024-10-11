@@ -63,7 +63,7 @@ public class UserApiController {
 
     @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/v1/api/user/sign-in")
-    public ApiResp<JwtTokenDto> signIn(@Valid @RequestParam("phoneNumber")
+    public ApiResp<String> signIn(@Valid @RequestParam("phoneNumber")
                                            @Schema(example = "01012345679") String phoneNumber,
                                        HttpServletResponse response) {
 
@@ -73,7 +73,7 @@ public class UserApiController {
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
-        return ApiResp.success(HttpStatus.OK, jwtTokenDto);
+        return ApiResp.success(HttpStatus.OK, "Login Success");
     }
 
     @Operation(summary = "로그아웃", description = "로그아웃")
