@@ -58,6 +58,9 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/v3/api-docs/**",
             "/webjars/**",
+
+            // 스프링 엑추에이터 엔드포인트 허용 설정
+            "/actuator/**"
     };
 
     @Bean
