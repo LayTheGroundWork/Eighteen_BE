@@ -56,9 +56,17 @@ public class UserApiController {
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
-    public ApiResp<JwtTokenDto> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
-                                             @RequestParam("profileImageKeys") List<String> keys){
-        return ApiResp.success(HttpStatus.OK, userService.save(requestDto,keys));
+    public ApiResp<String> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
+                                  @RequestParam("profileImageKeys") List<String> keys,
+                                  HttpServletResponse response){
+
+        JwtTokenDto jwtTokenDto = userService.save(requestDto,keys);
+
+        // 응답 헤더에 토큰 추가
+        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
+        response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
+
+        return ApiResp.success(HttpStatus.OK, "Login Success");
     }
 
     @Operation(summary = "로그인", description = "로그인")
@@ -70,7 +78,7 @@ public class UserApiController {
         JwtTokenDto jwtTokenDto = userService.signIn(phoneNumber);
 
         // 응답 헤더에 토큰 추가
-        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
+        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
         return ApiResp.success(HttpStatus.OK, "Login Success");
@@ -90,7 +98,7 @@ public class UserApiController {
                                         HttpServletResponse response) {
 
         JwtTokenDto jwtTokenDto = userService.reissue(accessToken, refreshToken);
-        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + jwtTokenDto.getAccessToken());
+        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
         return ApiResp.success(HttpStatus.OK, jwtTokenDto);
