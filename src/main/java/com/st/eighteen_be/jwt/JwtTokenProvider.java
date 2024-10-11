@@ -38,7 +38,7 @@ public class JwtTokenProvider {
     private long refreshTokenExpireTime;
 
     private static final String TOKEN_TYPE = "Bearer";
-    public static final String BEARER_PREFIX = "Bearer ";
+    public static final String BEARER_PREFIX = "Bearer-";
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String REFRESH_HEADER = "Refresh";
     private static final String AUTHORITIES_KEY = "auth";
