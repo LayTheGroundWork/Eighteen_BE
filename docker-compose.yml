@@ -90,6 +90,7 @@ services:
   kafka:
     image: bitnami/kafka:3.6.1
     container_name: kafka
+    network_mode: host
     ports:
       - "9094:9094"
     environment:
