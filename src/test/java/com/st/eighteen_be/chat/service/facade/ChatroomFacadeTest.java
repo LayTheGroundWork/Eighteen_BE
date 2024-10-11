@@ -21,7 +21,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -46,47 +48,50 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
-    
+
     @Autowired
     private MongoTemplate mongoTemplate;
-    
+
     private ChatroomFacade chatroomFacade;
-    
+
     private RedisMessageService redisMessageService;
-    
+
     private ChatroomService chatroomService;
-    
+
     private ChatMessageService chatMessageService;
-    
+
     @Autowired
     private UnreadMessageRedisRepository unreadMessageRedisRepository;
-    
+
     @Autowired
     private ChatMessageCollectionRepository chatMessageCollectionRepository;
-    
+
     @Autowired
     private ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
-    
+
     private ChatroomInfoCollection chatroomInfoCollection;
-    
+
     private ChatMessageCollection chatMessageCollection;
-    
+
     private EnterChatRoomRequestDTO enterChatRoomRequestDTO;
-    
+
+    @MockBean
+    private SimpMessagingTemplate messagingTemplate;
+
     @BeforeEach
     void setUp() {
         // Given
         redisMessageService = new RedisMessageService(unreadMessageRedisRepository);
         chatroomService = new ChatroomService(chatroomInfoCollectionRepository, redisMessageService);
-        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService);
+        chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService, messagingTemplate);
         chatroomFacade = new ChatroomFacade(chatroomService, chatMessageService, redisMessageService);
-        
+
         chatroomInfoCollection = ChatroomInfoCollection.builder()
                 .senderNo(1L)
                 .receiverNo(2L)
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
-        
+
         chatMessageCollection = ChatMessageCollection.builder()
                 .senderNo(1L)
                 .receiverNo(2L)
@@ -94,76 +99,76 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
                 .updatedAt(LocalDateTime.now())
                 .message("Hello")
                 .build();
-        
+
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
                 .requestTime(LocalDateTime.now().plusDays(1))
                 .build();
     }
-    
+
     @Test
     @DisplayName("채팅메시지가 저장된 내역이 있는 경우 메시지 정상 반환")
     void When_findMessagesBeforeTimeInRoom_Expect_EmptyList() {
         //Given
         ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
-        
+
         ReflectionTestUtils.setField(chatMessageCollection, "chatroomInfoId", saved.get_id());
-        
+
         mongoTemplate.save(chatMessageCollection);
-        
+
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
                 .chatroomInfoId(saved.get_id().toString())
                 .requestTime(LocalDateTime.now())
                 .build();
-        
+
         // When
         List<ChatMessageResponseDTO> actual = chatroomFacade.getChatroom(enterChatRoomRequestDTO);
-        
+
         // Then
         assertThat(actual).isNotEmpty();
         assertThat(actual.get(0).getSenderNo()).isEqualTo(1L);
         assertThat(actual.get(0).getReceiverNo()).isEqualTo(2L);
         assertThat(actual.get(0).getMessage()).isEqualTo("Hello");
     }
-    
+
     @Test
     @DisplayName("채팅방 조회시 REDIS 에서 읽지 않은 메시지 카운트 초기화")
     void When_getChatroom_Expect_ResetUnreadMessageCount() {
         //Given
         ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
-        
+
         unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(1L, 2L, 1L));
         assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L))).isPresent();
-        
+
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
                 .chatroomInfoId(saved.get_id().toString())
                 .requestTime(LocalDateTime.now())
                 .build();
-        
+
         // When
         chatroomFacade.getChatroom(enterChatRoomRequestDTO);
-        
+
         // Then
         assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L))).isEmpty();
     }
-    
+
     @Test
     @DisplayName("채팅메시지가 저장된 내역이 없는 경우 빈 리스트 반환")
     void When_findMessagesBeforeTimeInRoom_Expect_NotEmptyList() {
         //Given
         ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
-        
+
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
                 .chatroomInfoId(saved.get_id().toString())
                 .requestTime(LocalDateTime.now())
                 .build();
-        
+
         // When
         List<ChatMessageResponseDTO> actual = chatroomFacade.getChatroom(enterChatRoomRequestDTO);
-        
+
         // Then
         assertThat(actual).isEmpty();
     }
-    
+
     @AfterEach
     void tearDown() {
         for (String collectionName : mongoTemplate.getCollectionNames()) {

@@ -1,14 +1,13 @@
 package com.st.eighteen_be.chat.api;
 
-import com.st.eighteen_be.chat.constant.KafkaConst;
 import com.st.eighteen_be.chat.model.dto.request.ChatMessageRequestDTO;
 import com.st.eighteen_be.chat.model.dto.request.EnterChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.dto.request.FindChatRoomRequestDTO;
 import com.st.eighteen_be.chat.model.dto.response.ChatMessageResponseDTO;
 import com.st.eighteen_be.chat.model.dto.response.ChatroomWithLastestMessageDTO;
+import com.st.eighteen_be.chat.service.ChatMessageService;
 import com.st.eighteen_be.chat.service.ChatroomService;
 import com.st.eighteen_be.chat.service.facade.ChatroomFacade;
-import com.st.eighteen_be.chat.service.kafka.ChattingProducer;
 import com.st.eighteen_be.common.response.ApiResp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,10 +40,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ChattingApiController {
-    private final ChattingProducer chattingProducer;
     private final ChatroomFacade chatroomFacade;
     private final ChatroomService chatroomService;
-    
+
+    private final ChatMessageService chatMessageService;
+    private final SimpMessagingTemplate smt;
+
     @Operation(summary = "내 채팅방 조회", description = "내 채팅방을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -56,10 +58,10 @@ public class ChattingApiController {
             Long senderNo
     ) {
         log.info("findAllMyChatrooms.senderNo() = {}", senderNo);
-        
+
         return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(FindChatRoomRequestDTO.of(senderNo)));
     }
-    
+
     @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -71,36 +73,36 @@ public class ChattingApiController {
             @PathVariable
             @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3b3" ,required = true)
             String chatroomInfoId,
-            
+
             @Parameter(description = "요청 시간", example = "2021-04-12T00:00:00")
             @RequestParam(required = true)
             String requestTime
     ) {
         log.info("enterChatroom.chatroomInfoId() = {} , requestTime = {}", chatroomInfoId, requestTime);
-        
+
         return ApiResp.success(HttpStatus.OK, chatroomFacade.getChatroom(EnterChatRoomRequestDTO.of(chatroomInfoId, requestTime)));
     }
-    
-    @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.", ignoreJsonView = true)
-    @MessageMapping("/v1/api/chat/{chatroom-id}/message") // /pub/v1/apichat/{chatroom-id}/message
+
+    @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.")
+    @MessageMapping("/v1/api/chat/{chatroom-id}/message") // /pub/v1/api/chat/{chatroom-id}/message
     public void sendMessage(@DestinationVariable(value = "chatroom-id") String chatroomId, ChatMessageRequestDTO chatMessage) {
         log.info("sendMessage.chatMessage.senderNo() = {} , chatMessage.receiverNo() = {}", chatMessage.getSenderNo(), chatMessage.getReceiverNo());
-        
-        chattingProducer.send(KafkaConst.CHAT_TOPIC, chatMessage, chatroomId);
+
+        chatMessageService.send(chatMessage, chatroomId);
     }
-    
+
     @PutMapping("/v1/api/chat/{chatroom-id}/quit")
     public ApiResp<Object> quitChatroom(
             @PathVariable("chatroom-id")
             @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3" ,required = true)
             String chatroomId,
-            
+
             @Parameter(description = "나가는 사용자 번호", example = "1", required = true)
             @RequestParam(required = true)
             Long quitUserNo
     ) {
         chatroomFacade.quitChatroom(chatroomId, quitUserNo);
-        
+
         return ApiResp.success(HttpStatus.OK, "채팅방 나가기 성공");
     }
 }

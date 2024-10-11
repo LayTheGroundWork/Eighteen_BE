@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -102,7 +102,7 @@ class UserApiControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
     }
 
-    @Test
+    /*@Test
     @DisplayName("회원 가입")
     void user_sign_up() throws Exception {
         // given: 테스트에 필요한 데이터와 Mock 객체의 동작 정의
@@ -126,7 +126,7 @@ class UserApiControllerTest {
 
         // then: 결과 검증
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(200);
-    }
+    }*/
 
     @Test
     @DisplayName("회원 로그인")

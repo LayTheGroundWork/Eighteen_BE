@@ -15,7 +15,6 @@ services:
     links:
       - mysql
       - mongodb
-      - kafka
       - redis-master
       - redis-slave-1
       - redis-slave-2
@@ -24,7 +23,6 @@ services:
     depends_on:
       - mysql
       - mongodb
-      - kafka
       - redis-master
       - redis-slave-1
       - redis-slave-2
@@ -84,29 +82,6 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
       # EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU: 1
 
-    networks:
-      - app-tier
-
-  kafka:
-    image: bitnami/kafka:3.6.1
-    container_name: kafka
-    network_mode: host
-    ports:
-      - "9094:9094"
-    environment:
-      - KAFKA_ENABLE_KRAFT=yes
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_BROKER_ID=1
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=${KAFKA_ADVERTISED_LISTENERS}
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-    volumes:
-      - kafka1-data:/bitnami/kafka
     networks:
       - app-tier
 

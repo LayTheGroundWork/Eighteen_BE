@@ -13,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,49 +26,58 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ChatMessageService {
-    
+
     private final ChatMessageCollectionRepository chatMessageCollectionRepository;
     private final ChatroomInfoCollectionRepository chatroomInfoCollectionRepository;
     private final RedisMessageService redisMessageService;
-    
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Transactional(readOnly = false)
     public void processMessage(ChatMessageRequestDTO messageDto) {
         log.info("========== processMessage ========== senderNo : {}, receiverNo : {}", messageDto.getSenderNo(), messageDto.getReceiverNo());
-        
+
         ChatMessageCollection chatMessage = messageDto.toCollection();
-        
+
         chatroomInfoCollectionRepository.findById(chatMessage.getChatroomInfoId().toString())
                 .ifPresentOrElse(
                         chatroomInfo -> {
                             log.info("========== chatroom found ==========");
-                            
+
                             addMessage(chatMessage);
                         },
                         () -> {
                             log.info("========== chatroom not found ==========");
-                            
+
                             throw new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM);
                         }
                 );
     }
-    
+
     public List<ChatMessageResponseDTO> findMessagesBeforeTimeInRoom(Long senderNo, Long receiverNo, LocalDateTime lastMessageTime) {
         log.info("========== findMessagesBeforeTimeInRoom ========== senderNo : {}, receiverNo : {}, lastMessageTime : {}", senderNo, receiverNo, lastMessageTime);
-        
+
         Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
-        
+
         List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findBySenderNoAndReceiverNoAndCreatedAtBefore(senderNo, receiverNo, lastMessageTime, pageable);
-        
+
         return foundChatMessages.stream()
                 .map(ChatMessageCollection::toResponseDTO)
                 .toList();
     }
-    
+
     private void addMessage(ChatMessageCollection chatMessage) {
         log.info("========== addMessage ==========");
-        
+
         chatMessageCollectionRepository.save(chatMessage);
-        
+
         redisMessageService.incrementUnreadMessageCount(chatMessage.getSenderNo(), chatMessage.getReceiverNo());
+    }
+
+    public void send(ChatMessageRequestDTO messageDto, String chatroomId) {
+        messageDto.setChatroomInfoId(chatroomId);
+
+        this.processMessage(messageDto);
+
+        messagingTemplate.convertAndSend(MessageFormat.format("/sub/v1/api/chat/{0}/message", messageDto.getChatroomInfoId()), messageDto);
     }
 }

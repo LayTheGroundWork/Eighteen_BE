@@ -1,0 +1,4 @@
+### 마이페이지 조회
+GET {{url}}/v1/api/my-page
+Content-Type: application/json
+Authorization: Bearer {{token}}
