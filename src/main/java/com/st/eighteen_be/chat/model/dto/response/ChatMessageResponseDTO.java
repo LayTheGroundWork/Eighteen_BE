@@ -19,11 +19,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessageResponseDTO implements Serializable {
     
-    @Schema(description = "발신자 번호", example = "1")
+    @Schema(description = "발신자 아이디", example = "senderUniqueId")
     @NotNull
     private String senderId;
     
-    @Schema(description = "수신자 번호", example = "2")
+    @Schema(description = "수신자 아이디", example = "receiverUniqueId")
     @NotNull
     private String receiverId;
     
