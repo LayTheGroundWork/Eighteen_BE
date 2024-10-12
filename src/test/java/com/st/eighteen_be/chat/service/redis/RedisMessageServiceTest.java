@@ -28,6 +28,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ServiceWithRedisTest
 class RedisMessageServiceTest extends RedisTestContainerExtenstion {
     
+    public static final String SENDER_ID = "senderId";
+    public static final String RECEIVER_ID = "receiverId";
+    
     @Autowired
     private UnreadMessageRedisRepository unreadMessageRedisRepository;
     
@@ -43,10 +46,10 @@ class RedisMessageServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("읽지 않음 카운트가 REDIS 에 저장되어 있지 않은 상태에서 카운트 증가 테스트")
     void When_IncrementUnreadMessageCount_Expect_Success() {
         // When
-        redisMessageService.incrementUnreadMessageCount(1L, 2L);
+        redisMessageService.incrementUnreadMessageCount(SENDER_ID, RECEIVER_ID);
         
         // Then
-        Optional<UnreadMessageCount> found = unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L));
+        Optional<UnreadMessageCount> found = unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(SENDER_ID, RECEIVER_ID));
         assertThat(found).isPresent();
         assertThat(found.get().getCount()).isEqualTo(1);
     }
@@ -55,14 +58,14 @@ class RedisMessageServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("읽지 않음 카운트가 REDIS 에 저장되어 있는 상태에서 카운트 증가 테스트")
     void When_IncrementUnreadMessageCount_Expect_Success2() {
         // Given
-        UnreadMessageCount unreadMessageCount = UnreadMessageCount.forChatroomEntry(1L, 2L, 1L);
+        UnreadMessageCount unreadMessageCount = UnreadMessageCount.forChatroomEntry(SENDER_ID, RECEIVER_ID, 1L);
         unreadMessageRedisRepository.save(unreadMessageCount);
         
         // When
-        redisMessageService.incrementUnreadMessageCount(1L, 2L);
+        redisMessageService.incrementUnreadMessageCount(SENDER_ID, RECEIVER_ID);
         
         // Then
-        Optional<UnreadMessageCount> found = unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L));
+        Optional<UnreadMessageCount> found = unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(SENDER_ID, RECEIVER_ID));
         assertThat(found).isPresent();
         assertThat(found.get().getCount()).isEqualTo(2);
     }
@@ -71,13 +74,13 @@ class RedisMessageServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("REDIS 읽지않음 초기화 테스트")
     void When_ResetUnreadMessageCount_Expect_Success() {
         // Given
-        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(1L, 2L, 1L));
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(SENDER_ID, RECEIVER_ID, 1L));
         
         // When
-        redisMessageService.resetUnreadMessageCount(UnreadMessageCount.forChatroomEntry(1L, 2L, 1L));
+        redisMessageService.resetUnreadMessageCount(UnreadMessageCount.forChatroomEntry(SENDER_ID, RECEIVER_ID, 1L));
         
         // Then
-        Optional<UnreadMessageCount> found = unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L));
+        Optional<UnreadMessageCount> found = unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(SENDER_ID, RECEIVER_ID));
         
         assertThat(found).isEmpty();
     }
@@ -86,10 +89,10 @@ class RedisMessageServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("REDIS 읽지않음 카운트 조회 정상 테스트")
     void When_GetUnreadMessageCount_Expect_Success() {
         // Given
-        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(1L, 2L, 10L));
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(SENDER_ID, RECEIVER_ID, 10L));
         
         // When
-        long unreadMessageCount = redisMessageService.getUnreadMessageCount(2L, 1L);
+        long unreadMessageCount = redisMessageService.getUnreadMessageCount(RECEIVER_ID, SENDER_ID);
         
         // Then
         assertThat(unreadMessageCount).isEqualTo(10L);

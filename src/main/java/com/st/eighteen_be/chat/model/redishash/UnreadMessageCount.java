@@ -27,15 +27,15 @@ public class UnreadMessageCount {
     
     @Id
     private String id;
-    private Long senderNo;
-    private Long receiverNo;
+    private String senderId;
+    private String receiverId;
     private long count;
     
     @Builder
-    public UnreadMessageCount(Long senderNo, Long receiverNo, Long count) {
-        this.id = makeId(senderNo, receiverNo);
-        this.senderNo = senderNo;
-        this.receiverNo = receiverNo;
+    public UnreadMessageCount(String senderId, String receiverId, Long count) {
+        this.id = makeId(senderId, receiverId);
+        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.count = count;
     }
     
@@ -43,23 +43,23 @@ public class UnreadMessageCount {
         this.count++;
     }
     
-    public static UnreadMessageCount forChatroomEntry(Long senderNo, Long receiverNo, Long count) {
+    public static UnreadMessageCount forChatroomEntry(String senderId, String receiverId, Long count) {
         return UnreadMessageCount.builder()
-                .senderNo(senderNo)
-                .receiverNo(receiverNo)
+                .senderId(senderId)
+                .receiverId(receiverId)
                 .count(count)
                 .build();
     }
     
-    public static UnreadMessageCount forChatroomEntry(Long receiverNo, Long senderNo) {
+    public static UnreadMessageCount forChatroomEntry(String receiverId, String senderId) {
         return UnreadMessageCount.builder()
-                .senderNo(senderNo)
-                .receiverNo(receiverNo)
+                .senderId(senderId)
+                .receiverId(receiverId)
                 .count(0L)
                 .build();
     }
     
-    public static String makeId(Long senderNo, Long receiverNo) {
-        return MessageFormat.format(UNREAD_MESSAGE_COUNT_KEY + ":{0}:{1}", senderNo, receiverNo);
+    public static String makeId(String senderId, String receiverId) {
+        return MessageFormat.format(UNREAD_MESSAGE_COUNT_KEY + ":{0}:{1}", senderId, receiverId);
     }
 }

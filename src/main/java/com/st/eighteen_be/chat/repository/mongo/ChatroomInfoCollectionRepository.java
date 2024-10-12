@@ -23,13 +23,13 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
      * FIXME : 자바 쿼리로 변경이 가능하다면 변경하는 것이 좋을 것 같다.
      * 발신자 번호로 채팅방 목록 조회
      *
-     * @param senderNo 채팅 송신자 번호
+     * @param senderId 채팅 송신자 번호
      * @return 채팅방 목록
      */
     @Aggregation(pipeline = {
             """
                     { $match: {
-                        'senderNo': ?0,
+                        "senderId": ?0,
                         'leftUsers': { $nin: [?0] }
                     } }
            """,
@@ -55,8 +55,8 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
             """
                     { $project: {
                         '_id': 1,
-                        'senderNo': 1,
-                        'receiverNo': 1,
+                        'senderId': 1,
+                        "receiverId": 1,
                         'chatroomType': 1,
                         'createdAt': 1,
                         'updatedAt': 1,
@@ -65,5 +65,5 @@ public interface ChatroomInfoCollectionRepository extends MongoRepository<Chatro
                     } }
             """
     })
-    List<ChatroomWithLastestMessageDTO> findAllChatroomBySenderNo(Long senderNo);
+    List<ChatroomWithLastestMessageDTO> findAllChatroomBySenderNo(String senderId);
 }

@@ -85,24 +85,24 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
         chatroomService = new ChatroomService(chatroomInfoCollectionRepository, redisMessageService);
         chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService, messagingTemplate);
         chatroomFacade = new ChatroomFacade(chatroomService, chatMessageService, redisMessageService);
-
+        
         chatroomInfoCollection = ChatroomInfoCollection.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
-                .chatroomType(ChatroomType.PRIVATE)
-                .build();
-
+                                         .senderId("senderIdTester")
+                                         .receiverId("receiverIdTester")
+                                         .chatroomType(ChatroomType.PRIVATE)
+                                         .build();
+        
         chatMessageCollection = ChatMessageCollection.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .message("Hello")
-                .build();
-
+                                        .senderId("senderIdTester")
+                                        .receiverId("receiverIdTester")
+                                        .createdAt(LocalDateTime.now())
+                                        .updatedAt(LocalDateTime.now())
+                                        .message("Hello")
+                                        .build();
+        
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
-                .requestTime(LocalDateTime.now().plusDays(1))
-                .build();
+                                          .requestTime(LocalDateTime.now().plusDays(1))
+                                          .build();
     }
 
     @Test
@@ -125,8 +125,8 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
 
         // Then
         assertThat(actual).isNotEmpty();
-        assertThat(actual.get(0).getSenderNo()).isEqualTo(1L);
-        assertThat(actual.get(0).getReceiverNo()).isEqualTo(2L);
+        assertThat(actual.get(0).getSenderId()).isEqualTo("senderIdTester");
+        assertThat(actual.get(0).getReceiverId()).isEqualTo("receiverIdTester");
         assertThat(actual.get(0).getMessage()).isEqualTo("Hello");
     }
 
@@ -136,8 +136,8 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
         //Given
         ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
 
-        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(1L, 2L, 1L));
-        assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L))).isPresent();
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry("senderIdTester", "receiverIdTester", 1L));
+        assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId("senderIdTester", "receiverIdTester"))).isPresent();
 
         enterChatRoomRequestDTO = EnterChatRoomRequestDTO.builder()
                 .chatroomInfoId(saved.get_id().toString())
@@ -148,7 +148,7 @@ public class ChatroomFacadeTest extends RedisTestContainerExtenstion {
         chatroomFacade.getChatroom(enterChatRoomRequestDTO);
 
         // Then
-        assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId(1L, 2L))).isEmpty();
+        assertThat(unreadMessageRedisRepository.findById(UnreadMessageCount.makeId("senderIdTester", "receiverIdTester"))).isEmpty();
     }
 
     @Test

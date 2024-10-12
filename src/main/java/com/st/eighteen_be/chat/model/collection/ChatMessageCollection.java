@@ -27,29 +27,30 @@ public class ChatMessageCollection extends BaseDocument {
     private ObjectId chatroomInfoId;
     
     //TODO 회원 존재하지 않기에 임시 String 처리
-    @Field(value = "senderNo")
-    private Long senderNo;
+    @Field(value = "senderId")
+    private String senderId;
     
     //TODO 회원 존재하지 않기에 임시 String 처리
-    @Field(value = "receiverNo")
-    private Long receiverNo;
+    @Field(value = "receiverId")
+    private String receiverId;
     
     @Field(value = "message")
     private String message;
     
-    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, ObjectId _id, ObjectId chatroomInfoId, Long senderNo, Long receiverNo, String message) {
+    private ChatMessageCollection(LocalDateTime createdAt, LocalDateTime updatedAt, ObjectId _id, ObjectId chatroomInfoId, String senderId, String receiverId, String message) {
         super(createdAt, updatedAt);
+        
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.message = message;
         this._id = _id;
         this.chatroomInfoId = chatroomInfoId;
-        this.senderNo = senderNo;
-        this.receiverNo = receiverNo;
-        this.message = message;
     }
     
     public ChatMessageResponseDTO toResponseDTO() {
         return ChatMessageResponseDTO.builder()
-                .senderNo(getSenderNo())
-                .receiverNo(getReceiverNo())
+                .senderId(getSenderId())
+                .receiverId(getReceiverId())
                 .message(getMessage())
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())

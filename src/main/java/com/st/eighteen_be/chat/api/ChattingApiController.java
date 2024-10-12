@@ -51,15 +51,15 @@ public class ChattingApiController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
     })
-    @GetMapping("/v1/api/chat/all/{senderNo}")
+    @GetMapping("/v1/api/chat/all/{sender-id}")
     public ApiResp<List<ChatroomWithLastestMessageDTO>> findAllMyChatrooms(
-            @PathVariable("senderNo")
-            @Parameter(description = "사용자 번호", example = "1", required = true)
-            Long senderNo
+            @PathVariable("sender-id")
+            @Parameter(description = "사용자 아이디", example = "qkrtkdwns3410", required = true)
+            String senderId
     ) {
-        log.info("findAllMyChatrooms.senderNo() = {}", senderNo);
+        log.info("findAllMyChatrooms.senderId() = {}", senderId);
 
-        return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(FindChatRoomRequestDTO.of(senderNo)));
+        return ApiResp.success(HttpStatus.OK, chatroomService.findAllMyChatrooms(FindChatRoomRequestDTO.of(senderId)));
     }
 
     @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다.")
@@ -86,7 +86,7 @@ public class ChattingApiController {
     @Operation(summary = "채팅 메시지 전송", description = "채팅 메시지를 전송합니다.")
     @MessageMapping("/v1/api/chat/{chatroom-id}/message") // /pub/v1/api/chat/{chatroom-id}/message
     public void sendMessage(@DestinationVariable(value = "chatroom-id") String chatroomId, ChatMessageRequestDTO chatMessage) {
-        log.info("sendMessage.chatMessage.senderNo() = {} , chatMessage.receiverNo() = {}", chatMessage.getSenderNo(), chatMessage.getReceiverNo());
+        log.info("sendMessage.chatMessage.senderNo() = {} , chatMessage.receiverNo() = {}", chatMessage.getSenderId(), chatMessage.getReceiverId());
 
         chatMessageService.send(chatMessage, chatroomId);
     }
@@ -97,11 +97,11 @@ public class ChattingApiController {
             @Parameter(description = "채팅방 번호", example = "60f1b3b3b3b3b3b3b3b3b3" ,required = true)
             String chatroomId,
 
-            @Parameter(description = "나가는 사용자 번호", example = "1", required = true)
+            @Parameter(description = "나가는 사용자 아이디", example = "qkrtkdwns3410", required = true)
             @RequestParam(required = true)
-            Long quitUserNo
+            String quitUserId
     ) {
-        chatroomFacade.quitChatroom(chatroomId, quitUserNo);
+        chatroomFacade.quitChatroom(chatroomId, quitUserId);
 
         return ApiResp.success(HttpStatus.OK, "채팅방 나가기 성공");
     }

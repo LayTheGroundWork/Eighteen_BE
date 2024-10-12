@@ -1,7 +1,7 @@
 package com.st.eighteen_be.chat.model.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 /**
@@ -18,16 +18,15 @@ import lombok.Builder;
 @Schema(description = "채팅방 조회 요청 DTO")
 public record FindChatRoomRequestDTO(
         @Schema(description = "발신자 번호", example = "1")
-        @Positive(message = "senderNo is not positive.")
-        long senderNo
+        @NotNull(message = "senderId must not be null") String senderId
 ) {
     @Builder
     public FindChatRoomRequestDTO {
     }
     
-    public static FindChatRoomRequestDTO of(long senderNo) {
+    public static FindChatRoomRequestDTO of(String senderId) {
         return FindChatRoomRequestDTO.builder()
-                .senderNo(senderNo)
-                .build();
+                       .senderId(senderId)
+                       .build();
     }
 }

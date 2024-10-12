@@ -24,11 +24,11 @@ public class ChatroomWithLastestMessageDTO implements Serializable {
     @Schema(description = "채팅방 ID", example = "6073f3b4b3b3b3b3b3b3b3b3")
     private ObjectId _id;
     
-    @Schema(description = "발신자 번호", example = "1")
-    private Long senderNo;
+    @Schema(description = "발신자 번호", example = "senderIdTester")
+    private String senderId;
     
-    @Schema(description = "수신자 번호", example = "2")
-    private Long receiverNo;
+    @Schema(description = "수신자 번호", example = "receiverIdTester")
+    private String receiverId;
     
     @Schema(description = "채팅방 타입", example = "PRIVATE")
     private ChatroomType chatroomType;
@@ -49,10 +49,10 @@ public class ChatroomWithLastestMessageDTO implements Serializable {
     private LocalDateTime messageCreatedAt;
     
     @Builder
-    private ChatroomWithLastestMessageDTO(ObjectId _id, Long senderNo, Long receiverNo, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, Long unreadMessageCount, String message, LocalDateTime messageCreatedAt) {
+    private ChatroomWithLastestMessageDTO(ObjectId _id, String senderId, String receiverId, ChatroomType chatroomType, LocalDateTime createdAt, LocalDateTime updatedAt, Long unreadMessageCount, String message, LocalDateTime messageCreatedAt) {
         this._id = _id;
-        this.senderNo = senderNo;
-        this.receiverNo = receiverNo;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.chatroomType = chatroomType;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

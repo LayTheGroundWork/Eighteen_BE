@@ -10,6 +10,7 @@ import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadReq
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -39,55 +40,56 @@ import java.util.Set;
  */
 @Document(collection = "chatroom_info")
 @CompoundIndexes({
-        @CompoundIndex(name = "chatroom_info_idx", def = "{'SENDER_NO': 1, 'RECEIVER_NO': 1}")
+        @CompoundIndex(name = "chatroom_info_idx", def = "{'senderId': 1, 'receiverId': 1}")
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 public class ChatroomInfoCollection extends BaseDocument {
     @Id
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     @Field(value = "_id", targetType = FieldType.OBJECT_ID)
     private ObjectId _id;
     
-    @Field(name = "senderNo")
-    private Long senderNo;
+    @Field(name = "senderId")
+    private String senderId;
     
-    @Field(name = "receiverNo")
-    private Long receiverNo;
+    @Field(name = "receiverId")
+    private String receiverId;
     
     @Convert(converter = ChatroomTypeConverter.class)
     @Column(name = "chatroomType", nullable = false)
     private ChatroomType chatroomType;
     
     @Field(name = "leftUsers")
-    private Set<Long> leftUsers = new HashSet<>();
+    @Builder.Default
+    private Set<String> leftUsers = new HashSet<>();
     
-    private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, Long senderNo, Long receiverNo, ChatroomType chatroomType) {
+    private ChatroomInfoCollection(LocalDateTime createdAt, LocalDateTime updatedAt, String senderId, String receiverId, ChatroomType chatroomType) {
         super(createdAt, updatedAt);
         
-        this.senderNo = senderNo;
-        this.receiverNo = receiverNo;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.chatroomType = chatroomType;
     }
     
-    public boolean isUserInChatroom(Long userNo) {
-        return Objects.equals(senderNo, userNo) || Objects.equals(receiverNo, userNo);
+    public boolean isUserInChatroom(String userId) {
+        return Objects.equals(senderId, userId) || Objects.equals(receiverId, userId);
     }
     
-    public void addLeftUser(Long userNo) {
-        leftUsers.add(userNo);
+    public void addLeftUser(String userId) {
+        leftUsers.add(userId);
     }
     
-    public static ChatroomInfoCollection of(Long senderNo, Long receiverNo, ChatroomType chatroomType) {
-        if (Objects.isNull(senderNo) || Objects.isNull(receiverNo) || Objects.isNull(chatroomType)) {
+    public static ChatroomInfoCollection of(String senderId, String receiverId, ChatroomType chatroomType) {
+        if (Objects.isNull(senderId) || Objects.isNull(receiverId) || Objects.isNull(chatroomType)) {
             throw new BadRequestException(ErrorCode.NOT_NULL);
         }
         
         return ChatroomInfoCollection.builder()
-                .senderNo(senderNo)
-                .receiverNo(receiverNo)
-                .chatroomType(chatroomType)
-                .build();
+                       .senderId(senderId)
+                       .receiverId(receiverId)
+                       .chatroomType(chatroomType)
+                       .build();
     }
 }

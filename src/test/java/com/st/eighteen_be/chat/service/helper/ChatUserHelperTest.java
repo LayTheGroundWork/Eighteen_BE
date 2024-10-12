@@ -25,22 +25,22 @@ public class ChatUserHelperTest {
     @DisplayName("validNotSameUser 테스트 - 두 유저가 다를 때")
     void testValidNotSameUserWhenNotSameThenNoException() {
         // given
-        Long senderNo = 1L;
-        Long receiverNo = 2L;
+        String senderId = "senderIdTester";
+        String receiverId = "receiverIdTester";
         
         // when & then
-        assertDoesNotThrow(() -> ChatUserHelper.validNotSameUser(senderNo, receiverNo));
+        assertDoesNotThrow(() -> ChatUserHelper.validNotSameUser(senderId, receiverId));
     }
     
     @Test
     @DisplayName("validNotSameUser 테스트 - 두 유저가 같을 때")
     void testValidNotSameUserWhenSameThenBadRequestException() {
         // Arrange
-        Long senderNo = 1L;
-        Long receiverNo = 1L;
+        String senderId = "senderIdTester";
+        String receiverId = "senderIdTester";
         
         // when & then
-        Assertions.assertThatThrownBy(() -> ChatUserHelper.validNotSameUser(senderNo, receiverNo))
+        Assertions.assertThatThrownBy(() -> ChatUserHelper.validNotSameUser(senderId, receiverId))
                 .isInstanceOf(BadRequestException.class);
     }
 }

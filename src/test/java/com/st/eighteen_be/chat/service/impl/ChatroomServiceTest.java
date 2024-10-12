@@ -49,6 +49,9 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
     
     //로거
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ChatroomServiceTest.class);
+    public static final String SENDER_ID_TESTER = "senderIdTester";
+    public static final String RECEIVER_ID_TESTER_2 = "receiverIdTester2";
+    public static final String RECEIVER_ID_TESTER = "receiverIdTester";
     
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -71,31 +74,30 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
         
         chatroomService = new ChatroomService(chatroomInfoCollectionRepository, redisMessageService);
         
-        savedChatroomInfoCollection = ChatroomInfoCollection.of(1L, 2L, ChatroomType.PRIVATE);
+        savedChatroomInfoCollection = ChatroomInfoCollection.of(SENDER_ID_TESTER, RECEIVER_ID_TESTER, ChatroomType.PRIVATE);
     }
     
     @Test
     @DisplayName("채팅방 정상 생성 테스트 - 올바른 파라미터")
     void When_CreateChatroom_Then_Success() {
         // When
-        ChatroomInfoCollection actual = chatroomService.createChatroom(1L, 2L);
+        ChatroomInfoCollection actual = chatroomService.createChatroom(SENDER_ID_TESTER, RECEIVER_ID_TESTER);
         
         // Then
         ChatroomInfoCollection found = chatroomInfoCollectionRepository.findById(actual.get_id().toString()).get();
         assertThat(found).isNotNull();
-        assertThat(found.getSenderNo()).isEqualTo(1L);
-        assertThat(found.getReceiverNo()).isEqualTo(2L);
+        assertThat(found.getSenderId()).isEqualTo(SENDER_ID_TESTER);
+        assertThat(found.getReceiverId()).isEqualTo(RECEIVER_ID_TESTER);
     }
     
     @Test
     @DisplayName("채팅방 파라미터 오류 테스트 - 매개변수 null 테스트")
     void When_CreateChatroom_Then_Exception_NullPointerException() {
         // When & Then
-        assertThatThrownBy(() -> chatroomService.createChatroom(null, 1L))
+        assertThatThrownBy(() -> chatroomService.createChatroom(null, RECEIVER_ID_TESTER))
                 .isInstanceOf(NullPointerException.class);
         
-        assertThatThrownBy(() -> chatroomService.createChatroom(1L, null))
-                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> chatroomService.createChatroom(SENDER_ID_TESTER, null))                .isInstanceOf(NullPointerException.class);
     }
     
     @Test
@@ -109,15 +111,15 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
         
         // Then
         assertThat(found).isNotNull();
-        assertThat(found.getSenderNo()).isEqualTo(1L);
-        assertThat(found.getReceiverNo()).isEqualTo(2L);
+        assertThat(found.getSenderId()).isEqualTo(SENDER_ID_TESTER);
+        assertThat(found.getReceiverId()).isEqualTo(RECEIVER_ID_TESTER);
     }
     
     @Test
     @DisplayName("채팅방 생성시 - 송신자와 수신자가 동일한 경우 BadRequestException 발생")
     void When_CreateChatroom_Then_Exception_BadRequestException() {
         // When & Then
-        assertThatThrownBy(() -> chatroomService.createChatroom(1L, 1L))
+        assertThatThrownBy(() -> chatroomService.createChatroom(SENDER_ID_TESTER, SENDER_ID_TESTER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("같은 사용자입니다.");
     }
@@ -136,10 +138,10 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
     @DisplayName("채팅방 전체 목록 조회  - 각 채팅방의  마지막 채팅까지 올바르게 가져와야합니다.")
     void When_FindAllMyChatrooms_Then_Success() {
         // Given
-        ChatroomInfoCollection anotherSavedChatroomInfoCollection = ChatroomInfoCollection.of(1L, 3L, ChatroomType.PRIVATE);
+        ChatroomInfoCollection anotherSavedChatroomInfoCollection = ChatroomInfoCollection.of(SENDER_ID_TESTER, RECEIVER_ID_TESTER_2, ChatroomType.PRIVATE);
         
         FindChatRoomRequestDTO requestDTO = FindChatRoomRequestDTO.builder()
-                .senderNo(1L)
+                .senderId(SENDER_ID_TESTER)
                 .build();
         
         //채팅방 생성
@@ -147,28 +149,28 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
         ChatroomInfoCollection secondChatroomInfo = mongoTemplate.save(anotherSavedChatroomInfoCollection);// 1 - 3 채팅방 생성
         
         ChatMessageCollection firstChatMessage = ChatMessageCollection.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
-                .chatroomInfoId(firstChatroomInfo.get_id())
-                .message("안녕하세요 1-2")
-                .createdAt(LocalDateTime.now().minusDays(1))
-                .build();
+                                                                .senderId(SENDER_ID_TESTER)
+                                                                .receiverId(RECEIVER_ID_TESTER)
+                                                                .chatroomInfoId(firstChatroomInfo.get_id())
+                                                                .message("안녕하세요 1-2")
+                                                                .createdAt(LocalDateTime.now().minusDays(1))
+                                                                .build();
         
         ChatMessageCollection secondChatMessage = ChatMessageCollection.builder()
-                .senderNo(1L)
-                .receiverNo(3L)
-                .chatroomInfoId(secondChatroomInfo.get_id())
-                .message("안녕하세요 1-3")
-                .createdAt(LocalDateTime.now().minusDays(2))
-                .build();
+                                                                .senderId(SENDER_ID_TESTER)
+                                                                .receiverId(RECEIVER_ID_TESTER_2)
+                                                                .chatroomInfoId(secondChatroomInfo.get_id())
+                                                                .message("안녕하세요 1-3")
+                                                                .createdAt(LocalDateTime.now().minusDays(2))
+                                                                .build();
         
         //채팅방별 채팅생성
         mongoTemplate.save(firstChatMessage);
         mongoTemplate.save(secondChatMessage);
         
         //redis 에 읽지 않은 메시지 카운트 저장
-        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(2L, 1L, 5L));
-        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(3L, 1L, 10L));
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(RECEIVER_ID_TESTER, SENDER_ID_TESTER, 5L));
+        unreadMessageRedisRepository.save(UnreadMessageCount.forChatroomEntry(RECEIVER_ID_TESTER_2, SENDER_ID_TESTER, 10L));
         
         // When
         var chatrooms = chatroomService.findAllMyChatrooms(requestDTO);
@@ -176,13 +178,12 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
         // Then
         assertThat(chatrooms).isNotEmpty();
         
-        
         assertSoftly(softAssertions -> {
             log.info("chatrooms.message : {}", chatrooms.get(0).getMessage());
             log.info("chatrooms.messageCreatedAt : {}", chatrooms.get(0).getMessageCreatedAt());
             
-            softAssertions.assertThat(chatrooms.get(0).getSenderNo()).isEqualTo(1L);
-            softAssertions.assertThat(chatrooms.get(0).getReceiverNo()).isEqualTo(2L);
+            softAssertions.assertThat(chatrooms.get(0).getSenderId()).isEqualTo(SENDER_ID_TESTER);
+            softAssertions.assertThat(chatrooms.get(0).getReceiverId()).isEqualTo(RECEIVER_ID_TESTER);
             softAssertions.assertThat(chatrooms.get(0).getMessage()).isEqualTo("안녕하세요 1-2");
             softAssertions.assertThat(chatrooms.get(0).getUnreadMessageCount()).isEqualTo(5L);
             softAssertions.assertThat(chatrooms.get(0).getMessageCreatedAt()).isNotNull();
@@ -192,8 +193,8 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
             log.info("chatrooms.message : {}", chatrooms.get(1).getMessage());
             log.info("chatrooms.messageCreatedAt : {}", chatrooms.get(1).getMessageCreatedAt());
             
-            softAssertions.assertThat(chatrooms.get(1).getSenderNo()).isEqualTo(1L);
-            softAssertions.assertThat(chatrooms.get(1).getReceiverNo()).isEqualTo(3L);
+            softAssertions.assertThat(chatrooms.get(1).getSenderId()).isEqualTo(SENDER_ID_TESTER);
+            softAssertions.assertThat(chatrooms.get(1).getReceiverId()).isEqualTo(RECEIVER_ID_TESTER_2);
             softAssertions.assertThat(chatrooms.get(1).getMessage()).isEqualTo("안녕하세요 1-3");
             softAssertions.assertThat(chatrooms.get(1).getUnreadMessageCount()).isEqualTo(10L);
             softAssertions.assertThat(chatrooms.get(1).getMessageCreatedAt()).isNotNull();
@@ -207,11 +208,11 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
         ChatroomInfoCollection saved = mongoTemplate.save(savedChatroomInfoCollection);
         
         // When
-        chatroomService.quitChatroom(saved.get_id().toString(), 1L);
+        chatroomService.quitChatroom(saved.get_id().toString(), SENDER_ID_TESTER);
         
         // Then
         ChatroomInfoCollection found = chatroomInfoCollectionRepository.findById(saved.get_id().toString()).get();
-        assertThat(found.getLeftUsers()).contains(1L);
+        assertThat(found.getLeftUsers()).contains(SENDER_ID_TESTER);
     }
     
     @Test
@@ -221,10 +222,10 @@ class ChatroomServiceTest extends RedisTestContainerExtenstion {
         ChatroomInfoCollection saved = mongoTemplate.save(savedChatroomInfoCollection);
         
         // When
-        chatroomService.quitChatroom(saved.get_id().toString(), savedChatroomInfoCollection.getSenderNo());
+        chatroomService.quitChatroom(saved.get_id().toString(), savedChatroomInfoCollection.getSenderId());
         
         // Then
-        List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(savedChatroomInfoCollection.getSenderNo());
+        List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(savedChatroomInfoCollection.getSenderId());
         assertThat(allChatroomBySenderNo).isEmpty();
     }
     

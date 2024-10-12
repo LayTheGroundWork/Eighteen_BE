@@ -64,8 +64,8 @@ public class ChatMessageServiceTest {
         chatMessageService = new ChatMessageService(chatMessageCollectionRepository, chatroomInfoCollectionRepository, redisMessageService, messagingTemplate);
 
         chatroomInfoCollection = ChatroomInfoCollection.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
+                                         .senderId("senderId")
+                                         .receiverId("receiverId")
                 .chatroomType(ChatroomType.PRIVATE)
                 .build();
     }
@@ -74,8 +74,8 @@ public class ChatMessageServiceTest {
     @DisplayName("processMessage -  채팅방이 별도로 존재하지 않는 경우 NotFoundException 발생")
     void When_processMessage_IfChatroomNotExist_Expect_NotFoundException() {
         messageDto = ChatMessageRequestDTO.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
+                             .senderId("senderId")
+                             .receiverId("receiverId")
                 .chatroomInfoId("60f1b3b3b3b3b3b3b3b3b3b3")
                 .message("message")
                 .build();
@@ -91,13 +91,13 @@ public class ChatMessageServiceTest {
     void When_processMessage_IfChatroomExist_Expect_SendMessage() {
         // Given
         ChatroomInfoCollection saved = mongoTemplate.save(chatroomInfoCollection);
-
+        
         messageDto = ChatMessageRequestDTO.builder()
-                .senderNo(1L)
-                .receiverNo(2L)
-                .chatroomInfoId(saved.get_id().toString())
-                .message("message")
-                .build();
+                             .senderId("senderId")
+                             .receiverId("receiverId")
+                             .chatroomInfoId(saved.get_id().toString())
+                             .message("message")
+                             .build();
 
         // When
         chatMessageService.processMessage(messageDto);
@@ -110,9 +110,10 @@ public class ChatMessageServiceTest {
         assertThat(foundChatroom.getChatroomType()).isEqualTo(ChatroomType.PRIVATE);
 
         assertThat(foundChatMessage).isNotNull();
-        assertThat(foundChatMessage.getSenderNo()).isEqualTo(1L);
+        assertThat(foundChatMessage.getSenderId()).isEqualTo("senderId");
         assertThat(foundChatMessage.getMessage()).isEqualTo("message");
-        assertThat(foundChatMessage.getReceiverNo()).isEqualTo(2L);
+        assertThat(foundChatMessage.getReceiverId()).isEqualTo("receiverId");
+        assertThat(foundChatMessage.getChatroomInfoId()).isEqualTo(saved.get_id());
     }
 
     @AfterEach

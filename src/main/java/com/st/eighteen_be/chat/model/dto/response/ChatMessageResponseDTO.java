@@ -21,11 +21,11 @@ public class ChatMessageResponseDTO implements Serializable {
     
     @Schema(description = "발신자 번호", example = "1")
     @NotNull
-    private Long senderNo;
+    private String senderId;
     
     @Schema(description = "수신자 번호", example = "2")
     @NotNull
-    private Long receiverNo;
+    private String receiverId;
     
     @Schema(description = "메시지", example = "안녕하세요")
     @NotNull
@@ -41,9 +41,9 @@ public class ChatMessageResponseDTO implements Serializable {
     private LocalDateTime updatedAt;
     
     @Builder
-    private ChatMessageResponseDTO(Long senderNo, Long receiverNo, String message, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.senderNo = senderNo;
-        this.receiverNo = receiverNo;
+    private ChatMessageResponseDTO(String senderId, String receiverId, String message, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.senderId = senderId;
+        this.receiverId = receiverId;
         this.message = message;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

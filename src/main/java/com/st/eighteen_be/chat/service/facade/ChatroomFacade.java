@@ -43,18 +43,18 @@ public class ChatroomFacade {
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(enterChatRoomRequestDTO.chatroomInfoId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM));
         
-        redisMessageService.resetUnreadMessageCount(UnreadMessageCount.forChatroomEntry(chatroomInfoCollection.getSenderNo(), chatroomInfoCollection.getReceiverNo(), 0L));
+        redisMessageService.resetUnreadMessageCount(UnreadMessageCount.forChatroomEntry(chatroomInfoCollection.getSenderId(), chatroomInfoCollection.getReceiverId(), 0L));
         
-        return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getSenderNo(), chatroomInfoCollection.getReceiverNo(), enterChatRoomRequestDTO.requestTime());
+        return chatMessageService.findMessagesBeforeTimeInRoom(chatroomInfoCollection.getSenderId(), chatroomInfoCollection.getReceiverId(), enterChatRoomRequestDTO.requestTime());
     }
     
     @Transactional(readOnly = false)
-    public void quitChatroom(String chatroomId, Long quitUserNo) {
-        log.info("========== quitChatroom ========== chatroomId : {}, userNo : {}", chatroomId, quitUserNo);
+    public void quitChatroom(String chatroomId, String quitUserId) {
+        log.info("========== quitChatroom ========== chatroomId : {}, userNo : {}", chatroomId, quitUserId);
         
         ChatroomInfoCollection chatroomInfoCollection = chatroomService.getChatroom(chatroomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CHATROOM));
         
-        chatroomService.quitChatroom(chatroomId, quitUserNo);
+        chatroomService.quitChatroom(chatroomId, quitUserId);
     }
 }

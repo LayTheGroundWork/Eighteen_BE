@@ -27,12 +27,12 @@ public class ChatroomService {
     private final RedisMessageService redisMessageService;
     
     @Transactional(readOnly = false)
-    public ChatroomInfoCollection createChatroom(@NonNull final Long senderNo, @NonNull final Long receiverNo) {
-        log.info("========== createChatroom ========== senderNo : {}, receiverNo : {}", senderNo, receiverNo);
+    public ChatroomInfoCollection createChatroom(final @NonNull String senderId, final @NonNull String receiverId) {
+        log.info("========== createChatroom ========== senderId : {}, receiverId : {}", senderId, receiverId);
         
-        ChatUserHelper.validNotSameUser(senderNo, receiverNo);
+        ChatUserHelper.validNotSameUser(senderId, receiverId);
         
-        ChatroomInfoCollection newChatroom = ChatroomInfoCollection.of(senderNo, receiverNo, ChatroomType.PRIVATE);
+        ChatroomInfoCollection newChatroom = ChatroomInfoCollection.of(senderId, receiverId, ChatroomType.PRIVATE);
         return chatroomInfoCollectionRepository.save(newChatroom);
     }
     
@@ -43,27 +43,25 @@ public class ChatroomService {
     }
     
     public List<ChatroomWithLastestMessageDTO> findAllMyChatrooms(@Valid FindChatRoomRequestDTO requestDTO) {
-        log.info("========== findAllMyChatrooms ========== senderNo : {}", requestDTO.senderNo());
+        log.info("========== findAllMyChatrooms ========== senderNo : {}", requestDTO.senderId());
         
-        List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(requestDTO.senderNo());
+        List<ChatroomWithLastestMessageDTO> allChatroomBySenderNo = chatroomInfoCollectionRepository.findAllChatroomBySenderNo(requestDTO.senderId());
         
         for (ChatroomWithLastestMessageDTO chatroomWithLastestMessageDTO : allChatroomBySenderNo) {
-            long unreadMessageCount = redisMessageService.getUnreadMessageCount(chatroomWithLastestMessageDTO.getSenderNo(), chatroomWithLastestMessageDTO.getReceiverNo());
+            long unreadMessageCount = redisMessageService.getUnreadMessageCount(chatroomWithLastestMessageDTO.getSenderId(), chatroomWithLastestMessageDTO.getReceiverId());
             chatroomWithLastestMessageDTO.setUnreadMessageCount(unreadMessageCount);
         }
-        
-        log.info("========== findAllMyChatrooms ========== all readCount was updated");
         
         return allChatroomBySenderNo;
     }
     
-    public void quitChatroom(String chatroomId, Long quitUserNo) {
-        log.info("========== quitChatroom ========== chatroomId : {}, userNo : {}", chatroomId, quitUserNo);
+    public void quitChatroom(String chatroomId, String quitUserId) {
+        log.info("========== quitChatroom ========== chatroomId : {}, userNo : {}", chatroomId, quitUserId);
         
         chatroomInfoCollectionRepository.findById(chatroomId)
                 .ifPresent(chatroomInfoCollection -> {
-                    if (chatroomInfoCollection.isUserInChatroom(quitUserNo)) {
-                        chatroomInfoCollection.addLeftUser(quitUserNo);
+                    if (chatroomInfoCollection.isUserInChatroom(quitUserId)) {
+                        chatroomInfoCollection.addLeftUser(quitUserId);
                         chatroomInfoCollectionRepository.save(chatroomInfoCollection);
                     }
                 });

@@ -34,15 +34,13 @@ public class ChatMessageService {
 
     @Transactional(readOnly = false)
     public void processMessage(ChatMessageRequestDTO messageDto) {
-        log.info("========== processMessage ========== senderNo : {}, receiverNo : {}", messageDto.getSenderNo(), messageDto.getReceiverNo());
-
+        log.info("========== processMessage ========== senderId : {}, receiverId : {}", messageDto.getSenderId(), messageDto.getReceiverId());
         ChatMessageCollection chatMessage = messageDto.toCollection();
 
         chatroomInfoCollectionRepository.findById(chatMessage.getChatroomInfoId().toString())
                 .ifPresentOrElse(
                         chatroomInfo -> {
                             log.info("========== chatroom found ==========");
-
                             addMessage(chatMessage);
                         },
                         () -> {
@@ -53,12 +51,12 @@ public class ChatMessageService {
                 );
     }
 
-    public List<ChatMessageResponseDTO> findMessagesBeforeTimeInRoom(Long senderNo, Long receiverNo, LocalDateTime lastMessageTime) {
-        log.info("========== findMessagesBeforeTimeInRoom ========== senderNo : {}, receiverNo : {}, lastMessageTime : {}", senderNo, receiverNo, lastMessageTime);
+    public List<ChatMessageResponseDTO> findMessagesBeforeTimeInRoom(String senderId, String receiverId, LocalDateTime lastMessageTime) {
+        log.info("========== findMessagesBeforeTimeInRoom ========== senderId : {}, receiverId : {}, lastMessageTime : {}", senderId, receiverId, lastMessageTime);
 
         Pageable pageable = PageRequest.of(0, 20, Sort.by("createdAt").descending());
 
-        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findBySenderNoAndReceiverNoAndCreatedAtBefore(senderNo, receiverNo, lastMessageTime, pageable);
+        List<ChatMessageCollection> foundChatMessages = chatMessageCollectionRepository.findBySenderIdAndReceiverIdAndCreatedAtBefore(senderId, receiverId, lastMessageTime, pageable);
 
         return foundChatMessages.stream()
                 .map(ChatMessageCollection::toResponseDTO)
@@ -70,14 +68,12 @@ public class ChatMessageService {
 
         chatMessageCollectionRepository.save(chatMessage);
 
-        redisMessageService.incrementUnreadMessageCount(chatMessage.getSenderNo(), chatMessage.getReceiverNo());
+        redisMessageService.incrementUnreadMessageCount(chatMessage.getSenderId(), chatMessage.getReceiverId());
     }
-
-    public void send(ChatMessageRequestDTO messageDto, String chatroomId) {
+    
+public void send(ChatMessageRequestDTO messageDto, String chatroomId) {
         messageDto.setChatroomInfoId(chatroomId);
-
         this.processMessage(messageDto);
-
         messagingTemplate.convertAndSend(MessageFormat.format("/sub/v1/api/chat/{0}/message", messageDto.getChatroomInfoId()), messageDto);
     }
 }

@@ -9,5 +9,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChatMessageCollectionRepository extends MongoRepository<ChatMessageCollection, String> {
-    List<ChatMessageCollection> findBySenderNoAndReceiverNoAndCreatedAtBefore(Long senderNo, Long receiverNo, @NonNull LocalDateTime createdAt, Pageable pageable);
+    List<ChatMessageCollection> findBySenderIdAndReceiverIdAndCreatedAtBefore(String senderId, String receiverId, @NonNull LocalDateTime createdAt, Pageable pageable);
 }
