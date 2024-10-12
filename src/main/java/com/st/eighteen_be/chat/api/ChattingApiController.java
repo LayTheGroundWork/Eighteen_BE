@@ -11,12 +11,15 @@ import com.st.eighteen_be.chat.service.facade.ChatroomFacade;
 import com.st.eighteen_be.common.response.ApiResp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -65,8 +68,8 @@ public class ChattingApiController {
     @Operation(summary = "채팅방 입장", description = "채팅방에 입장하고, 채팅내역을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "302", description = "INVALID REQUEST"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+            @ApiResponse(responseCode = "302", description = "INVALID REQUEST", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE)),
     })
     @GetMapping("/v1/api/chat/enter/{chatroomInfoId}")
     public ApiResp<List<ChatMessageResponseDTO>> enterChatroom(
@@ -91,6 +94,7 @@ public class ChattingApiController {
         chatMessageService.send(chatMessage, chatroomId);
     }
 
+    @Operation(summary = "채팅방 나가기", description = "채팅방에 나가기 시작합니다.")
     @PutMapping("/v1/api/chat/{chatroom-id}/quit")
     public ApiResp<Object> quitChatroom(
             @PathVariable("chatroom-id")
