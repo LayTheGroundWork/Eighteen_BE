@@ -7,17 +7,10 @@ services:
     # Configuration for building the docker image for the backend service
     image: eighteenbe/eighteen:0.0.1
     container_name: eighteen-be
+    network_mode: host
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: always
-    links:
-      - mysql
-      - mongodb
-      - redis-master
-      - redis-slave-1
-      - redis-slave-2
-      - redis-sentinel-1
-      - redis-sentinel-2
     depends_on:
       - mysql
       - mongodb
@@ -41,8 +34,6 @@ services:
       SPRING_DATA_MONGODB_DATABASE: ${MONGO_INITDB_DATABASE}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks:
-      - app-tier
 
   mysql:
     image: "mysql:8.0.36"
