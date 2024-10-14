@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -94,10 +96,9 @@ public class UserApiController {
     @Operation(summary = "토큰 재발급", description = "토큰 재발급")
     @PutMapping("/v1/api/user/reissue")
     public ApiResp<JwtTokenDto> reissue(@RequestHeader("Refresh") String refreshToken,
-                                        @RequestHeader("Authorization") String accessToken,
                                         HttpServletResponse response) {
 
-        JwtTokenDto jwtTokenDto = userService.reissue(accessToken, refreshToken);
+        JwtTokenDto jwtTokenDto = userService.reissue(refreshToken);
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
@@ -106,15 +107,15 @@ public class UserApiController {
 
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
     @PostMapping("/v1/api/user/like")
-    public ApiResp<String> like(@RequestHeader("Authorization") String accessToken, Integer likedId){
-        likeService.addLike(accessToken,likedId);
+    public ApiResp<String> like(@AuthenticationPrincipal UserDetails userDetails, Integer likedId){
+        likeService.addLike(userDetails.getUsername(),likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
     }
 
     @Operation(summary = "회원 좋아요 취소", description = "회원 좋아요 취소하기")
     @PostMapping("/v1/api/user/like-cancel")
-    public ApiResp<String> cancelLike(@RequestHeader("Authorization") String accessToken, Integer likedId){
-        likeService.cancelLike(accessToken,likedId);
+    public ApiResp<String> cancelLike(@AuthenticationPrincipal UserDetails userDetails, Integer likedId){
+        likeService.cancelLike(userDetails.getUsername(),likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 취소 완료");
     }
 
@@ -126,15 +127,16 @@ public class UserApiController {
 
     @Operation(summary = "좋아요 여부 포함된 회원 전체 조회", description = "좋아요 여부 포함된 회원 전체 조회")
     @PostMapping("/v1/api/user/find-all")
-    public ApiResp<List<UserProfileResponseDto>> findAll(@RequestHeader("Authorization") String accessToken){
-        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikes(accessToken));
+    public ApiResp<List<UserProfileResponseDto>> findAll(@AuthenticationPrincipal UserDetails userDetails){
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikes(userDetails.getUsername()));
     }
 
     @Operation(summary = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회", description = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회")
     @PostMapping("/v1/api/user/find-all-by-category")
-    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@RequestHeader("Authorization") String accessToken,
+    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
                                                                    @RequestParam("category") String category){
-        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(accessToken,category));
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(
+                userDetails.getUsername(),category));
     }
 
     // Test API

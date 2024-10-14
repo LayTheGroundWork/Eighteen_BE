@@ -8,6 +8,8 @@ import com.st.eighteen_be.user.domain.UserLike;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +30,9 @@ public class LikeService {
     public static final String USER_LIKES_PREFIX = "userLikes:";
 
 
-    public void addLike(String accessToken, Integer likedId){
-        String likerId = getUserUniqueIdFromRequest(accessToken);
+    public void addLike(String uniqueId, Integer likedId){
 
-        String userLikesKey = USER_LIKES_PREFIX + likerId;
+        String userLikesKey = USER_LIKES_PREFIX + uniqueId;
 
         if (Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
             throw new IllegalStateException("Already liked");
@@ -41,9 +42,8 @@ public class LikeService {
         redisLikeTemplate.opsForValue().increment(LIKE_COUNT_PREFIX + likedId);
     }
 
-    public void cancelLike(String accessToken, Integer likedId){
-        String likerId = getUserUniqueIdFromRequest(accessToken);
-        String userLikesKey = USER_LIKES_PREFIX + likerId;
+    public void cancelLike(String uniqueId, Integer likedId){
+        String userLikesKey = USER_LIKES_PREFIX + uniqueId;
 
         if (Boolean.FALSE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
             //TODO: 레디스에 없지만 DB에는 있는지 확인하는 로직이 필요함
@@ -67,28 +67,17 @@ public class LikeService {
     }
 
     @Transactional(readOnly = true)
-    public Set<String> getLikedUserIds(String accessToken) {
-        String likerId = getUserUniqueIdFromRequest(accessToken);
-        String userLikesKey = USER_LIKES_PREFIX + likerId;
+    public Set<String> getLikedUserIds(String uniqueId) {
+        String userLikesKey = USER_LIKES_PREFIX + uniqueId;
 
         return redisLikeTemplate.opsForSet().members(userLikesKey);
     }
 
     @Transactional(readOnly = true)
-    public boolean getLikedUserId(String accessToken, Integer likedId) {
-        String likerId = getUserUniqueIdFromRequest(accessToken);
-        String userLikesKey = USER_LIKES_PREFIX + likerId;
+    public boolean getLikedUserId(String uniqueId, Integer likedId) {
+        String userLikesKey = USER_LIKES_PREFIX + uniqueId;
 
         return Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId));
-    }
-
-
-    private String getUserUniqueIdFromRequest(String accessToken){
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
-        if (requestAccessToken == null || !jwtTokenProvider.validateToken(requestAccessToken)) {
-            throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
-        }
-        return jwtTokenProvider.getAuthentication(requestAccessToken).getName();
     }
 
     public void backupUserLikeDataToMySQL(){

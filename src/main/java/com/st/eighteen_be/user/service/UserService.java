@@ -24,6 +24,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -129,9 +130,7 @@ public class UserService {
 
     }
 
-    public JwtTokenDto reissue(String accessToken, String refreshToken) {
-
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
+    public JwtTokenDto reissue(String refreshToken) {
         String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(refreshToken);
 
         // 1. Refresh Token 검증
@@ -139,8 +138,8 @@ public class UserService {
             throw new NotValidException(ErrorCode.REFRESH_TOKEN_NOT_VALID);
         }
 
-        // 2. Access Token 에서 User ID 가져오기
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
+        // 2. SecurityContextHolder 에서 Authentication 객체 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져옴
         RefreshToken token = refreshTokenService.findRefreshTokenById(authentication.getName());

@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -23,24 +25,24 @@ public class MyPageApiController {
 
     @Operation(summary = "myPage 보기", description = "myPage 보기")
     @GetMapping("/v1/api/my-page")
-    public ApiResp<UserDetailsResponseDto> view(@RequestHeader("Authorization") String accessToken){
-        return ApiResp.success(HttpStatus.OK, myPageService.view(accessToken));
+    public ApiResp<UserDetailsResponseDto> view(@AuthenticationPrincipal UserDetails userDetails){
+        return ApiResp.success(HttpStatus.OK, myPageService.view(userDetails.getUsername()));
     }
 
     @Operation(summary = "myPage 수정", description = "myPage 수정")
     @PostMapping("/v1/api/my-page/update")
-    public ApiResp<String> update(@RequestHeader("Authorization") String accessToken,
+    public ApiResp<String> update(@AuthenticationPrincipal UserDetails userDetails,
                                   @RequestBody MyPageRequestDto request) {
-        myPageService.update(request,accessToken);
+        myPageService.update(userDetails.getUsername(),request);
 
         return ApiResp.success(HttpStatus.OK, "수정되었습니다.");
     }
 
     @Operation(summary = "대표 이미지 수정", description = "대표 이미지 수정")
     @PostMapping("/v1/api/my-page/main-image-upadte")
-    public ApiResp<String> mainImageUpdate(@RequestHeader("Authorization") String accessToken,
+    public ApiResp<String> mainImageUpdate(@AuthenticationPrincipal UserDetails userDetails,
                                            @RequestBody UserMediaData userMediaData){
-        myPageService.thumbnailUpdate(accessToken,userMediaData);
+        myPageService.thumbnailUpdate(userDetails.getUsername(), userMediaData);
         return ApiResp.success(HttpStatus.OK, "대표이미지 설정 완료");
     }
 }

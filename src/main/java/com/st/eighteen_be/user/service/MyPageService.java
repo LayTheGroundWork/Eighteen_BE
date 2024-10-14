@@ -8,6 +8,7 @@ import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,25 +20,23 @@ import java.util.List;
 @Transactional
 public class MyPageService {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final UserDtoService userDtoService;
 
     @Transactional(readOnly = true)
-    public UserDetailsResponseDto view(String accessToken){
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
+    public UserDetailsResponseDto view(String uniqueId){
 
-        return userDtoService.findByUniqueId(authentication.getName());
+        return userDtoService.findByUniqueId(uniqueId);
     }
 
-    public void update(MyPageRequestDto requestDto, String accessToken) {
-        UserInfo userInfo = userService.findByToken(accessToken);
+    public void update(String uniqueId, MyPageRequestDto requestDto) {
+        UserInfo userInfo = userService.findByUniqueId(uniqueId);
+
         userInfo.myPageUpdate(requestDto);
     }
 
-    public void thumbnailUpdate(String accessToken, UserMediaData userMediaData){
-        UserInfo user = userService.findByToken(accessToken);
+    public void thumbnailUpdate(String uniqueId, UserMediaData userMediaData){
+        UserInfo user = userService.findByToken(uniqueId);
 
         thumbnailFlagChange(user.getMediaDataList());
 
