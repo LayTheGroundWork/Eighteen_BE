@@ -45,3 +45,6 @@ out/
 
 ### Environment ###
 /.env.*
+
+### Log ###
+/log/*.log
