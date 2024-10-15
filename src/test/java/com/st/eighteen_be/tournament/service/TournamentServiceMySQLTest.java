@@ -414,7 +414,7 @@ class TournamentServiceMySQLTest {
                     .participantIdsOrderByRank(result.participantEntities.stream().map(TournamentParticipantEntity::getUserId).collect(Collectors.toList()))
                     .build();
 
-            given(userService.findByToken(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
+            given(userService.findByUniqueId(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
 
             // when
             tournamentService.processVote(tournamentVoteRequestDTO, "accessToken");
@@ -454,7 +454,7 @@ class TournamentServiceMySQLTest {
                             .build();
 
 
-            given(userService.findByToken(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
+            given(userService.findByUniqueId(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
 
             // when
             tournamentService.processVote(tournamentVoteRequestDTO, "accessToken");
