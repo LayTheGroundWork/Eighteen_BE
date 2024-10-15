@@ -20,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -85,8 +87,9 @@ public class TournamentApiController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @PostMapping("/v1/api/tournament/final/vote")
-    public ApiResp<Object> vote(@RequestBody TournamentVoteRequestDTO voteRequest, @RequestHeader("Authorization") String accessToken) {
-        tournamentService.processVote(voteRequest, accessToken);
+    public ApiResp<Object> vote(@RequestBody TournamentVoteRequestDTO voteRequest,
+                                @AuthenticationPrincipal UserDetails userDetails) {
+        tournamentService.processVote(voteRequest, userDetails.getUsername());
 
         return ApiResp.success(HttpStatus.OK, "토너먼트 투표 완료");
     }

@@ -1,37 +1,40 @@
 package com.st.eighteen_be.token.service;
 
 import com.st.eighteen_be.jwt.JwtTokenProvider;
-import com.st.eighteen_be.token.domain.RefreshToken;
-import com.st.eighteen_be.token.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+import java.util.concurrent.TimeUnit;
+
+
+@Component
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, String> redisRefreshTokenTemplate;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Value("${jwt.refreshTokenExpireTime}")
-    private long refreshTokenExpireTime;
+    private static final String REFRESH_TOKEN = "refreshToken:";
 
-    public RefreshToken saveOrUpdate(Authentication authentication) {
-        return refreshTokenRepository.save(RefreshToken.from(
-                authentication.getName(),
-                jwtTokenProvider.generateToken(authentication).getRefreshToken(),
-                refreshTokenExpireTime)
-        );
-    }
-    public RefreshToken findRefreshTokenById(String username) {
-        return refreshTokenRepository.findById(username).orElseThrow(
-                () -> new RuntimeException("로그아웃 된 사용자입니다.")
-        );
+    public void setRefreshToken(Authentication authentication, String refreshToken) {
+        long expiration = jwtTokenProvider.getExpiration(refreshToken);
+        redisRefreshTokenTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(refreshToken.getClass()));
+        redisRefreshTokenTemplate.opsForValue().set(
+                REFRESH_TOKEN + authentication.getName(), refreshToken, expiration, TimeUnit.MILLISECONDS);
     }
 
-    public void deleteRefreshTokenById(String username) {
-        refreshTokenRepository.deleteById(username);
+    public String getRefreshToken(String key) {
+        return redisRefreshTokenTemplate.opsForValue().get(REFRESH_TOKEN+key);
+    }
+
+    public void deleteRefreshToken(String key) {
+        redisRefreshTokenTemplate.delete(REFRESH_TOKEN + key);
+    }
+
+    public boolean hasKeyRefreshToken(String key) {
+        return Boolean.TRUE.equals(redisRefreshTokenTemplate.hasKey(REFRESH_TOKEN+key));
     }
 }

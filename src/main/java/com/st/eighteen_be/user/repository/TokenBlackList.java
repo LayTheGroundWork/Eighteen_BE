@@ -13,22 +13,22 @@ public class TokenBlackList {
 
     private final RedisTemplate<String, String> redisBlackListTemplate;
 
-    private static final String PREFIX = "black->";
+    private static final String BLACKLIST = "black->";
 
     public void setBlackList(String key, String phoneNumber, Long milliSeconds) {
         redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(phoneNumber.getClass()));
-        redisBlackListTemplate.opsForValue().set(PREFIX + key, phoneNumber, milliSeconds, TimeUnit.MILLISECONDS);
+        redisBlackListTemplate.opsForValue().set(BLACKLIST + key, phoneNumber, milliSeconds, TimeUnit.MILLISECONDS);
     }
 
     public Object getBlackList(String key) {
-        return redisBlackListTemplate.opsForValue().get(PREFIX+key);
+        return redisBlackListTemplate.opsForValue().get(BLACKLIST+key);
     }
 
     public boolean deleteBlackList(String key) {
-        return Boolean.TRUE.equals(redisBlackListTemplate.delete(PREFIX+key));
+        return Boolean.TRUE.equals(redisBlackListTemplate.delete(BLACKLIST+key));
     }
 
     public boolean hasKeyBlackList(String key) {
-        return Boolean.TRUE.equals(redisBlackListTemplate.hasKey(PREFIX+key));
+        return Boolean.TRUE.equals(redisBlackListTemplate.hasKey(BLACKLIST+key));
     }
 }

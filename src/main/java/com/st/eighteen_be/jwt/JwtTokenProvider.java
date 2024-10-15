@@ -78,8 +78,10 @@ public class JwtTokenProvider {
                 .compact();
 
         // RefreshToken 생성
+        Date refreshTokenExpiresIn = new Date(now + refreshTokenExpireTime);
         String refreshToken = Jwts.builder()
-                .expiration(new Date(now + refreshTokenExpireTime))
+                .subject(authentication.getName())
+                .expiration(refreshTokenExpiresIn)
                 .signWith(key)
                 .compact();
 

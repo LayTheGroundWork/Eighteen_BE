@@ -88,21 +88,23 @@ public class UserApiController {
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @DeleteMapping("/v1/api/user/sign-out")
-    public ApiResp<String> signOut(@RequestHeader("Authorization") String accessToken) {
+    public ApiResp<String> signOut(@RequestHeader(AUTHORIZATION_HEADER) String accessToken) {
         userService.signOut(accessToken);
         return ApiResp.success(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
     @Operation(summary = "토큰 재발급", description = "토큰 재발급")
     @PutMapping("/v1/api/user/reissue")
-    public ApiResp<JwtTokenDto> reissue(@RequestHeader("Refresh") String refreshToken,
+    public ApiResp<String> reissue(@RequestHeader(AUTHORIZATION_HEADER) String accessToken,
+                                        @RequestHeader(REFRESH_HEADER) String refreshToken,
                                         HttpServletResponse response) {
 
-        JwtTokenDto jwtTokenDto = userService.reissue(refreshToken);
+        JwtTokenDto jwtTokenDto = userService.reissue(accessToken, refreshToken);
+
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
 
-        return ApiResp.success(HttpStatus.OK, jwtTokenDto);
+        return ApiResp.success(HttpStatus.OK, "Reissue Success");
     }
 
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
