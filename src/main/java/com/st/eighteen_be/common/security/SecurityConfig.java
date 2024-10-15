@@ -52,8 +52,13 @@ public class SecurityConfig {
 
     // 권한 확인을 하지 않는 URI
     private static final String[] PERMIT_ALL_PATTERNS = new String[] {
-            "/v1/api/**",
-            "/h2-console/**",
+            "/",
+            "/v1/api/user/like/view-backup-data/*",
+            "/v1/api/user/like/force-start",
+            "/v1/api/user/duplication-check",
+            "/v1/api/user/reissue",
+            "/v1/api/user/sign-up",
+            "/v1/api/user/sign-in",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",

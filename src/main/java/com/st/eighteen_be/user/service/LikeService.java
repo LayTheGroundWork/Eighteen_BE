@@ -1,15 +1,10 @@
 package com.st.eighteen_be.user.service;
 
-import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
-import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserLike;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +18,6 @@ import java.util.Set;
 public class LikeService {
 
     private final RedisTemplate<String,String> redisLikeTemplate;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
     public static final String LIKE_COUNT_PREFIX = "likeCount:";
@@ -89,7 +83,7 @@ public class LikeService {
             for (String redisUserId : userLikesRedisKey) {
                 String uniqueId = redisUserId.split(":")[1];
 
-                UserInfo userInfo = userService.findByUniqueIdToEntity(uniqueId);
+                UserInfo userInfo = userService.findByUniqueId(uniqueId);
 
                 Set<String> likedUser = Objects.requireNonNull(redisLikeTemplate.opsForSet().members(redisUserId));
 
@@ -113,7 +107,7 @@ public class LikeService {
 
                 if (redisLikeTemplate.opsForValue().get(data) == null) break;
 
-                UserInfo userInfo = userService.findByIdToEntity(userId);
+                UserInfo userInfo = userService.findById(userId);
 
                 int likeCount = Integer.parseInt(Objects.requireNonNull(redisLikeTemplate.opsForValue().get(data)));
                 userInfo.backupLikeCount(likeCount);

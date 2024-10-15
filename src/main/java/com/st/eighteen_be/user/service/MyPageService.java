@@ -1,14 +1,11 @@
 package com.st.eighteen_be.user.service;
 
-import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +33,7 @@ public class MyPageService {
     }
 
     public void thumbnailUpdate(String uniqueId, UserMediaData userMediaData){
-        UserInfo user = userService.findByToken(uniqueId);
+        UserInfo user = userService.findByUniqueId(uniqueId);
 
         thumbnailFlagChange(user.getMediaDataList());
 

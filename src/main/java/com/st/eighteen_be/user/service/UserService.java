@@ -7,7 +7,6 @@ import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotVal
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
-import com.st.eighteen_be.token.domain.RefreshToken;
 import com.st.eighteen_be.token.service.RefreshTokenService;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserMediaData;
@@ -24,7 +23,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,14 +85,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
         );
 
-        // 1. phoneNumber와 verificationCode를 기반으로 Authentication 객체 생성
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userInfo.getUniqueId(), "");
-
-        log.info("UsernamePasswordAuthenticationToken-> {}", authenticationToken);
-
-        // 2. 실제 검증 authentication() 메서드를 통해 요청된 User 에 대한 검증 진행
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        Authentication authentication = createAuthentication(userInfo.getUniqueId());
 
         log.info("authentication-> {}", authentication);
 
@@ -102,7 +93,7 @@ public class UserService {
         JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
 
         // 4. RefreshToken 저장
-        refreshTokenService.saveOrUpdate(authentication);
+        refreshTokenService.setRefreshToken(authentication, token.getRefreshToken());
 
         // 5. 토큰 발급
         return token;
@@ -121,7 +112,7 @@ public class UserService {
         Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
         // 3. DB에 저장된 Refresh Token 제거
-        refreshTokenService.deleteRefreshTokenById(authentication.getName());
+        refreshTokenService.deleteRefreshToken(authentication.getName());
 
         // 4. Access Token blacklist에 등록하여 만료시키기
         // 해당 엑세스 토큰의 남은 유효시간을 얻음
@@ -130,7 +121,8 @@ public class UserService {
 
     }
 
-    public JwtTokenDto reissue(String refreshToken) {
+    public JwtTokenDto reissue(String accessToken, String refreshToken) {
+        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
         String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(refreshToken);
 
         // 1. Refresh Token 검증
@@ -138,22 +130,22 @@ public class UserService {
             throw new NotValidException(ErrorCode.REFRESH_TOKEN_NOT_VALID);
         }
 
-        // 2. SecurityContextHolder 에서 Authentication 객체 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // 2. 액세스 토큰으로 Authentication 객체 생성
+        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 
-        // 3. 저장소에서 User ID 를 기반으로 Refresh Token 값 가져옴
-        RefreshToken token = refreshTokenService.findRefreshTokenById(authentication.getName());
+        // 4. 저장소에서 User Unique ID 를 기반으로 Refresh Token 값 가져옴
+        String getRefreshToken = refreshTokenService.getRefreshToken(authentication.getName());
 
-        // 4. Refresh Token 일치하는지 검사
-        if (!token.getRefreshToken().equals(requestRefreshToken)) {
+        // 5. Refresh Token 일치하는지 검사
+        if (!getRefreshToken.equals(requestRefreshToken)) {
             throw new AuthenticationException(ErrorCode.TOKEN_UNAUTHORIZED);
         }
 
-        // 5. 새로운 토큰 생성
+        // 6. 새로운 토큰 생성
         JwtTokenDto newToken = jwtTokenProvider.generateToken(authentication);
 
-        // 6. 저장소 정보 업데이트
-        refreshTokenService.saveOrUpdate(authentication);
+        // 7. 저장소 정보 업데이트
+        refreshTokenService.setRefreshToken(authentication,newToken.getRefreshToken());
 
         return newToken;
     }
@@ -180,27 +172,6 @@ public class UserService {
         }
     }
 
-    public UserInfo findByToken(String accessToken) {
-        String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
-
-        return userRepository.findByUniqueId(authentication.getName()).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
-        );
-    }
-
-    public UserInfo findByUniqueIdToEntity(String uniqueId){
-        return userRepository.findByUniqueId(uniqueId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
-        );
-    }
-
-    public UserInfo findByIdToEntity(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOT_FOUND_USER)
-        );
-    }
-
     public UserInfo findById(Integer userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
@@ -219,11 +190,16 @@ public class UserService {
         return userRepository.findAllByCategory(category);
     }
 
-//    public UserMediaData findByImageKey(String imageKey){
-//        return userRepository.findByImageKey(imageKey);
-//    }
-
     int findLikeCountById(Integer id) {
-        return userRepository.findById(id).map(UserInfo::getLikeCount).orElse(0);
+        return userRepository.findById(id)
+                .map(UserInfo::getLikeCount).orElse(0);
     }
+
+    private Authentication createAuthentication(String uniqueId){
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(uniqueId, "");
+
+        return authenticationManager.authenticate(authenticationToken);
+    }
+
 }

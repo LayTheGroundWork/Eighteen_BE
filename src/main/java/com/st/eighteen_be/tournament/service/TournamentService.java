@@ -190,10 +190,10 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = false)
-    public void processVote(TournamentVoteRequestDTO voteRequestDTO, String accessToken) {
+    public void processVote(TournamentVoteRequestDTO voteRequestDTO, String uniqueId) {
         log.info("processVote start");
 
-        UserInfo loginedUser = userService.findByToken(accessToken);
+        UserInfo loginedUser = userService.findByUniqueId(uniqueId);
 
         tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO, loginedUser.getUniqueId());
         tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO, loginedUser.getUniqueId());
