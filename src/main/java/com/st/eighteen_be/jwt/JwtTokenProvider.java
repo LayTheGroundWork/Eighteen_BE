@@ -1,5 +1,7 @@
 package com.st.eighteen_be.jwt;
 
+import com.st.eighteen_be.common.exception.ErrorCode;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -133,14 +135,18 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return !tokenBlackList.hasKeyBlackList(token);
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("invalid JWT", e);
+
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT", e);
+            throw new BadRequestException(ErrorCode.EXPIRED_TOKEN);
+
+        } catch (SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT: {}", e.getMessage());
+
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT", e);
+            log.info("Unsupported JWT: {}", e.getMessage());
+
         } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty", e);
+            log.info("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
     }
@@ -160,7 +166,8 @@ public class JwtTokenProvider {
 
     // Request Header에 Access Token 정보를 추출하는 메서드
     public String resolveAccessToken(String accessToken) {
-        if (StringUtils.hasText(accessToken) && (accessToken.startsWith(BEARER_PREFIX_A) || accessToken.startsWith(BEARER_PREFIX_B))) {
+        if (StringUtils.hasText(accessToken) &&
+                (accessToken.startsWith(BEARER_PREFIX_A) || accessToken.startsWith(BEARER_PREFIX_B))) {
             return accessToken.substring(7);
         }
         return null;

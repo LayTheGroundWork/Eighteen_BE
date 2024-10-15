@@ -44,7 +44,9 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized..."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden..."),
 
+    // jwt
     TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰의 유효기간이 만료되었습니다"),
     REFRESH_TOKEN_NOT_VALID(HttpStatus.NOT_FOUND, "Refresh Token이 유효하지 않습니다."),
     ACCESS_TOKEN_NOT_VALID(HttpStatus.NOT_FOUND, "Access Token이 유효하지 않습니다."),
     TOKEN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "자격 증명 실패"),

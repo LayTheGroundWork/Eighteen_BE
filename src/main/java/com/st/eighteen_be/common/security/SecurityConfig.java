@@ -38,6 +38,7 @@ import java.io.PrintWriter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -87,7 +88,7 @@ public class SecurityConfig {
                 )
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,objectMapper), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionConfig ->
                         exceptionConfig.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                                 .accessDeniedHandler(jwtAccessDeniedHandler)
