@@ -34,7 +34,9 @@ public class SwaggerConfig {
                                 .version("v1")
                                 .description("18_BE API 명세서_v1")
                 )
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth")) // SecurityRequirement를 추가하여 인증 요구사항을 설정
+                // SecurityRequirement를 추가하여 인증 요구사항을 설정
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("refreshToken"))
                 .components(new io.swagger.v3.oas.models.Components() // SecurityScheme을 추가하여 인증 스키마를 설정
                         .addSecuritySchemes("bearerAuth",
                                 new SecurityScheme()
