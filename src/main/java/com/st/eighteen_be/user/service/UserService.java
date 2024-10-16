@@ -148,6 +148,13 @@ public class UserService {
         }
     }
 
+    public String delete(String uniqueId) {
+        UserInfo userInfo = findByUniqueId(uniqueId);
+        userRepository.delete(userInfo);
+
+        return uniqueId;
+    }
+
     public Set<String> getRoles(UserInfo userInfo){
         Set<UserRoles> userRoles = userInfo.getRoles();
         Set<String> roles = new HashSet<>();

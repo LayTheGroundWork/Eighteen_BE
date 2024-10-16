@@ -173,4 +173,11 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK,
                 SecurityUtil.getCurrentUsername() + "/" + accessToken + "/" + refreshToken);
     }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 api 수행 시 헤더에서 token 삭제해야함")
+    @DeleteMapping("/v1/api/user/delete")
+    public ApiResp<String> deleteUser(@AuthenticationPrincipal UserDetails userDetails){
+        return ApiResp.success(HttpStatus.OK,
+                "delete Success: "+ userService.delete(userDetails.getUsername()));
+    }
 }
