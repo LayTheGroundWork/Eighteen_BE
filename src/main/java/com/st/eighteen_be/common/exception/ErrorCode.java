@@ -46,11 +46,12 @@ public enum ErrorCode {
 
     // jwt
     TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
-    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰의 유효기간이 만료되었습니다"),
-    REFRESH_TOKEN_NOT_VALID(HttpStatus.NOT_FOUND, "Refresh Token이 유효하지 않습니다."),
-    ACCESS_TOKEN_NOT_VALID(HttpStatus.NOT_FOUND, "Access Token이 유효하지 않습니다."),
-    TOKEN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "자격 증명 실패"),
-    TOKEN_FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Expired Token"),
+    INVALID_TOKEN(HttpStatus.NOT_FOUND, "Invalid Token"),
+    UNSUPPORTED_TOKEN(HttpStatus.NOT_FOUND, "Unsupported Token"),
+    TOKEN_IS_EMPTY(HttpStatus.NOT_FOUND, "Token Is Empty"),
+    UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "Unauthorized Token.."),
+    FORBIDDEN_TOKEN(HttpStatus.FORBIDDEN, "Forbidden Token.."),
 
     //profile
     NOT_FOUND_PROFILE(HttpStatus.NOT_FOUND, "해당하는 프로필을 찾을 수 없습니다.");

@@ -17,7 +17,7 @@ import lombok.Getter;
  */
 
 @Getter
-public class AuthenticationException extends CustomeRuntimeException {
+public class AuthenticationJwtException extends CustomeRuntimeException {
 
-    public AuthenticationException(ErrorCode errorCode){ super(errorCode); }
+    public AuthenticationJwtException(ErrorCode errorCode){ super(errorCode); }
 }

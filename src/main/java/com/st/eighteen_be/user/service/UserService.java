@@ -1,10 +1,7 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationException;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotValidException;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.*;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.service.RefreshTokenService;
@@ -16,6 +13,8 @@ import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SecurityException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +22,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,13 +103,8 @@ public class UserService {
 
         String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
 
-        // 1. Access Token 검증
-        if (!jwtTokenProvider.validateToken(requestAccessToken)) {
-            throw new NotValidException(ErrorCode.ACCESS_TOKEN_NOT_VALID);
-        }
-
-        // 2. Access Token 에서 authentication 을 가져옵니다.
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
+        // 2. SecurityContextHolder 에서 authentication 을 가져옵니다.
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 3. DB에 저장된 Refresh Token 제거
         refreshTokenService.deleteRefreshToken(authentication.getName());
@@ -125,29 +120,32 @@ public class UserService {
         String requestAccessToken = jwtTokenProvider.resolveAccessToken(accessToken);
         String requestRefreshToken = jwtTokenProvider.resolveRefreshToken(refreshToken);
 
-        // 1. Refresh Token 검증
-        if (!jwtTokenProvider.validateToken(requestRefreshToken)) {
-            throw new NotValidException(ErrorCode.REFRESH_TOKEN_NOT_VALID);
+        try {
+            // 1. Refresh Token 검증
+            jwtTokenProvider.validateToken(requestRefreshToken);
+
+            // 2. 액세스 토큰으로 Authentication 객체 생성
+            Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
+
+            // 4. 저장소에서 User Unique ID 를 기반으로 Refresh Token 값 가져옴
+            String getRefreshToken = refreshTokenService.getRefreshToken(authentication.getName());
+
+            // 5. Refresh Token 일치하는지 검사
+            if (!getRefreshToken.equals(requestRefreshToken)) {
+                throw new AuthenticationJwtException(ErrorCode.UNAUTHORIZED_TOKEN);
+            }
+
+            // 6. 새로운 토큰 생성
+            JwtTokenDto newToken = jwtTokenProvider.generateToken(authentication);
+
+            // 7. 저장소 정보 업데이트
+            refreshTokenService.setRefreshToken(authentication,newToken.getRefreshToken());
+
+            return newToken;
+
+        } catch (SecurityException | MalformedJwtException e){
+            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
         }
-
-        // 2. 액세스 토큰으로 Authentication 객체 생성
-        Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
-
-        // 4. 저장소에서 User Unique ID 를 기반으로 Refresh Token 값 가져옴
-        String getRefreshToken = refreshTokenService.getRefreshToken(authentication.getName());
-
-        // 5. Refresh Token 일치하는지 검사
-        if (!getRefreshToken.equals(requestRefreshToken)) {
-            throw new AuthenticationException(ErrorCode.TOKEN_UNAUTHORIZED);
-        }
-
-        // 6. 새로운 토큰 생성
-        JwtTokenDto newToken = jwtTokenProvider.generateToken(authentication);
-
-        // 7. 저장소 정보 업데이트
-        refreshTokenService.setRefreshToken(authentication,newToken.getRefreshToken());
-
-        return newToken;
     }
 
     public Set<String> getRoles(UserInfo userInfo){

@@ -14,6 +14,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
         // 유효한 자격증명을 제공하지 않고 접근하려 할때 401
-        ApiResp.fail(ErrorCode.TOKEN_UNAUTHORIZED);
+        ApiResp.fail(ErrorCode.UNAUTHORIZED_TOKEN);
     }
 }
