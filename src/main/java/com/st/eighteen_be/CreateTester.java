@@ -8,27 +8,32 @@ import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.enums.RolesType;
 import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class CreateTester {
 
-    private static final String TESTER_PHONE_NUMBER = "01012345678";
-    private static final String TESTER_ENCRYPT_PHONE_NUMBER = "49 87 37 -20 56 2 107 68 54 120 -37 -100 -115 119 -61 -57 ";
-    private static final String TESTER_NICKNAME = "tester1";
-    private static final LocalDate TESTER_BIRTHDAY = LocalDate.of(1999, 12, 23);
-    private static final SchoolData TESTER_SCHOOL_DATA = new SchoolData("테스터고등학교", "서울");
-    private static final String TESTER_UNIQUE_ID = "Tester";
-    private static final Set<String> TESTER_ROLES = Set.of("USER");
-
+    private static final List<String> TESTER_PHONE_NUMBER = List.of("01012345678","01012341234");
+    private static final List<String> TESTER_ENCRYPT_PHONE_NUMBER = List.of(
+            "49 87 37 -20 56 2 107 68 54 120 -37 -100 -115 119 -61 -57 ",
+            "59 7 73 93 23 30 -3 82 -33 -114 -65 12 -62 -56 66 13 "
+    );
+    private static final List<String> TESTER_NICKNAME = List.of("kim","lee");
+    private static final List<LocalDate> TESTER_BIRTHDAY = List.of(
+            LocalDate.of(2010, 12, 23),
+            LocalDate.of(2013, 12, 6)
+    );
+    private static final List<SchoolData> TESTER_SCHOOL_DATA = List.of(
+            new SchoolData("테스터고등학교", "서울"),
+            new SchoolData("테스터중학교", "정선")
+    );
+    private static final List<String> TESTER_UNIQUE_ID = List.of("tester1","tester2");
     private static final String IMAGE_KEY = "testKey";
     private static final String THUMBNAIL_IMAGE_KEY = "thumbnail_testKey";
     private static final boolean IS_THUMBNAIL = true;
@@ -40,20 +45,26 @@ public class CreateTester {
 
     @PostConstruct
     public void createTester() {
-        Optional<UserInfo> existingTester = userRepository.findByUniqueId(TESTER_UNIQUE_ID);
+        userRepository.deleteAll();
 
-        if (existingTester.isPresent()) {
-            log.info("Tester already exists with unique ID: {}", TESTER_UNIQUE_ID);
-            userRepository.deleteAll();
-        }
-
-        UserInfo tester = UserInfo.builder()
+        UserInfo tester1 = UserInfo.builder()
                 .thumbnail(THUMBNAIL_IMAGE_KEY)
-                .phoneNumber(TESTER_ENCRYPT_PHONE_NUMBER)
-                .nickName(TESTER_NICKNAME)
-                .birthDay(TESTER_BIRTHDAY)
-                .schoolData(TESTER_SCHOOL_DATA)
-                .uniqueId(TESTER_UNIQUE_ID)
+                .phoneNumber(TESTER_ENCRYPT_PHONE_NUMBER.get(0))
+                .nickName(TESTER_NICKNAME.get(0))
+                .birthDay(TESTER_BIRTHDAY.get(0))
+                .schoolData(TESTER_SCHOOL_DATA.get(0))
+                .uniqueId(TESTER_UNIQUE_ID.get(0))
+                .category(CategoryType.ETC)
+                .tournamentJoin(TOURNAMENT_JOIN)
+                .build();
+
+        UserInfo tester2 = UserInfo.builder()
+                .thumbnail(THUMBNAIL_IMAGE_KEY)
+                .phoneNumber(TESTER_ENCRYPT_PHONE_NUMBER.get(1))
+                .nickName(TESTER_NICKNAME.get(1))
+                .birthDay(TESTER_BIRTHDAY.get(1))
+                .schoolData(TESTER_SCHOOL_DATA.get(1))
+                .uniqueId(TESTER_UNIQUE_ID.get(1))
                 .category(CategoryType.ETC)
                 .tournamentJoin(TOURNAMENT_JOIN)
                 .build();
@@ -62,20 +73,24 @@ public class CreateTester {
                 .role(RolesType.USER)
                 .build();
 
-        userRoles.setUser(tester);
+        userRoles.setUser(tester1);
+        userRoles.setUser(tester2);
 
         UserMediaData userMediaData = UserMediaData.builder()
                 .imageKey(IMAGE_KEY)
                 .isThumbnail(IS_THUMBNAIL)
                 .build();
 
-        userMediaData.setUser(tester);
+        userMediaData.setUser(tester1);
+        userMediaData.setUser(tester2);
 
         try {
-            userRepository.save(tester);
-            log.info("Tester created successfully: {}", tester);
+            userRepository.save(tester1);
+            log.info("Tester created successfully: {}", tester1);
+            userRepository.save(tester2);
+            log.info("Tester created successfully: {}", tester2);
         } catch (Exception e) {
-            log.error("Error creating tester: ", e);
+            log.error("Error creating testers: ", e);
         }
     }
 }
