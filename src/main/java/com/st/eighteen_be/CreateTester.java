@@ -10,6 +10,7 @@ import com.st.eighteen_be.user.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,12 @@ public class CreateTester {
 
     @PostConstruct
     public void createTester() {
-        userRepository.deleteAll();
+        Optional<UserInfo> user1 = userRepository.findByUniqueId(TESTER_UNIQUE_ID.get(0));
+        Optional<UserInfo> user2 = userRepository.findByUniqueId(TESTER_UNIQUE_ID.get(1));
+
+        if(user1.isPresent() || user2.isPresent()){
+            userRepository.deleteAll();
+        }
 
         UserInfo tester1 = UserInfo.builder()
                 .thumbnail(THUMBNAIL_IMAGE_KEY)
@@ -69,20 +75,28 @@ public class CreateTester {
                 .tournamentJoin(TOURNAMENT_JOIN)
                 .build();
 
-        UserRoles userRoles = UserRoles.builder()
+        UserRoles userRoles1 = UserRoles.builder()
                 .role(RolesType.USER)
                 .build();
+        userRoles1.setUser(tester1);
 
-        userRoles.setUser(tester1);
-        userRoles.setUser(tester2);
+        UserRoles userRoles2 = UserRoles.builder()
+                .role(RolesType.USER)
+                .build();
+        userRoles2.setUser(tester2);
 
-        UserMediaData userMediaData = UserMediaData.builder()
+        UserMediaData userMediaData1 = UserMediaData.builder()
                 .imageKey(IMAGE_KEY)
                 .isThumbnail(IS_THUMBNAIL)
                 .build();
 
-        userMediaData.setUser(tester1);
-        userMediaData.setUser(tester2);
+        userMediaData1.setUser(tester1);
+
+        UserMediaData userMediaData2 = UserMediaData.builder()
+                .imageKey(IMAGE_KEY)
+                .isThumbnail(IS_THUMBNAIL)
+                .build();
+        userMediaData2.setUser(tester2);
 
         try {
             userRepository.save(tester1);
