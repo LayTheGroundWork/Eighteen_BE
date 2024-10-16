@@ -1,8 +1,10 @@
 package com.st.eighteen_be.jwt;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
-import com.st.eighteen_be.user.repository.TokenBlackList;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomExpiredJwtException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomIllegalArgumentException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomInvalidException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomUnsupportedJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -27,7 +29,6 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    private final TokenBlackList tokenBlackList;
     private Key key;
 
     @Value("${jwt.secret}")
@@ -45,10 +46,6 @@ public class JwtTokenProvider {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String REFRESH_HEADER = "Refresh";
     private static final String AUTHORITIES_KEY = "auth";
-
-    public JwtTokenProvider(TokenBlackList tokenBlackList) {
-        this.tokenBlackList = tokenBlackList;
-    }
 
     // 이 코드는 HMAC-SHA 키를 생성하는 데 사용되는 Base64 인코딩된 문자열을 디코딩하여 키를 초기화하는 용도로 사용
     @PostConstruct
@@ -128,27 +125,25 @@ public class JwtTokenProvider {
     }
 
     // 토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parser()
                     .verifyWith((SecretKey) key)
                     .build()
                     .parseSignedClaims(token);
-            return !tokenBlackList.hasKeyBlackList(token);
 
         } catch (ExpiredJwtException e) {
-            throw new BadRequestException(ErrorCode.EXPIRED_TOKEN);
+            throw new CustomExpiredJwtException(ErrorCode.EXPIRED_TOKEN);
 
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT: {}", e.getMessage());
+            throw new CustomInvalidException(ErrorCode.INVALID_TOKEN);
 
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT: {}", e.getMessage());
+            throw new CustomUnsupportedJwtException(ErrorCode.UNSUPPORTED_TOKEN);
 
         } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty: {}", e.getMessage());
+            throw new CustomIllegalArgumentException(ErrorCode.TOKEN_IS_EMPTY);
         }
-        return false;
     }
 
     // accessToken

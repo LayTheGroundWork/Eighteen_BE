@@ -168,7 +168,7 @@ public class UserApiController {
         log.info("Refresh Header: {}", refreshToken);
 
         if (accessToken == null || accessToken.isEmpty()) {
-            return ApiResp.fail(ErrorCode.ACCESS_TOKEN_NOT_VALID);
+            return ApiResp.fail(ErrorCode.INVALID_TOKEN);
         }
         return ApiResp.success(HttpStatus.OK,
                 SecurityUtil.getCurrentUsername() + "/" + accessToken + "/" + refreshToken);

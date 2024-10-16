@@ -38,7 +38,6 @@ import java.io.PrintWriter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -52,8 +51,7 @@ public class SecurityConfig {
     private String salt;
 
     // 권한 확인을 하지 않는 URI
-    private static final String[] PERMIT_ALL_PATTERNS = new String[] {
-            "/",
+    public static final String[] PERMIT_ALL_PATTERNS = new String[] {
             "/v1/api/schools",
             "/v1/api/message/send",
             "/v1/api/message/confirms",
@@ -91,7 +89,7 @@ public class SecurityConfig {
                 )
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionConfig ->
                         exceptionConfig.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                                 .accessDeniedHandler(jwtAccessDeniedHandler)
