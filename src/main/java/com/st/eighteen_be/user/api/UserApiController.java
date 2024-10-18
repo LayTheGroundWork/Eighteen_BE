@@ -127,13 +127,19 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, userDtoService.findByUniqueId(uniqueId));
     }
 
-    @Operation(summary = "좋아요 여부 포함된 회원 전체 조회", description = "좋아요 여부 포함된 회원 전체 조회")
+    @Operation(summary = "회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수x")
+    @PostMapping("/v1/api/guest/find-all")
+    public ApiResp<List<UserProfileResponseDto>> findAll(){
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfiles());
+    }
+
+    @Operation(summary = "좋아요 여부 포함된 회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수")
     @PostMapping("/v1/api/user/find-all")
     public ApiResp<List<UserProfileResponseDto>> findAll(@AuthenticationPrincipal UserDetails userDetails){
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikes(userDetails.getUsername()));
     }
 
-    @Operation(summary = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회", description = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회")
+    @Operation(summary = "좋아요 여부 포함 및 카테고리에 맞는 회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수")
     @PostMapping("/v1/api/user/find-all-by-category")
     public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
                                                                    @RequestParam("category") String category){

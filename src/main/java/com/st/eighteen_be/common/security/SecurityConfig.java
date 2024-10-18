@@ -55,6 +55,8 @@ public class SecurityConfig {
             "/v1/api/schools",
             "/v1/api/message/send",
             "/v1/api/message/confirms",
+            "/v1/api/guest/find-all",
+            "/v1/api/user/find/*",
             "/v1/api/user/like/view-backup-data/*",
             "/v1/api/user/like/force-start",
             "/v1/api/user/duplication-check",
