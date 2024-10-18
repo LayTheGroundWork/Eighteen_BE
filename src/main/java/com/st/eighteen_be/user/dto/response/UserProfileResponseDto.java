@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class UserProfileResponseDto {
 
-    private String profileImages;
+    private String profileImage;
     private Integer id;
     private String nickName;
     private String uniqueId;
@@ -22,7 +22,7 @@ public class UserProfileResponseDto {
     @Builder
     public UserProfileResponseDto(UserInfo entity, boolean likeStatus) {
         this.id = entity.getId();
-        this.profileImages = entity.getThumbnail();
+        this.profileImage = entity.getThumbnail();
         this.nickName = entity.getNickName();
         this.uniqueId = entity.getUniqueId();
         this.location = entity.getSchoolData().getSchoolLocation();
