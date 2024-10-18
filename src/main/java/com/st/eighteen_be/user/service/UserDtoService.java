@@ -66,7 +66,17 @@ public class UserDtoService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithCategory(String accessToken, String category){
+    public List<UserProfileResponseDto> getUserProfilesWithCategory(String category){
+        List<UserInfo> users = userService.findAllByCategory(CategoryType.of(category));
+        Collections.shuffle(users);
+
+        return users.stream()
+                .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
+                .collect(Collectors.toList());
+
+    }
+
+    public List<UserProfileResponseDto> getUserProfilesWithLikeStatusAndCategory(String accessToken, String category){
         List<UserInfo> users = userService.findAllByCategory(CategoryType.of(category));
         Collections.shuffle(users);
 
