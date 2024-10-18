@@ -6,6 +6,7 @@ import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.dto.response.UserQuestionResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,19 @@ public class UserDtoService {
         return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(accessToken,userInfo.getId()));
     }
 
+    public List<UserProfileResponseDto> getUserProfiles(){
+        List<UserInfo> users = userService.findAll();
+        Collections.shuffle(users);
+
+        return users.stream()
+                .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
+                .toList();
+    }
+
     public List<UserProfileResponseDto> getUserProfilesWithLikes(String accessToken) {
         List<UserInfo> users = userService.findAll();
+        Collections.shuffle(users);
+
         Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
 
         return users.stream()
@@ -56,6 +68,8 @@ public class UserDtoService {
 
     public List<UserProfileResponseDto> getUserProfilesWithCategory(String accessToken, String category){
         List<UserInfo> users = userService.findAllByCategory(CategoryType.of(category));
+        Collections.shuffle(users);
+
         Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
 
         return users.stream()
@@ -80,7 +94,8 @@ public class UserDtoService {
     }
 
     private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
-        boolean isLiked = likedUserIds != null && likedUserIds.contains(user.getId().toString());
+        boolean isLiked =
+                likedUserIds != null && likedUserIds.contains(user.getId().toString());
 
         return new UserProfileResponseDto(user, isLiked);
     }
