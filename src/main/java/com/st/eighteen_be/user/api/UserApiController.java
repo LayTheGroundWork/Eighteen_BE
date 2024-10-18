@@ -109,14 +109,14 @@ public class UserApiController {
 
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
     @PostMapping("/v1/api/user/like")
-    public ApiResp<String> like(@AuthenticationPrincipal UserDetails userDetails, Integer likedId){
+    public ApiResp<String> like(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Integer likedId){
         likeService.addLike(userDetails.getUsername(),likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
     }
 
     @Operation(summary = "회원 좋아요 취소", description = "회원 좋아요 취소하기")
     @PostMapping("/v1/api/user/like-cancel")
-    public ApiResp<String> cancelLike(@AuthenticationPrincipal UserDetails userDetails, Integer likedId){
+    public ApiResp<String> cancelLike(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Integer likedId){
         likeService.cancelLike(userDetails.getUsername(),likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 취소 완료");
     }
