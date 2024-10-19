@@ -1,7 +1,10 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.common.exception.ErrorCode;
-import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.*;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.AuthenticationJwtException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
+import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.OccupiedException;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
 import com.st.eighteen_be.token.service.RefreshTokenService;
@@ -15,21 +18,22 @@ import com.st.eighteen_be.user.repository.TokenBlackList;
 import com.st.eighteen_be.user.repository.UserRepository;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SecurityException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -191,8 +195,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public List<UserInfo> findAllByCategory(CategoryType category){
-        return userRepository.findAllByCategory(category);
+    public Slice<UserInfo> findAllByCategory(CategoryType category, Pageable pageable){
+        return userRepository.findAllByCategory(category,pageable);
+    }
+
+    public Slice<UserInfo> findPageBy(Pageable pageable){
+        return userRepository.findPageBy(pageable);
     }
 
     int findLikeCountById(Integer id) {

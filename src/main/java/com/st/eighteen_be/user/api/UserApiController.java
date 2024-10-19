@@ -1,5 +1,9 @@
 package com.st.eighteen_be.user.api;
 
+import static com.st.eighteen_be.jwt.JwtTokenProvider.AUTHORIZATION_HEADER;
+import static com.st.eighteen_be.jwt.JwtTokenProvider.BEARER_PREFIX_A;
+import static com.st.eighteen_be.jwt.JwtTokenProvider.REFRESH_HEADER;
+
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
@@ -15,17 +19,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.st.eighteen_be.jwt.JwtTokenProvider.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * packageName    : com.st.eighteen_be.member.api
@@ -122,35 +134,45 @@ public class UserApiController {
     }
 
     @Operation(summary = "회원 상세 정보 보기", description = "회원 상세 정보 보기")
-    @PostMapping("/v1/api/user/find/{unique-id}")
+    @GetMapping("/v1/api/user/find/{unique-id}")
     public ApiResp<UserDetailsResponseDto> find(@PathVariable("unique-id") String uniqueId) {
         return ApiResp.success(HttpStatus.OK, userDtoService.findByUniqueId(uniqueId));
     }
 
-    @Operation(summary = "[GUEST]회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수x")
+    @Operation(summary = "[GUEST]회원 전체 조회",
+            description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
     @PostMapping("/v1/api/guest/find-all")
-    public ApiResp<List<UserProfileResponseDto>> findAll(){
-        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfiles());
+    public ApiResp<List<UserProfileResponseDto>> findAll(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilePage(pageable));
     }
 
-    @Operation(summary = "[USER]회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수")
+    @Operation(summary = "[USER]회원 전체 조회",
+            description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
     @PostMapping("/v1/api/user/find-all")
-    public ApiResp<List<UserProfileResponseDto>> findAll(@AuthenticationPrincipal UserDetails userDetails){
-        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikes(userDetails.getUsername()));
+    public ApiResp<List<UserProfileResponseDto>> findAll(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @PageableDefault(page = 0, size = 10) Pageable pageable){
+
+        return ApiResp.success(HttpStatus.OK, userDtoService.
+                getUserProfilesWithLikes(userDetails.getUsername(), pageable));
     }
 
-    @Operation(summary = "[GUEST] 카테고리에 맞는 회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수x")
+    @Operation(summary = "[GUEST] 카테고리에 맞는 회원 전체 조회",
+            description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
     @PostMapping("/v1/api/guest/find-all-by-category")
-    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@RequestParam("category") String category){
-        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(category));
+    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@RequestParam("category") String category,
+                                                                   @PageableDefault(page = 0, size = 10) Pageable pageable){
+        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(category,pageable));
     }
 
-    @Operation(summary = "[USER] 카테고리에 맞는 회원 전체 조회", description = "순서 랜덤하게 뿌림 && 헤더에 토큰값 필수")
+    @Operation(summary = "[USER] 카테고리에 맞는 회원 전체 조회",
+            description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
     @PostMapping("/v1/api/user/find-all-by-category")
     public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
-                                                                   @RequestParam("category") String category){
+                                                                   @PageableDefault(page = 0, size = 10) Pageable pageable,
+                                                                   @RequestParam("category") String category) {
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikeStatusAndCategory(
-                userDetails.getUsername(),category));
+                userDetails.getUsername(),category,pageable));
     }
 
     // Test API

@@ -4,13 +4,16 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import io.lettuce.core.dynamic.annotation.Param;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface UserRepository extends JpaRepository<UserInfo,Integer> {
+
+    Slice<UserInfo> findPageBy(Pageable pageable);
 
     Optional<UserInfo> findByUniqueId(String uniqueId);
 
@@ -28,5 +31,5 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
     List<UserRandomResponseDto> findRandomUser(@Param("category") CategoryType category);
 
     @Query("SELECT u FROM UserInfo u where u.category=:category")
-    List<UserInfo> findAllByCategory(@Param("category") CategoryType category);
+    Slice<UserInfo> findAllByCategory(@Param("category") CategoryType category, Pageable pageable);
 }
