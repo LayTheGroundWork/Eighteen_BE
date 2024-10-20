@@ -2,14 +2,13 @@ package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserLike;
+import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -17,45 +16,52 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LikeService {
 
-    private final RedisTemplate<String,String> redisLikeTemplate;
+    private final RedisTemplate<String,String> likeRedisTemplate;
     private final UserService userService;
 
     public static final String LIKE_COUNT_PREFIX = "likeCount:";
     public static final String USER_LIKES_PREFIX = "userLikes:";
 
 
-    public void addLike(String uniqueId, Integer likedId){
+    public void addLike(String uniqueId, Integer userId){
 
         String userLikesKey = USER_LIKES_PREFIX + uniqueId;
+        UserInfo user = userService.findById(userId);
+        String likedId = Integer.toString(user.getId());
 
-        if (Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
+        if (Boolean.TRUE.equals(likeRedisTemplate.opsForSet().isMember(
+                userLikesKey,likedId))
+        ) {
             throw new IllegalStateException("Already liked");
         }
 
-        redisLikeTemplate.opsForSet().add(userLikesKey, likedId.toString());
-        redisLikeTemplate.opsForValue().increment(LIKE_COUNT_PREFIX + likedId);
+        likeRedisTemplate.opsForSet().add(userLikesKey, likedId);
+        likeRedisTemplate.opsForValue().increment(LIKE_COUNT_PREFIX + likedId);
     }
 
-    public void cancelLike(String uniqueId, Integer likedId){
+    public void cancelLike(String uniqueId, Integer userId){
         String userLikesKey = USER_LIKES_PREFIX + uniqueId;
+        UserInfo user = userService.findById(userId);
+        String likedId = Integer.toString(user.getId());
 
-        if (Boolean.FALSE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId.toString()))) {
+        if (Boolean.FALSE.equals(likeRedisTemplate.opsForSet().isMember(userLikesKey, likedId))) {
             //TODO: 레디스에 없지만 DB에는 있는지 확인하는 로직이 필요함
             throw new IllegalStateException("Not liked yet");
         }
-        redisLikeTemplate.opsForSet().remove(userLikesKey,likedId);
-        redisLikeTemplate.opsForValue().decrement(LIKE_COUNT_PREFIX + likedId);
+        likeRedisTemplate.opsForSet().remove(userLikesKey,likedId);
+        likeRedisTemplate.opsForValue().decrement(LIKE_COUNT_PREFIX + likedId);
     }
 
     @Transactional(readOnly = true)
     public int countLikes(Integer userId) {
         String likeCountKey = LIKE_COUNT_PREFIX + userId;
-        String count = redisLikeTemplate.opsForValue().get(likeCountKey);
+        String count = likeRedisTemplate.opsForValue().get((likeCountKey));
+
         if (count == null) {
             // Redis에 값이 없으면 데이터베이스에서 가져와 Redis에 저장
-            int likeCount = userService.findLikeCountById(userId);
-            redisLikeTemplate.opsForValue().set(likeCountKey, String.valueOf(likeCount));
-            return likeCount;
+            String likeCount = Integer.toString(userService.findLikeCountById(userId));
+            likeRedisTemplate.opsForValue().set(likeCountKey, likeCount);
+            return Integer.parseInt(likeCount);
         }
         return Integer.parseInt(count);
     }
@@ -64,20 +70,22 @@ public class LikeService {
     public Set<String> getLikedUserIds(String uniqueId) {
         String userLikesKey = USER_LIKES_PREFIX + uniqueId;
 
-        return redisLikeTemplate.opsForSet().members(userLikesKey);
+        return likeRedisTemplate.opsForSet().members(userLikesKey);
     }
 
     @Transactional(readOnly = true)
-    public boolean getLikedUserId(String uniqueId, Integer likedId) {
+    public boolean getLikedUserId(String uniqueId, Integer userId) {
         String userLikesKey = USER_LIKES_PREFIX + uniqueId;
+        UserInfo user = userService.findById(userId);
+        String likedId = Integer.toString(user.getId());
 
-        return Boolean.TRUE.equals(redisLikeTemplate.opsForSet().isMember(userLikesKey, likedId));
+        return Boolean.TRUE.equals(likeRedisTemplate.opsForSet().isMember(userLikesKey, likedId));
     }
 
     public void backupUserLikeDataToMySQL(){
         log.info("user likes backup start");
 
-        Set<String> userLikesRedisKey = redisLikeTemplate.keys(LikeService.USER_LIKES_PREFIX + "*");
+        Set<String> userLikesRedisKey = likeRedisTemplate.keys(LikeService.USER_LIKES_PREFIX + "*");
 
         if(userLikesRedisKey != null) {
             for (String redisUserId : userLikesRedisKey) {
@@ -85,11 +93,10 @@ public class LikeService {
 
                 UserInfo userInfo = userService.findByUniqueId(uniqueId);
 
-                Set<String> likedUser = Objects.requireNonNull(redisLikeTemplate.opsForSet().members(redisUserId));
+                Set<String> likedUser = Objects.requireNonNull(likeRedisTemplate.opsForSet().members(redisUserId));
 
-                for (String str : likedUser) {
-                    Integer likedId = Integer.parseInt(str);
-                    UserLike.addLikedId(userInfo, likedId);
+                for (String likedId : likedUser) {
+                    UserLike.addLikedId(userInfo, Integer.valueOf(likedId));
                 }
             }
         }
@@ -99,18 +106,18 @@ public class LikeService {
     public void backupLikeCountToMySQL(){
         log.info("user like count backup start");
 
-        Set<String> likeCountRedisKey = redisLikeTemplate.keys(LikeService.LIKE_COUNT_PREFIX + "*");
+        Set<String> likeCountRedisKey = likeRedisTemplate.keys(LikeService.LIKE_COUNT_PREFIX + "*");
 
         if(likeCountRedisKey != null) {
             for (String data : likeCountRedisKey) {
                 Integer userId = Integer.parseInt(data.split(":")[1]);
 
-                if (redisLikeTemplate.opsForValue().get(data) == null) break;
+                if (likeRedisTemplate.opsForValue().get(data) == null) break;
 
                 UserInfo userInfo = userService.findById(userId);
 
-                int likeCount = Integer.parseInt(Objects.requireNonNull(redisLikeTemplate.opsForValue().get(data)));
-                userInfo.backupLikeCount(likeCount);
+                String likeCount = Objects.requireNonNull(likeRedisTemplate.opsForValue().get(data));
+                userInfo.backupLikeCount(Integer.parseInt(likeCount));
             }
         }
 
