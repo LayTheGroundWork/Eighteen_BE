@@ -15,7 +15,7 @@ Authorization: Bearer {{token}}
 
 {
   "voterId": "voter1",
-  "tournamentNo": 4,
+  "tournamentNo": 1,
   "participantIdsOrderByRank": [
     "user1",
     "user2",
