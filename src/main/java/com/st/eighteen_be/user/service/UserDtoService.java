@@ -116,7 +116,7 @@ public class UserDtoService {
 
     private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
         boolean isLiked =
-                likedUserIds != null && likedUserIds.contains(user.getId().toString());
+                likedUserIds != null && likedUserIds.contains(String.valueOf(user.getId()));
 
         return new UserProfileResponseDto(user, isLiked);
     }
