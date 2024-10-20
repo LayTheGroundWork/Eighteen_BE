@@ -1,3 +1,3 @@
 
 ### 학교 검색
-GET {{url}}/v1/api/schools?schoolName=소프트웨어
+GET {{url}}/v1/api/schools?schoolName= 인덕

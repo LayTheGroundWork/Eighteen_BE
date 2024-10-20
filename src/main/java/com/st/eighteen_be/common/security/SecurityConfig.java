@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -35,6 +36,7 @@ import java.io.PrintWriter;
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -64,6 +66,11 @@ public class SecurityConfig {
             "/v1/api/user/reissue",
             "/v1/api/user/sign-up",
             "/v1/api/user/sign-in",
+            "/v1/api/tournament/force-start",
+            "/v1/api/tournament/force-end",
+            "/v1/api/tournament/search",
+            "/v1/api/tournament/force-pick-random-user-to-redis",
+            "/v1/api/tournament/winner/*",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",

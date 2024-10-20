@@ -13,6 +13,7 @@ import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
+import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
@@ -91,15 +92,18 @@ class TournamentServiceMySQLTest {
 
     @Mock
     private ListOperations<String, RandomUser> listOperations;
-
+    
     @Mock
     private HashOperations<String, String, RandomUser> hashOperations;
-
+    
+    @Autowired
+    private TournamentWinnerRepository tournamentWinnerRepository;
+    
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, voteEntityRepository, userRepository, randomUserRedisRepository,
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, randomUserRedisRepository,
                 redisTemplate);
-
+        
         given(redisTemplate.opsForList()).willReturn(listOperations);
         given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
     }

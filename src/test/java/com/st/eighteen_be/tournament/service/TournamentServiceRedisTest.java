@@ -7,6 +7,7 @@ import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
+import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
@@ -58,15 +59,18 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
 
     @MockBean
     private UserService userService;
-
+    
     @MockBean
     private UserRepository userRepository;
+    
     @Autowired
     private RandomUserRedisRepository randomUserRedisRepository;
+    @Autowired
+    private TournamentWinnerRepository tournamentWinnerRepository;
     
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, voteEntityRepository, userRepository, randomUserRedisRepository, redisTemplate);
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, randomUserRedisRepository, redisTemplate);
     }
 
     @Test

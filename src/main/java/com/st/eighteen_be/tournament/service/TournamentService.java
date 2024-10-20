@@ -13,6 +13,7 @@ import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
+import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
@@ -27,9 +28,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -53,13 +52,14 @@ public class TournamentService {
 
     private final TournamentEntityRepository tournamentEntityRepository;
     private final TournamentParticipantRepository tournamentParticipantEntityRepository;
+    private final TournamentWinnerRepository tournamentWinnerRepository;
     private final VoteEntityRepository voteEntityRepository;
-
+    
     private final UserRepository userRepository;
-
+    
     private final RandomUserRedisRepository randomUserRedisRepository;
     private final RedisTemplate<String, RandomUser> redisTemplate;
-
+    
     public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, CategoryType category) {
         log.info("search start category : {}", category);
 
@@ -142,8 +142,6 @@ public class TournamentService {
 
     @Transactional(readOnly = false)
     public TournamentEntity createNewTournament(CategoryType category, int season) {
-        log.info("createNewTournament start category : {}", category);
-
         TournamentEntity created = TournamentEntity.createTournamentEntity(category, season);
 
         return tournamentEntityRepository.save(created);
@@ -151,25 +149,56 @@ public class TournamentService {
 
     @Transactional(readOnly = false)
     public void endLastestTournaments() {
-        log.info("endLastestTournaments start");
-
         for (CategoryType category : CategoryType.values()) {
             TournamentEntity foundTournamet = endTournamentByCategory(category);
             determineWinner(foundTournamet.getTournamentNo());
         }
     }
-
+    
+    /**
+     *  종료된 토너먼트 정보 조회 및 종료 프로세스
+     *
+     * @param category  카테고리
+     * @return 종료된 토너먼트 정보
+     */
     private TournamentEntity endTournamentByCategory(CategoryType category) {
         log.info("endTournamentByCategory start category : {}", category.getCategory());
 
         return tournamentEntityRepository.findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(category)
                 .map(tournament -> {
                     tournament.endTournament();
-                    return tournamentEntityRepository.save(tournament);
+                    TournamentEntity endedTournament = tournamentEntityRepository.save(tournament);
+                    
+                    updateWinnerCount(endedTournament);
+                    
+                    return endedTournament;
                 })
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_CATEGORY));
     }
-
+    
+    /**
+     *  종료된 토너먼트의 우승자 카운트 DB 저장
+     *
+     * @param endedTournament 종료된 토너먼트 정보
+     */
+    private void updateWinnerCount(TournamentEntity endedTournament) {
+        // 종료된 토너먼트의 우승자 카운트 DB 저장
+        Optional<TournamentParticipantEntity> winner = tournamentParticipantEntityRepository.findByTournament(endedTournament).stream()
+                .max(Comparator.comparing(TournamentParticipantEntity::getScore));
+        
+        // 우승자 카운트에 존재하는지 확인 -> 존재하는 경우 카운트 증가
+        winner.ifPresent(tournamentParticipantEntity -> tournamentWinnerRepository.findByUserId(tournamentParticipantEntity.getUserId())
+                .ifPresentOrElse(
+                        tournamentWinner -> {
+                            tournamentWinner.addWinnerCount();
+                            tournamentWinnerRepository.save(tournamentWinner);
+                        },
+                        
+                        // 존재하지 않는 경우 새로운 우승자 추가
+                        () -> tournamentWinnerRepository.save(tournamentParticipantEntity.toWinnerEntity())
+                ));
+    }
+    
     @Transactional(readOnly = false)
     public List<TournamentVoteResultResponseDTO> determineWinner(@NonNull Long tournamentNo) {
         log.info("determineWinner start");
