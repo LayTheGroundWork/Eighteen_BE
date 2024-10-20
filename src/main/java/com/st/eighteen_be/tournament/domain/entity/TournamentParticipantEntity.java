@@ -1,6 +1,8 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
+import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament_winner.domain.TournamentWinnerEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -53,5 +55,17 @@ public class TournamentParticipantEntity extends BaseEntity {
                 .userId(userId)
                 .tournament(tournament)
                 .build();
+    }
+    
+    public static TournamentParticipantEntity toWinnerEntity(TournamentEntity newTournament, RandomUser randomUser) {
+        return TournamentParticipantEntity.builder()
+                .tournament(newTournament)
+                .userId(String.valueOf(randomUser.getUserId()))
+                .userImageUrl(randomUser.getProfileImageUrl())
+                .build();
+    }
+    
+    public TournamentWinnerEntity toWinnerEntity() {
+        return TournamentWinnerEntity.from(this);
     }
 }
