@@ -22,13 +22,13 @@ import com.st.eighteen_be.user.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -60,17 +60,10 @@ public class TournamentService {
     private final RandomUserRedisRepository randomUserRedisRepository;
     private final RedisTemplate<String, RandomUser> redisTemplate;
     
-    public List<TournamentSearchResponseDTO> search() {
-        return tournamentEntityRepository.findTournamentMainInfos()
-                .stream()
-                /* .map(tournament -> TournamentSearchResponseDTO.builder()
-                         .tournamentThumbnailUrl(tournament.getThumbnailUrl())
-                         .status(tournament.isStatus())
-                         .category(tournament.getCategory())
-                         .startDate(tournament.getStartDate())
-                         .endDate(tournament.getEndDate())
-                         .build())*/
-                .collect(Collectors.toList());
+    public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, CategoryType category) {
+        log.info("search start category : {}", category);
+
+        return tournamentEntityRepository.findTournamentByCategoryAndPaging(category, pageRequest);
     }
 
     @Transactional(readOnly = false)
@@ -176,7 +169,7 @@ public class TournamentService {
                     tournament.endTournament();
                     TournamentEntity endedTournament = tournamentEntityRepository.save(tournament);
                     
-                    addWinner(endedTournament);
+                    updateWinnerCount(endedTournament);
                     
                     return endedTournament;
                 })
@@ -188,13 +181,22 @@ public class TournamentService {
      *
      * @param endedTournament 종료된 토너먼트 정보
      */
-    private void addWinner(TournamentEntity endedTournament) {
+    private void updateWinnerCount(TournamentEntity endedTournament) {
         // 종료된 토너먼트의 우승자 카운트 DB 저장
         Optional<TournamentParticipantEntity> winner = tournamentParticipantEntityRepository.findByTournament(endedTournament).stream()
                 .max(Comparator.comparing(TournamentParticipantEntity::getScore));
         
-        winner.flatMap(tournamentParticipantEntity -> tournamentWinnerRepository.findByUserId(tournamentParticipantEntity.getUserId()))
-                .ifPresent(tournamentWinnerRepository::save);
+        // 우승자 카운트에 존재하는지 확인 -> 존재하는 경우 카운트 증가
+        winner.ifPresent(tournamentParticipantEntity -> tournamentWinnerRepository.findByUserId(tournamentParticipantEntity.getUserId())
+                .ifPresentOrElse(
+                        tournamentWinner -> {
+                            tournamentWinner.addWinnerCount();
+                            tournamentWinnerRepository.save(tournamentWinner);
+                        },
+                        
+                        // 존재하지 않는 경우 새로운 우승자 추가
+                        () -> tournamentWinnerRepository.save(tournamentParticipantEntity.toWinnerEntity())
+                ));
     }
     
     @Transactional(readOnly = false)

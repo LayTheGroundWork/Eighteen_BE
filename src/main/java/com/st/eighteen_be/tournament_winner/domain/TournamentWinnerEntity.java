@@ -30,21 +30,18 @@ public class TournamentWinnerEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
     
-    @Column(name = "participant_no", nullable = false)
-    private Long participantNo;
-    
-    @OneToOne
-    @JoinColumn(name = "participant_no", referencedColumnName = "participant_no", insertable = false, updatable = false)
-    private TournamentParticipantEntity participant;
-    
-    //우승한 토너번호 번호
-    @Column(name = "winning_tournament_no", nullable = false)
-    private Long winningTournamentNo;
+    @Builder.Default
+    @Column(name = "winner_count", nullable = false)
+    private Integer winnerCount = 0 ;
     
     public static TournamentWinnerEntity from(TournamentParticipantEntity participant) {
         return TournamentWinnerEntity.builder()
                 .userId(participant.getUserId())
-                .winningTournamentNo(participant.getTournament().getTournamentNo())
+                .winnerCount(0)
                 .build();
+    }
+    
+    public void addWinnerCount() {
+        this.winnerCount++;
     }
 }
