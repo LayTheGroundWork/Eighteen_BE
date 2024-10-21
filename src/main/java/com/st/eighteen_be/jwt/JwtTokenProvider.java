@@ -5,10 +5,22 @@ import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.Cu
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomIllegalArgumentException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomInvalidException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.jwt.CustomUnsupportedJwtException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
 import jakarta.annotation.PostConstruct;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,11 +31,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import javax.crypto.SecretKey;
-import java.security.Key;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -79,7 +86,6 @@ public class JwtTokenProvider {
         // RefreshToken 생성
         Date refreshTokenExpiresIn = new Date(now + refreshTokenExpireTime);
         String refreshToken = Jwts.builder()
-                .subject(authentication.getName())
                 .expiration(refreshTokenExpiresIn)
                 .signWith(key)
                 .compact();
