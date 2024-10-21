@@ -1,17 +1,15 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.st.eighteen_be.tournament.domain.dto.response.QTournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
-import com.st.eighteen_be.user.enums.CategoryType;
+import com.st.eighteen_be.tournament.domain.entity.QTournamentEntity;
+import com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity;
+import com.st.eighteen_be.tournament_winner.domain.QTournamentWinnerEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import static com.st.eighteen_be.tournament.domain.entity.QTournamentEntity.tournamentEntity;
-import static com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity.tournamentParticipantEntity;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.repository.querydsl
@@ -44,25 +42,24 @@ public class TournamentRepositoryCustomImpl implements TournamentRepositoryCusto
     */
     @Override
     public List<TournamentSearchResponseDTO> findTournamentMainInfos() {
-        //토너먼트
-        qf.select(
-                        new QTournamentSearchResponseDTO(
-                                tournamentParticipantEntity.tournament,
-                                
-                        ))
-                .from(tournamentParticipantEntity)
-                .leftJoin(tournamentParticipantEntity.tournament)
-                .orderBy(tournamentParticipantEntity.tournament.tournamentNo.desc())
+        QTournamentEntity t = QTournamentEntity.tournamentEntity;
+        QTournamentWinnerEntity tw = QTournamentWinnerEntity.tournamentWinnerEntity;
+        QTournamentParticipantEntity tp = QTournamentParticipantEntity.tournamentParticipantEntity;
+        
+        // 평평한 데이터 조회
+        List<Tuple> tuples = qf
+                .select(
+                        t.category,
+                        t.season,
+                        t.tournamentNo,
+                        tp.userImageUrl
+                )
+                .from(t)
+                .leftJoin(tw).on(tw.winningTournamentNo.eq(t.tournamentNo))
+                .leftJoin(tp).on(tw.participantNo.eq(tp.participantNo))
+                .orderBy(t.category.asc(), t.tournamentNo.desc())
                 .fetch();
         
         return List.of();
-    }
-    
-    private static BooleanExpression eqCategory(CategoryType category) {
-        if (category == null) {
-            return null;
-        }
-        
-        return tournamentEntity.category.eq(category);
     }
 }
