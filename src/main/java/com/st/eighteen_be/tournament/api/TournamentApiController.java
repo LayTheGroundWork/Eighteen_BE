@@ -6,7 +6,6 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchRespons
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.scheduler.TournamentScheduler;
 import com.st.eighteen_be.tournament.service.TournamentService;
-import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,8 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,25 +47,8 @@ public class TournamentApiController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     @GetMapping("/v1/api/tournament/search")
-    public ApiResp<List<TournamentSearchResponseDTO>> search(
-            @Parameter(description = "페이지 번호", example = "1", required = true)
-            @RequestParam(value = "page", defaultValue = "1") int page,
-
-            @Parameter(description = "페이지 크기", example = "10", required = true)
-            @RequestParam(value = "size", defaultValue = "10") int size,
-
-            @Parameter(description = "정렬 기준", example = "TOURNAMENT_NO")
-            @RequestParam(value = "sort", defaultValue = "TOURNAMENT_NO") String sort,
-
-            @Parameter(description = "정렬 방향", example = "DESC")
-            @RequestParam(value = "sortDirection", defaultValue = "DESC") Sort.Direction sortDirection,
-
-            @Parameter(description = "카테고리", example = "GAME")
-            @RequestParam(value = "category", required = false) String category
-    ) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sort));
-
-        List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search(pageRequest, CategoryType.of(category));
+    public ApiResp<List<TournamentSearchResponseDTO>> search() {
+        List<TournamentSearchResponseDTO> responseDTOs = tournamentService.search();
 
         return ApiResp.success(HttpStatus.OK, responseDTOs);
     }

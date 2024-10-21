@@ -1,7 +1,6 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -68,16 +67,6 @@ public class TournamentEntity extends BaseEntity {
                 .startDate(LocalDateTime.now())
                 .season(season)
                 .status(true)
-                .build();
-    }
-
-    public TournamentSearchResponseDTO toTournamentSearchResponseDTO() {
-        return TournamentSearchResponseDTO.builder()
-                .tournamentNo(tournamentNo)
-                .thumbnailUrl(thumbnailUrl)
-                .status(status)
-                .startDate(startDate)
-                .endDate(endDate)
                 .build();
     }
 }
