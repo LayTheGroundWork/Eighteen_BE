@@ -1,12 +1,10 @@
 package com.st.eighteen_be.tournament.domain.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -24,6 +22,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Schema(description = "토너먼트 정보 응답 DTO")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class TournamentSearchResponseDTO {
@@ -34,8 +33,8 @@ public class TournamentSearchResponseDTO {
     private List<TournamentWinnerResponseDTO> winner;
     
     @QueryProjection
-    public TournamentSearchResponseDTO(String category, List<TournamentWinnerResponseDTO> winner) {
-        this.category = category;
+    public TournamentSearchResponseDTO(CategoryType category, List<TournamentWinnerResponseDTO> winner) {
+        this.category = category.getCategory();
         this.winner = winner;
     }
     
