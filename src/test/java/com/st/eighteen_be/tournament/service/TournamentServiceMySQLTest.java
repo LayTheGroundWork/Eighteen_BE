@@ -28,7 +28,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -123,7 +122,7 @@ class TournamentServiceMySQLTest {
         tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
 
         // when
-        List<TournamentSearchResponseDTO> actual = tournamentService.search(PageRequest.of(0, 2), CategoryType.GAME);
+        List<TournamentSearchResponseDTO> actual = tournamentService.search();
 
         // then
         assertThat(actual).isNotEmpty();
@@ -146,7 +145,7 @@ class TournamentServiceMySQLTest {
         tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
 
         // when
-        List<TournamentSearchResponseDTO> actual = tournamentService.search(PageRequest.of(0, 2), CategoryType.ETC);
+        List<TournamentSearchResponseDTO> actual = tournamentService.search();
 
         // then
         assertThat(actual).isEmpty();

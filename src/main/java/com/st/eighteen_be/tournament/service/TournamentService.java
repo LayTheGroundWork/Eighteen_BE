@@ -22,13 +22,13 @@ import com.st.eighteen_be.user.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -60,10 +60,17 @@ public class TournamentService {
     private final RandomUserRedisRepository randomUserRedisRepository;
     private final RedisTemplate<String, RandomUser> redisTemplate;
     
-    public List<TournamentSearchResponseDTO> search(PageRequest pageRequest, CategoryType category) {
-        log.info("search start category : {}", category);
-
-        return tournamentEntityRepository.findTournamentByCategoryAndPaging(category, pageRequest);
+    public List<TournamentSearchResponseDTO> search() {
+        return tournamentEntityRepository.findTournamentMainInfos()
+                .stream()
+                /* .map(tournament -> TournamentSearchResponseDTO.builder()
+                         .tournamentThumbnailUrl(tournament.getThumbnailUrl())
+                         .status(tournament.isStatus())
+                         .category(tournament.getCategory())
+                         .startDate(tournament.getStartDate())
+                         .endDate(tournament.getEndDate())
+                         .build())*/
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = false)

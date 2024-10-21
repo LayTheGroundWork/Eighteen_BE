@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface TournamentEntityRepository extends JpaRepository<TournamentEntity, Long>, TournamentRepositoryCustom {
     Optional<TournamentEntity> findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(@Nonnull CategoryType category);
-
+    
     Optional<TournamentEntity> findFirstByCategoryOrderByCreatedDateDesc(@Nonnull CategoryType category);
 }
