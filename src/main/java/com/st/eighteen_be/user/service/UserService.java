@@ -96,10 +96,13 @@ public class UserService {
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         JwtTokenDto token = jwtTokenProvider.generateToken(authentication);
 
-        // 4. RefreshToken 저장
-        refreshTokenService.setRefreshToken(authentication, token.getRefreshToken());
+        // 4. 리프레시 토큰에서 유효기간 뽑아오기
+        long expiration = jwtTokenProvider.getExpiration(token.getRefreshToken());
 
-        // 5. 토큰 발급
+        // 5. RefreshToken 저장
+        refreshTokenService.setRefreshToken(authentication, token.getRefreshToken(), expiration);
+
+        // 6. 토큰 발급
         return token;
     }
 
@@ -142,8 +145,11 @@ public class UserService {
             // 6. 새로운 토큰 생성
             JwtTokenDto newToken = jwtTokenProvider.generateToken(authentication);
 
-            // 7. 저장소 정보 업데이트
-            refreshTokenService.setRefreshToken(authentication,newToken.getRefreshToken());
+            // 7. 리프레시 토큰에서 유효기간 뽑아오기
+            long expiration = jwtTokenProvider.getExpiration(newToken.getRefreshToken());
+
+            // 8. 저장소 정보 업데이트
+            refreshTokenService.setRefreshToken(authentication,newToken.getRefreshToken(),expiration);
 
             return newToken;
 
