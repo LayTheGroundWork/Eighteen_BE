@@ -1,13 +1,11 @@
 package com.st.eighteen_be.token.service;
 
-import com.st.eighteen_be.jwt.JwtTokenProvider;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -15,12 +13,10 @@ import java.util.concurrent.TimeUnit;
 public class RefreshTokenService {
 
     private final RedisTemplate<String, String> redisRefreshTokenTemplate;
-    private final JwtTokenProvider jwtTokenProvider;
 
     private static final String REFRESH_TOKEN = "refreshToken:";
 
-    public void setRefreshToken(Authentication authentication, String refreshToken) {
-        long expiration = jwtTokenProvider.getExpiration(refreshToken);
+    public void setRefreshToken(Authentication authentication, String refreshToken, long expiration) {
         redisRefreshTokenTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(refreshToken.getClass()));
         redisRefreshTokenTemplate.opsForValue().set(
                 REFRESH_TOKEN + authentication.getName(), refreshToken, expiration, TimeUnit.MILLISECONDS);

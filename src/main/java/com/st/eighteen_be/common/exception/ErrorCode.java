@@ -46,11 +46,13 @@ public enum ErrorCode {
 
     // jwt
     TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
+
+    // jwt: filter 에서 response 로 보낼 시 한글은 ?로 표기되어 영어로 작성
+    TOKEN_IS_EMPTY(HttpStatus.NOT_FOUND, "Token Is Empty"),
+    UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "Unauthorized Token.."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Expired Token"),
     INVALID_TOKEN(HttpStatus.NOT_FOUND, "Invalid Token"),
     UNSUPPORTED_TOKEN(HttpStatus.NOT_FOUND, "Unsupported Token"),
-    TOKEN_IS_EMPTY(HttpStatus.NOT_FOUND, "Token Is Empty"),
-    UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "Unauthorized Token.."),
     FORBIDDEN_TOKEN(HttpStatus.FORBIDDEN, "Forbidden Token.."),
 
     //profile
