@@ -84,13 +84,17 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
 
             // 토너먼토와 참여자 정보를 조회합니다.
             TournamentEntity foundTournament = Optional.ofNullable(qf.selectFrom(tournamentEntity)
-                                                                           .where(eqTournamentNo(voteRequestDTO.getTournamentNo()))
-                                                                           .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT));
-
+                    .where(eqTournamentNo(voteRequestDTO.getTournamentNo()))
+                    .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT));
+            
             // 투표한 참여자 정보를 조회합니다.
             TournamentParticipantEntity foundTournamentParticipant = Optional.ofNullable(qf.selectFrom(tournamentParticipantEntity)
-                                                                                                 .where(eqVoteeId(participantId))
-                                                                                                 .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT_PARTICIPANT));
+                            .leftJoin(tournamentParticipantEntity.tournament, tournamentEntity)
+                            .on(tournamentParticipantEntity.tournament.tournamentNo.eq(tournamentEntity.tournamentNo))
+                            .where(eqVoteeId(participantId)
+                                    .and(tournamentEntity.tournamentNo.eq(voteRequestDTO.getTournamentNo())))
+                            .fetchOne())
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT_PARTICIPANT));
             
             em.persist(voteRequestDTO.toEntity(foundTournament, foundTournamentParticipant, point, loginedUserId));
             

@@ -13,6 +13,7 @@ import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
+import com.st.eighteen_be.tournament_winner.domain.TournamentWinnerEntity;
 import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
@@ -41,7 +42,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.st.eighteen_be.tournament.domain.entity.TournamentEntity.THUMBNAIL_DEFAULT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -108,64 +108,8 @@ class TournamentServiceMySQLTest {
     }
 
     @Test
-    @DisplayName("분야별 토너먼트 정상 조회 테스트")
-    void When_searchTournamentByCategory_Then_returnTournamentList() {
-        // given
-        TournamentEntity tournamentEntity = TournamentEntity.builder()
-                .category(CategoryType.GAME)
-                                                    .build();
-
-        TournamentEntity tournamentEntity2 = TournamentEntity.builder()
-                .category(CategoryType.SPORT)
-                                                     .build();
-
-        tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
-
-        // when
-        List<TournamentSearchResponseDTO> actual = tournamentService.search();
-
-        // then
-        assertThat(actual).isNotEmpty();
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getTournamentThumbnailUrl()).isEqualTo(THUMBNAIL_DEFAULT_URL);
-    }
-
-    @Test
-    @DisplayName("분야별 토너먼트 조회 시 해당하는 토너먼트가 없는 경우 빈 리스트 반환 테스트")
-    void When_searchTournamentByCategory_Then_returnEmptyList() {
-        // given
-        TournamentEntity tournamentEntity = TournamentEntity.builder()
-                .category(CategoryType.GAME)
-                                                    .build();
-
-        TournamentEntity tournamentEntity2 = TournamentEntity.builder()
-                .category(CategoryType.SPORT)
-                                                     .build();
-
-        tournamentEntityRepository.saveAll(List.of(tournamentEntity, tournamentEntity2));
-
-        // when
-        List<TournamentSearchResponseDTO> actual = tournamentService.search();
-
-        // then
-        assertThat(actual).isEmpty();
-    }
-
-    @Test
     @DisplayName("토너먼트를 시작합니다. 카테고리에 맞는 토너먼트 생성을 확인한다.")
     void When_startTournament_Then_createTournament() {
-        // given
-        List<TournamentParticipantEntity> tournamentParticipantEntities = List.of(
-                TournamentParticipantEntity.of("user1"),
-                TournamentParticipantEntity.of("user2"),
-                TournamentParticipantEntity.of("user3"),
-                TournamentParticipantEntity.of("user4"),
-                TournamentParticipantEntity.of("user5"),
-                TournamentParticipantEntity.of("user6"),
-                TournamentParticipantEntity.of("user7"),
-                TournamentParticipantEntity.of("user8")
-        );
-
         //redisTemplate.opsForList() 모킹
         List<RandomUser> randomUsers = IntStream.range(0, 16)
                 .boxed()
@@ -181,8 +125,81 @@ class TournamentServiceMySQLTest {
 
         // then
         List<TournamentEntity> actual = tournamentEntityRepository.findAll();
-
+        
         assertThat(actual).isNotEmpty().hasSize(CategoryType.values().length);
+    }
+    
+    @Test
+    @DisplayName("토너먼트 시즌 별 검색 및 우승자 세팅 테스트")
+    void search() {
+        // given
+        List<TournamentEntity> tournamentEntities = new ArrayList<>();
+        
+        //시즌 1 시즌 2 토너먼트를 생성하고, 그에 맞는 우승자와 참여자를 세팅한다.
+        for (int season = 1; season <= 2; season++) {
+            TournamentEntity gameTournament = TournamentEntity.builder()
+                    .season(season)
+                    .status(true)
+                    .category(CategoryType.ART)
+                    .build();
+            
+            tournamentEntities.add(gameTournament);
+        }
+        
+        tournamentEntityRepository.saveAll(tournamentEntities);
+        
+        //참여자 세팅
+        List<TournamentParticipantEntity> tournamentParticipantEntities = new ArrayList<>();
+        
+        for (TournamentEntity tournamentEntity : tournamentEntities) {
+            for (int i = 1; i <= 2; i++) {
+                TournamentParticipantEntity participant = TournamentParticipantEntity.builder()
+                        .userId("userId" + i)
+                        .tournament(tournamentEntity)
+                        .userImageUrl("http://test.com")
+                        .build();
+                
+                tournamentParticipantEntities.add(participant);
+            }
+        }
+        
+        tournamentParticipantEntityRepository.saveAll(tournamentParticipantEntities);
+        
+        //우승자 세팅
+        List<TournamentWinnerEntity> tournamentWinnerEntities = new ArrayList<>();
+        
+        for (TournamentEntity tournamentEntity : tournamentEntities) {
+            //유저 1을 우승자로 세팅한다.
+            TournamentWinnerEntity winner = TournamentWinnerEntity.builder()
+                    .userId("userId1")
+                    .participantNo(tournamentParticipantEntities.get(0).getParticipantNo())
+                    .winningTournamentNo(tournamentEntity.getTournamentNo())
+                    .build();
+            
+            tournamentWinnerEntities.add(winner);
+        }
+        
+        tournamentWinnerRepository.saveAll(tournamentWinnerEntities);
+        
+        // when
+        List<TournamentSearchResponseDTO> actual = tournamentService.search();
+        
+        // then
+        assertSoftly(
+                softly -> {
+                    assertThat(actual).isNotEmpty().hasSize(1);
+                    
+                    for (TournamentSearchResponseDTO tournamentSearchResponseDTO : actual) {
+                        assertThat(tournamentSearchResponseDTO.getWinner())
+                                .isNotEmpty()
+                                .hasSize(2);
+                        
+                        assertThat(tournamentSearchResponseDTO.getWinner().get(0).getTournamentNo()).isNotNull();
+                        assertThat(tournamentSearchResponseDTO.getWinner().get(0).getRound()).isNotNull();
+                        assertThat(tournamentSearchResponseDTO.getWinner().get(0).getProfileImageUrl()).isNotNull();
+                    }
+                }
+        );
     }
 
     @Nested
