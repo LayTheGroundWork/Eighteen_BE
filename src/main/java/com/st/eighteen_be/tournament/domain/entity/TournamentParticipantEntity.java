@@ -58,9 +58,9 @@ public class TournamentParticipantEntity extends BaseEntity {
     
     public TournamentWinnerEntity toTournamentWinnerEntity(TournamentEntity endedTournament) {
         return TournamentWinnerEntity.builder()
-                       .userId(userId)
-                       .participantNo(participantNo)
-                       .winningTournamentNo(endedTournament.getTournamentNo())
-                       .build();
+                .userId(userId)
+                .participantNo(participantNo)
+                .winningTournamentNo(endedTournament.getTournamentNo())
+                .build();
     }
 }

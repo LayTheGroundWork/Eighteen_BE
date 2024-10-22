@@ -3,7 +3,6 @@
 POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000001
 Content-Type: application/json
 
-
 ### 토너먼트 강제 시작
 POST {{url}}/v1/api/tournament/force-start
 
@@ -11,7 +10,7 @@ POST {{url}}/v1/api/tournament/force-start
 POST {{url}}/v1/api/tournament/force-end
 
 ### 토너먼트 검색
-GET {{url}}/v1/api/tournament/search?size=10&page=0&sort=TOURNAMENT_NO&sortDirection=DESC
+GET {{url}}/v1/api/tournament/search
 Content-Type: application/json
 
 ### 토너먼트 투표
@@ -20,8 +19,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "voterId": "voter1",
-    "tournamentNo": 6,
+    "tournamentNo": 12,
     "participantIdsOrderByRank": [
         "tester22",
         "tester21",

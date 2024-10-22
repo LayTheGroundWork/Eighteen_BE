@@ -39,6 +39,7 @@ public class TournamentSearchResponseDTO {
     }
     
     @Schema(description = "토너먼트 우승자 응답 DTO")
+    @Getter
     public static class TournamentWinnerResponseDTO {
         @Schema(description = "토너먼트 번호", example = "1")
         private Long tournamentNo;

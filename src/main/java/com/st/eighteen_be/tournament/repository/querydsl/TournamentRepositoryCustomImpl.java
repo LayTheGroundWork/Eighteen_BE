@@ -1,7 +1,9 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
-import com.querydsl.core.Tuple;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.st.eighteen_be.tournament.domain.dto.response.QTournamentSearchResponseDTO;
+import com.st.eighteen_be.tournament.domain.dto.response.QTournamentSearchResponseDTO_TournamentWinnerResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.QTournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity;
@@ -28,38 +30,25 @@ public class TournamentRepositoryCustomImpl implements TournamentRepositoryCusto
     
     private final JPAQueryFactory qf;
     
-    /*토너먼트 검색이 {   "status": 200,   "data": [     {
-             토너먼트 카테고리,
-             토너먼트 우승자들 : [
-                      {
-                       토너먼트 회차
-                       토너먼트 pk
-                        우승자 사진
-                 }
-              ]     }   ],   "message": "string" } 
-    한 줄은  일주일 단위이고 옆으로 스크롤은 역대 우승자
-    형태로 만들어야함
-    */
     @Override
     public List<TournamentSearchResponseDTO> findTournamentMainInfos() {
-        QTournamentEntity t = QTournamentEntity.tournamentEntity;
-        QTournamentWinnerEntity tw = QTournamentWinnerEntity.tournamentWinnerEntity;
-        QTournamentParticipantEntity tp = QTournamentParticipantEntity.tournamentParticipantEntity;
+        QTournamentEntity tournament = QTournamentEntity.tournamentEntity;
+        QTournamentWinnerEntity tournamentWinner = QTournamentWinnerEntity.tournamentWinnerEntity;
+        QTournamentParticipantEntity tournamentParticipant = QTournamentParticipantEntity.tournamentParticipantEntity;
         
-        // 평평한 데이터 조회
-        List<Tuple> tuples = qf
-                .select(
-                        t.category,
-                        t.season,
-                        t.tournamentNo,
-                        tp.userImageUrl
-                )
-                .from(t)
-                .leftJoin(tw).on(tw.winningTournamentNo.eq(t.tournamentNo))
-                .leftJoin(tp).on(tw.participantNo.eq(tp.participantNo))
-                .orderBy(t.category.asc(), t.tournamentNo.desc())
-                .fetch();
-        
-        return List.of();
+        return qf
+                .from(tournamentWinner)
+                .join(tournamentParticipant).on(tournamentWinner.participantNo.eq(tournamentParticipant.participantNo))
+                .join(tournament).on(tournament.tournamentNo.eq(tournamentWinner.winningTournamentNo))
+                .transform(GroupBy.groupBy(tournament.category)
+                        .list(new QTournamentSearchResponseDTO(
+                                tournament.category,
+                                GroupBy.list(new QTournamentSearchResponseDTO_TournamentWinnerResponseDTO(
+                                                tournamentWinner.winningTournamentNo,
+                                                tournament.season,
+                                                tournamentParticipant.userImageUrl
+                                        )
+                                ))
+                        ));
     }
 }

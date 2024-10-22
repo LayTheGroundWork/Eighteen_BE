@@ -63,11 +63,12 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
     @MockBean
     private UserRepository userRepository;
     
-    @Autowired
-    private RandomUserRedisRepository randomUserRedisRepository;
-    @Autowired
+    @MockBean
     private TournamentWinnerRepository tournamentWinnerRepository;
     
+    @Autowired
+    private RandomUserRedisRepository randomUserRedisRepository;
+
     @BeforeEach
     void setUp() {
         tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, randomUserRedisRepository, redisTemplate);

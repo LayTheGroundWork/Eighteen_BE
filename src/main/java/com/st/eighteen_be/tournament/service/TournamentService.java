@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.api
@@ -61,16 +60,7 @@ public class TournamentService {
     private final RedisTemplate<String, RandomUser> redisTemplate;
     
     public List<TournamentSearchResponseDTO> search() {
-        return tournamentEntityRepository.findTournamentMainInfos()
-                .stream()
-                /* .map(tournament -> TournamentSearchResponseDTO.builder()
-                         .tournamentThumbnailUrl(tournament.getThumbnailUrl())
-                         .status(tournament.isStatus())
-                         .category(tournament.getCategory())
-                         .startDate(tournament.getStartDate())
-                         .endDate(tournament.getEndDate())
-                         .build())*/
-                .collect(Collectors.toList());
+        return tournamentEntityRepository.findTournamentMainInfos();
     }
 
     @Transactional(readOnly = false)
