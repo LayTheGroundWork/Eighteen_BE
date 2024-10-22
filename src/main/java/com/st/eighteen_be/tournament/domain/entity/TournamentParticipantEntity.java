@@ -1,7 +1,6 @@
 package com.st.eighteen_be.tournament.domain.entity;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
 import com.st.eighteen_be.tournament_winner.domain.TournamentWinnerEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -57,15 +56,11 @@ public class TournamentParticipantEntity extends BaseEntity {
                 .build();
     }
     
-    public static TournamentParticipantEntity toWinnerEntity(TournamentEntity newTournament, RandomUser randomUser) {
-        return TournamentParticipantEntity.builder()
-                .tournament(newTournament)
-                .userId(String.valueOf(randomUser.getUserId()))
-                .userImageUrl(randomUser.getProfileImageUrl())
-                .build();
-    }
-    
-    public TournamentWinnerEntity toWinnerEntity() {
-        return TournamentWinnerEntity.from(this);
+    public TournamentWinnerEntity toTournamentWinnerEntity(TournamentEntity endedTournament) {
+        return TournamentWinnerEntity.builder()
+                       .userId(userId)
+                       .participantNo(participantNo)
+                       .winningTournamentNo(endedTournament.getTournamentNo())
+                       .build();
     }
 }

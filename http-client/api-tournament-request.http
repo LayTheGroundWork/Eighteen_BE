@@ -1,3 +1,9 @@
+### 로그인 편의
+### 로그인
+POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000001
+Content-Type: application/json
+
+
 ### 토너먼트 강제 시작
 POST {{url}}/v1/api/tournament/force-start
 
@@ -14,17 +20,19 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "voterId": "voter1",
-  "tournamentNo": 1,
-  "participantIdsOrderByRank": [
-    "user1",
-    "user2",
-    "user3"
-  ]
+    "voterId": "voter1",
+    "tournamentNo": 6,
+    "participantIdsOrderByRank": [
+        "tester22",
+        "tester21",
+        "tester20"
+    ]
 }
 
 ### 토너먼트 결과 조회
-GET {{url}}/v1/api/tournament/final/result?tournamentNo=1
+GET {{url}}/v1/api/tournament/final/result?tournamentNo=6
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 ### 토너먼트 32인 강제 레디스에 올리기
 PUT {{url}}/v1/api/tournament/force-pick-random-user-to-redis
