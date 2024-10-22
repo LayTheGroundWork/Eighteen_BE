@@ -4,13 +4,15 @@ import com.st.eighteen_be.user.domain.SchoolData;
 import com.st.eighteen_be.user.domain.SnsPlatform;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class MyPageRequestDto {
+
+    @Schema(description = "회원 프로필")
+    private List<String> mediaUrl;
 
     @Schema(description = "회원 닉네임")
     private String nickName;
@@ -35,8 +37,9 @@ public class MyPageRequestDto {
     private List<UserQuestion> questions;
 
     @Builder
-    public MyPageRequestDto(String nickName, SchoolData schoolData , SnsPlatform snsPlatform, String mbti,
+    public MyPageRequestDto(List<String> mediaUrl, String nickName, SchoolData schoolData , SnsPlatform snsPlatform, String mbti,
                             String introduction, List<UserQuestion> questions) {
+        this.mediaUrl = mediaUrl;
         this.nickName = nickName;
         this.schoolData = schoolData;
         this.snsPlatform = snsPlatform;

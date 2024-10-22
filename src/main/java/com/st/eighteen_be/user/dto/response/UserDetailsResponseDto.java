@@ -2,12 +2,11 @@ package com.st.eighteen_be.user.dto.response;
 
 import com.st.eighteen_be.user.domain.SnsPlatform;
 import com.st.eighteen_be.user.domain.UserInfo;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -25,6 +24,7 @@ public class UserDetailsResponseDto {
     private String schoolName;
     private SnsPlatform snsPlatform;
     private String category;
+    private boolean tournamentJoin;
     private List<UserQuestionResponseDto> questions;
 
     @Builder
@@ -41,6 +41,7 @@ public class UserDetailsResponseDto {
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
         this.snsPlatform = entity.getSnsPlatform();
+        this.tournamentJoin = entity.isTournamentJoin();
         this.questions = questionResponseDtoList;
     }
 
