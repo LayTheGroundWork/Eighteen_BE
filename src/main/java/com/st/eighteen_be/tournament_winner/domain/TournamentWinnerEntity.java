@@ -2,7 +2,10 @@ package com.st.eighteen_be.tournament_winner.domain;
 
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * packageName    : com.st.eighteen_be.tournament_winner.domain
@@ -19,7 +22,7 @@ import lombok.*;
 @Table(name = "tournament_winner")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 @Entity
 public class TournamentWinnerEntity {
     @Id

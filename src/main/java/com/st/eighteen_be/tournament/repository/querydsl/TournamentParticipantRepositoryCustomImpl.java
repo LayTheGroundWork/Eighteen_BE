@@ -91,8 +91,10 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
             TournamentParticipantEntity foundTournamentParticipant = Optional.ofNullable(qf.selectFrom(tournamentParticipantEntity)
                                                                                                  .where(eqVoteeId(participantId))
                                                                                                  .fetchOne()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT_PARTICIPANT));
-
-            em.persist(voteRequestDTO.toEntity(foundTournament, foundTournamentParticipant, point,loginedUserId));
+            
+            em.persist(voteRequestDTO.toEntity(foundTournament, foundTournamentParticipant, point, loginedUserId));
+            
+            rank++;
         }
 
         em.flush();
