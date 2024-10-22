@@ -11,6 +11,7 @@ import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.service.AuthService;
 import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserDtoService;
 import com.st.eighteen_be.user.service.UserService;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,20 +61,21 @@ public class UserApiController {
     private final UserService userService;
     private final LikeService likeService;
     private final UserDtoService userDtoService;
+    private final AuthService authService;
 
     @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
-    @PostMapping("/v1/api/user/duplication-check")
-    public ApiResp<Boolean> duplicationCheck(@RequestParam("uniqueId") String uniqueId){
-        return ApiResp.success(HttpStatus.OK, userService.isDuplicationUniqueId(uniqueId));
+    @GetMapping("/v1/api/user/duplication-check/{unique-id}")
+    public ApiResp<Boolean> duplicationCheck(@PathVariable("unique-id") String uniqueId){
+        return ApiResp.success(HttpStatus.OK, authService.isDuplicationUniqueId(uniqueId));
     }
 
     @Operation(summary = "회원가입", description = "회원가입")
     @PostMapping("/v1/api/user/sign-up")
     public ApiResp<String> signUp(@Valid @RequestBody SignUpRequestDto requestDto,
-                                  @RequestParam("profileImageKeys") List<String> keys,
+                                  @RequestParam(value = "profileImageKeys", required = false) List<String> keys,
                                   HttpServletResponse response){
 
-        JwtTokenDto jwtTokenDto = userService.save(requestDto,keys);
+        JwtTokenDto jwtTokenDto = authService.save(requestDto,keys);
 
         // 응답 헤더에 토큰 추가
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
@@ -89,7 +90,7 @@ public class UserApiController {
                                            @Schema(example = "01012345679") String phoneNumber,
                                        HttpServletResponse response) {
 
-        JwtTokenDto jwtTokenDto = userService.signIn(phoneNumber);
+        JwtTokenDto jwtTokenDto = authService.signIn(phoneNumber);
 
         // 응답 헤더에 토큰 추가
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
@@ -101,17 +102,17 @@ public class UserApiController {
     @Operation(summary = "로그아웃", description = "로그아웃")
     @DeleteMapping("/v1/api/user/sign-out")
     public ApiResp<String> signOut(@RequestHeader(AUTHORIZATION_HEADER) String accessToken) {
-        userService.signOut(accessToken);
+        authService.signOut(accessToken);
         return ApiResp.success(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
     @Operation(summary = "토큰 재발급", description = "토큰 재발급")
-    @PutMapping("/v1/api/user/reissue")
+    @PostMapping("/v1/api/user/reissue")
     public ApiResp<String> reissue(@RequestHeader(AUTHORIZATION_HEADER) String accessToken,
                                         @RequestHeader(REFRESH_HEADER) String refreshToken,
                                         HttpServletResponse response) {
 
-        JwtTokenDto jwtTokenDto = userService.reissue(accessToken, refreshToken);
+        JwtTokenDto jwtTokenDto = authService.reissue(accessToken, refreshToken);
 
         response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX_A + jwtTokenDto.getAccessToken());
         response.setHeader(REFRESH_HEADER, jwtTokenDto.getRefreshToken());
@@ -141,7 +142,7 @@ public class UserApiController {
 
     @Operation(summary = "[GUEST]회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @PostMapping("/v1/api/guest/find-all")
+    @GetMapping("/v1/api/guest/find-all")
     public ApiResp<List<UserProfileResponseDto>> findAll(@PageableDefault(page = 0, size = 10) Pageable pageable) {
 
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilePage(pageable));
@@ -149,7 +150,7 @@ public class UserApiController {
 
     @Operation(summary = "[USER]회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @PostMapping("/v1/api/user/find-all")
+    @GetMapping("/v1/api/user/find-all")
     public ApiResp<List<UserProfileResponseDto>> findAll(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PageableDefault(page = 0, size = 10) Pageable pageable){
 
@@ -159,18 +160,18 @@ public class UserApiController {
 
     @Operation(summary = "[GUEST] 카테고리에 맞는 회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @PostMapping("/v1/api/guest/find-all-by-category")
-    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@RequestParam("category") String category,
+    @GetMapping("/v1/api/guest/find-all-by-category/{category}")
+    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@PathVariable("category") String category,
                                                                    @PageableDefault(page = 0, size = 10) Pageable pageable){
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(category,pageable));
     }
 
     @Operation(summary = "[USER] 카테고리에 맞는 회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @PostMapping("/v1/api/user/find-all-by-category")
+    @GetMapping("/v1/api/user/find-all-by-category/{category}")
     public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
                                                                    @PageableDefault(page = 0, size = 10) Pageable pageable,
-                                                                   @RequestParam("category") String category) {
+                                                                   @PathVariable("category") String category) {
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikeStatusAndCategory(
                 userDetails.getUsername(),category,pageable));
     }

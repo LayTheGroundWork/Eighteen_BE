@@ -6,6 +6,7 @@ import com.st.eighteen_be.jwt.JwtAccessDeniedHandler;
 import com.st.eighteen_be.jwt.JwtAuthenticationEntryPoint;
 import com.st.eighteen_be.jwt.JwtAuthenticationFilter;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
+import java.io.PrintWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +30,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
-
-import java.io.PrintWriter;
 
 @Slf4j
 @Configuration
@@ -64,6 +63,7 @@ public class SecurityConfig {
             "/v1/api/user/reissue",
             "/v1/api/user/sign-up",
             "/v1/api/user/sign-in",
+            "/v1/api/file/upload",
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",

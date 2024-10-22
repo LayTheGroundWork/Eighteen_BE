@@ -1,13 +1,19 @@
 package com.st.eighteen_be.user.domain;
 
 import com.st.eighteen_be.common.basetime.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -20,7 +26,7 @@ public class UserMediaData extends BaseEntity {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private UserInfo user;
 
     private String imageKey;
@@ -38,7 +44,7 @@ public class UserMediaData extends BaseEntity {
             this.user.getMediaDataList().remove(this);
 
         this.user = user;
-        user.addMediaData(this);
+        user.getMediaDataList().add(this);
     }
 
     public void thumbnailFlagUpdate(){

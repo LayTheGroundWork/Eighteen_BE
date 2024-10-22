@@ -5,15 +5,28 @@ import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
 import com.st.eighteen_be.user.enums.CategoryType;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.time.LocalDate;
-import java.util.*;
 
 @Entity
 @Getter
@@ -23,8 +36,7 @@ public class UserInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id", updatable = false,
-            unique = true, nullable = false)
+    @Column(name = "user_id", updatable = false, unique = true, nullable = false)
     private Integer id;
 
     @Embedded
@@ -47,7 +59,7 @@ public class UserInfo extends BaseEntity {
     private Set<UserRoles> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserMediaData> mediaDataList = new LinkedList<>();
+    private List<UserMediaData> mediaDataList = new ArrayList<>();
 
     private String thumbnail;
 
@@ -96,14 +108,6 @@ public class UserInfo extends BaseEntity {
         this.mbti = mbti;
         this.likeCount = likeCount;
         this.tournamentJoin = tournamentJoin;
-    }
-
-    public void addRole(UserRoles userRole) {
-        roles.add(userRole);
-    }
-
-    public void addMediaData(UserMediaData userProfile){
-        mediaDataList.add(userProfile);
     }
 
     public void addQuestionAndAnswer(UserQuestion userQuestion) {
