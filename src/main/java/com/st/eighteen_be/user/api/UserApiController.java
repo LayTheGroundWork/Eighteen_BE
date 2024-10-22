@@ -135,8 +135,8 @@ public class UserApiController {
     }
 
     @Operation(summary = "회원 상세 정보 보기", description = "회원 상세 정보 보기")
-    @GetMapping("/v1/api/user/find")
-    public ApiResp<UserDetailsResponseDto> find(@RequestParam String uniqueId) {
+    @GetMapping("/v1/api/user/find/{unique-id}")
+    public ApiResp<UserDetailsResponseDto> find(@PathVariable("unique-id") String uniqueId) {
         return ApiResp.success(HttpStatus.OK, userDtoService.findByUniqueId(uniqueId));
     }
 
