@@ -45,6 +45,23 @@ Content-Type: application/json
     "tournamentJoin": {{$.clients..tournamentJoin}}
 }
 
+### 로그인 편의
 ### 로그인
 POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000001
 Content-Type: application/json
+
+> {%
+    const authHeader = response.headers.valueOf("Authorization").split("Bearer-")[1]
+    // local token 에 세팅
+    client.global.set("token", authHeader);
+%}
+
+### 회원 전체 조회
+GET {{url}}/v1/api/user/find-all
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "page": 0,
+    "size": 50
+}
