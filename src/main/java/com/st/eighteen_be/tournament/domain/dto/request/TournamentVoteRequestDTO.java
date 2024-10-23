@@ -34,8 +34,8 @@ public class TournamentVoteRequestDTO {
     @NotNull
     @Schema(description = "투표 대상 토너먼트 ID", example = "1", requiredMode = REQUIRED)
     private Long tournamentNo;
-
-    @ArraySchema(schema = @Schema(description = "참여자들의 아이디, 등수순으로", example = "[\"participant1\", \"participant2\", \"participant3\"]", requiredMode = REQUIRED), uniqueItems = true)
+    
+    @ArraySchema(schema = @Schema(description = "참여자들의 아이디, 등수순으로", example = "[\"tester22\", \"tester21\", \"tester20\", \"tester19\"]"), minItems = 4, uniqueItems = true)
     private List<String> participantIdsOrderByRank;
 
     public VoteEntity toEntity(TournamentEntity tournamentEntity, TournamentParticipantEntity participantEntity, int point, String loginedUserId) {

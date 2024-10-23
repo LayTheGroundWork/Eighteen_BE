@@ -4,6 +4,7 @@ import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
+import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.scheduler.TournamentScheduler;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -124,5 +125,14 @@ public class TournamentApiController {
         tournamentScheduler.pickRandomUser();
 
         return ApiResp.success(HttpStatus.OK, "랜덤 유저 선정 완료");
+    }
+    
+    @Operation(summary = "(편의) 모든 토너먼트 조회", description = "(편의) 모든 토너먼트 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+    })
+    @GetMapping("/v1/api/tournament/all")
+    public ApiResp<List<TournamentEntity>> findAllTournaments() {
+        return ApiResp.success(HttpStatus.OK, tournamentService.findAllTournaments());
     }
 }

@@ -232,4 +232,8 @@ public class TournamentService {
         tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO, loginedUser.getUniqueId());
         tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO, loginedUser.getUniqueId());
     }
+    
+    public List<TournamentEntity> findAllTournaments() {
+        return tournamentEntityRepository.findAll();
+    }
 }
