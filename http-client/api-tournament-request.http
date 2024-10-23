@@ -3,6 +3,12 @@
 POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000001
 Content-Type: application/json
 
+> {%
+    const authHeader = response.headers.valueOf("Authorization").split("Bearer-")[1]
+    // local token 에 세팅
+    client.global.set("token", authHeader);
+%}
+
 ### 토너먼트 강제 시작
 POST {{url}}/v1/api/tournament/force-start
 
@@ -19,7 +25,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "tournamentNo": 12,
+  "tournamentNo": 6,
     "participantIdsOrderByRank": [
         "tester22",
         "tester21",

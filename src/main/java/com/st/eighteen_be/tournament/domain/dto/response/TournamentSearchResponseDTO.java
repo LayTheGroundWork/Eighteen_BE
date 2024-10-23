@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,8 +30,9 @@ public class TournamentSearchResponseDTO {
     @Schema(description = "토너먼트 종류", example = "ART")
     private String category;
     
+    @Builder.Default
     @ArraySchema(schema = @Schema(description = "토너먼트 우승자 응답 DTO", example = "[{\"tournamentNo\":1,\"round\":1,\"profileImageUrl\":\"https://picsum.photos/200\"}]"))
-    private List<TournamentWinnerResponseDTO> winner;
+    private List<TournamentWinnerResponseDTO> winner = new ArrayList<>();
     
     @QueryProjection
     public TournamentSearchResponseDTO(CategoryType category, List<TournamentWinnerResponseDTO> winner) {

@@ -187,16 +187,18 @@ class TournamentServiceMySQLTest {
         // then
         assertSoftly(
                 softly -> {
-                    assertThat(actual).isNotEmpty().hasSize(1);
+                    //우승자가 없는 카테고리도 출력되어야한다.
+                    assertThat(actual).isNotEmpty().hasSize(CategoryType.values().length);
                     
+                    //actual 카테고리가 예술인 경우에만 winner 가 size 2개 나머지 winner 0개
                     for (TournamentSearchResponseDTO tournamentSearchResponseDTO : actual) {
-                        assertThat(tournamentSearchResponseDTO.getWinner())
-                                .isNotEmpty()
-                                .hasSize(2);
+                        if (Objects.equals(tournamentSearchResponseDTO.getCategory(), CategoryType.ART.getCategory())) {
+                            softly.assertThat(tournamentSearchResponseDTO.getWinner()).hasSize(2);
+                            continue;
+                        }
                         
-                        assertThat(tournamentSearchResponseDTO.getWinner().get(0).getTournamentNo()).isNotNull();
-                        assertThat(tournamentSearchResponseDTO.getWinner().get(0).getRound()).isNotNull();
-                        assertThat(tournamentSearchResponseDTO.getWinner().get(0).getProfileImageUrl()).isNotNull();
+                        //나머지
+                        softly.assertThat(tournamentSearchResponseDTO.getWinner()).isEmpty();
                     }
                 }
         );

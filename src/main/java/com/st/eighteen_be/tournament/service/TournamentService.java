@@ -60,9 +60,25 @@ public class TournamentService {
     private final RedisTemplate<String, RandomUser> redisTemplate;
     
     public List<TournamentSearchResponseDTO> search() {
-        return tournamentEntityRepository.findTournamentMainInfos();
+        List<TournamentSearchResponseDTO> tournamentMainInfos = tournamentEntityRepository.findTournamentMainInfos();
+        
+        //없는 카테고리의 경우에는 우승자는 빈값으로 주고으로 데이터를 주려고함 -- 굳이 쿼리 한방으로 처리하지않아도 된다.
+        addEmptyWinnerCategories(tournamentMainInfos);
+        
+        return tournamentMainInfos;
     }
-
+    
+    private static void addEmptyWinnerCategories(List<TournamentSearchResponseDTO> tournamentMainInfos) {
+        for (CategoryType category : CategoryType.values()) {
+            boolean isExist = tournamentMainInfos.stream()
+                    .anyMatch(tournamentSearchResponseDTO -> Objects.equals(tournamentSearchResponseDTO.getCategory(), category.getCategory()));
+            
+            if (!isExist) {
+                tournamentMainInfos.add(new TournamentSearchResponseDTO(category, new ArrayList<>()));
+            }
+        }
+    }
+    
     @Transactional(readOnly = false)
     public void startTournament() {
         log.info("startTournament start");
