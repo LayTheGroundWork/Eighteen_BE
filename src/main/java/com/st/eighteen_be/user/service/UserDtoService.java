@@ -58,9 +58,9 @@ public class UserDtoService {
         return responseDtoList;
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithLikes(String accessToken, Pageable pageable) {
+    public List<UserProfileResponseDto> getUserProfilesWithLikes(String uniqueId, Pageable pageable) {
         Slice<UserInfo> users = userService.findPageBy(pageable);
-        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
+        Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
 
         List<UserProfileResponseDto> responseDtoList = users.stream()
                 .map(user -> toUserProfileResponseDto(user,likedUserIds))
