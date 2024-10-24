@@ -8,15 +8,15 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultRes
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
-import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
+import com.st.eighteen_be.tournament.repository.MostLikedUserRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament_winner.domain.TournamentWinnerEntity;
 import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
+import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
@@ -81,26 +81,26 @@ class TournamentServiceMySQLTest {
     private UserRepository userRepository;
 
     @MockBean
-    private RedisTemplate<String, RandomUser> redisTemplate;
+    private RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
 
     @MockBean
     private UserService userService;
 
     @MockBean
-    private RandomUserRedisRepository randomUserRedisRepository;
+    private MostLikedUserRepository mostLikedUserRepository;
 
     @Mock
-    private ListOperations<String, RandomUser> listOperations;
+    private ListOperations<String, MostLikedUserRedisHash> listOperations;
     
     @Mock
-    private HashOperations<String, String, RandomUser> hashOperations;
+    private HashOperations<String, String, MostLikedUserRedisHash> hashOperations;
     
     @Autowired
     private TournamentWinnerRepository tournamentWinnerRepository;
     
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, randomUserRedisRepository,
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, mostLikedUserRepository,
                 redisTemplate);
         
         given(redisTemplate.opsForList()).willReturn(listOperations);
@@ -111,14 +111,14 @@ class TournamentServiceMySQLTest {
     @DisplayName("토너먼트를 시작합니다. 카테고리에 맞는 토너먼트 생성을 확인한다.")
     void When_startTournament_Then_createTournament() {
         //redisTemplate.opsForList() 모킹
-        List<RandomUser> randomUsers = IntStream.range(0, 16)
+        List<MostLikedUserRedisHash> mostLikedUserRedisHashes = IntStream.range(0, 16)
                 .boxed()
-                .map(i -> RandomUser.of("qkrtkdwns3410", "http://test.com", "예술"))
+                .map(i -> MostLikedUserRedisHash.of("qkrtkdwns3410", "http://test.com", "예술"))
                 .collect(Collectors.toList());
 
         //hashOperations.values(categoryKey). 에 대한 모킹처리
         given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
-        given(hashOperations.values(anyString())).willReturn(randomUsers);
+        given(hashOperations.values(anyString())).willReturn(mostLikedUserRedisHashes);
 
         // when
         tournamentService.startTournament();
@@ -229,14 +229,14 @@ class TournamentServiceMySQLTest {
             final int expectedCount = savedParticipantCount * CategoryType.values().length;
 
             //토너먼트 참여자 선정 모킹 데이터 given
-            List<RandomUser> randomUsers = IntStream.range(0, savedParticipantCount)
+            List<MostLikedUserRedisHash> mostLikedUserRedisHashes = IntStream.range(0, savedParticipantCount)
                     .boxed()
-                    .map(i -> RandomUser.of("userId" + i, "http://test.com", "예술"))
+                    .map(i -> MostLikedUserRedisHash.of("userId" + i, "http://test.com", "예술"))
                     .toList();
 
             //hashOperations.values(categoryKey). 에 대한 모킹처리
             given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
-            given(hashOperations.values(anyString())).willReturn(randomUsers);
+            given(hashOperations.values(anyString())).willReturn(mostLikedUserRedisHashes);
 
             // when
             tournamentService.startTournament();
@@ -504,7 +504,7 @@ class TournamentServiceMySQLTest {
 
     @Nested
     @DisplayName("토너먼트 참가자 선정 테스트")
-    class PickRandomUserTest {
+    class PickMostLikedUserRedisHashTest {
         @Test
         @Disabled("유저 부족한 케이스에 대해 다시 생각해보기")
         @DisplayName("랜덤 유저 선정시 유저가 32명 미만인 경우 예외를 발생시킨다.")
@@ -528,7 +528,7 @@ class TournamentServiceMySQLTest {
 
             // when
             // then
-            assertThatThrownBy(() -> tournamentService.saveRandomUser())
+            assertThatThrownBy(() -> tournamentService.saveMostLikedUsersToRedis())
                     .isInstanceOf(BadRequestException.class)
                     .hasMessageContaining("유저 수가 부족합니다");
         }
@@ -557,7 +557,7 @@ class TournamentServiceMySQLTest {
             userRepository.saveAll(userInfos);
 
             // when
-            Set<UserRandomResponseDto> actual = tournamentService.saveRandomUser();
+            Set<MostLikedUserResponseDto> actual = tournamentService.saveMostLikedUsersToRedis();
 
             // then
             assertThat(actual)

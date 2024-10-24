@@ -1,6 +1,6 @@
 package com.st.eighteen_be.user.dto.response;
 
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import lombok.*;
 
 /**
@@ -19,18 +19,18 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-public class UserRandomResponseDto {
+public class MostLikedUserResponseDto {
     private String userId;
     private String profileImageUrl;
 
-    public static UserRandomResponseDto of(String userId, String profileImageUrl) {
-        return UserRandomResponseDto.builder()
+    public static MostLikedUserResponseDto of(String userId, String profileImageUrl) {
+        return MostLikedUserResponseDto.builder()
                 .userId(userId)
                 .profileImageUrl(profileImageUrl)
                 .build();
     }
 
-    public RandomUser toRandomUser(String category) {
-        return RandomUser.of(userId, profileImageUrl, category);
+    public MostLikedUserRedisHash toMostLikedHash(String category) {
+        return MostLikedUserRedisHash.of(userId, profileImageUrl, category);
     }
 }

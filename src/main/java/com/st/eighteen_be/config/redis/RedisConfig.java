@@ -1,6 +1,6 @@
 package com.st.eighteen_be.config.redis;
 
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -62,8 +62,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, RandomUser> randomUserRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, RandomUser> template = new RedisTemplate<>();
+    public RedisTemplate<String, MostLikedUserRedisHash> randomUserRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, MostLikedUserRedisHash> template = new RedisTemplate<>();
 
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());

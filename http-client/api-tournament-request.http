@@ -39,7 +39,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### 토너먼트 32인 강제 레디스에 올리기
-PUT {{url}}/v1/api/tournament/force-pick-random-user-to-redis
+PUT {{url}}/v1/api/tournament/force-pick-most-liked-user-to-redis
 
 ### (편의) 토너먼트 모두 조회
 GET {{url}}/v1/api/tournament/all

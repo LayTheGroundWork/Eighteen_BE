@@ -2,9 +2,9 @@ package com.st.eighteen_be.tournament.scheduler;
 
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
 import com.st.eighteen_be.common.extension.RedisTestContainerExtenstion;
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import com.st.eighteen_be.tournament.service.TournamentService;
-import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
+import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
     private TournamentScheduler tournamentScheduler;
 
     @MockBean
-    private RedisTemplate<String, RandomUser> redisTemplate;
+    private RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
 
     @MockBean
     private TournamentService tournamentService;
@@ -70,15 +70,15 @@ public class TournamentBatchTest extends RedisTestContainerExtenstion {
     @DisplayName("pickRandomUser 스케쥴러 정상 동작 테스트")
     void When_pickRandomUser_Then_pickRandomUser() {
         // given
-        Set<UserRandomResponseDto> randomUsers = Collections.singleton(UserRandomResponseDto.of("qkrtkdwns3410", "https://example.com/profile.jpg"));
+        Set<MostLikedUserResponseDto> randomUsers = Collections.singleton(MostLikedUserResponseDto.of("qkrtkdwns3410", "https://example.com/profile.jpg"));
         
-        when(tournamentService.saveRandomUser()).thenReturn(randomUsers);
+        when(tournamentService.saveMostLikedUsersToRedis()).thenReturn(randomUsers);
 
         // when
-        tournamentScheduler.pickRandomUser();
+        tournamentScheduler.pickMostLikedUserToRedis();
 
         // then
 
-        verify(tournamentService, times(1)).saveRandomUser();
+        verify(tournamentService, times(1)).saveMostLikedUsersToRedis();
     }
 }

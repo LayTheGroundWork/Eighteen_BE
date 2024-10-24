@@ -1,6 +1,6 @@
 package com.st.eighteen_be.tournament.repository;
 
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +16,6 @@ import org.springframework.stereotype.Repository;
  * 24. 10. 9.        Jun       최초 생성
  */
 @Repository
-public interface RandomUserRedisRepository extends CrudRepository<RandomUser, String> {
+public interface MostLikedUserRepository extends CrudRepository<MostLikedUserRedisHash, String> {
 
 }
