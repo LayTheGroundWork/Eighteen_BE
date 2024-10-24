@@ -27,6 +27,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 /**
@@ -121,7 +126,22 @@ public class TournamentService {
         Set<MostLikedUserResponseDto> showedMostLikedUsers = new HashSet<>();
 
         for (CategoryType category : CategoryType.values()) {
-            List<MostLikedUserResponseDto> pickedMostLikedUsers = userRepository.findUsersOrderByLikeCount(category);
+            //저번주의 데이터에 대해 좋아요 순으로 32명을 뽑는다 32명이 안찰수도 있다.
+            //현재 날짜 기준으로 저번주 월요일 설정값을 매개변수로 넣고 저번주 일요일을 매개변수로 넣어준다.
+            LocalDateTime lastweekMonday = LocalDate.now()
+                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                    .minusWeeks(1).atStartOfDay();
+            
+            //저번주 일요일
+            LocalDateTime lastweekSunday = LocalDate.now()
+                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+                    .atTime(LocalTime.MAX);
+            
+            List<MostLikedUserResponseDto> selectedUsers = userRepository.findUsersByCategoryOrderByLastweekLikeCount(category, lastweekMonday, lastweekSunday);
+            
+            //좋아요 있는 유저의 경우 랜덤으로 넣는다 (32 - 좋아요 있는 유저)
+            final int leftUserCount = 32 - selectedUsers.size();
+            List<MostLikedUserResponseDto> pickedMostLikedUsers = userRepository.findRandomUsers(category, leftUserCount);
 
             //TODO 일단 주석처리 -> 검증이 필요한지 생각해봐야할듯.
             // validateRandomUserCount(pickedRandomUser);

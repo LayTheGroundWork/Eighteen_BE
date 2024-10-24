@@ -16,6 +16,7 @@ import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament_winner.domain.TournamentWinnerEntity;
 import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserLike;
 import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.repository.UserRepository;
@@ -550,10 +551,16 @@ class TournamentServiceMySQLTest {
                         .tournamentJoin(true) // 토너먼트 참여 여부
                         .category(CategoryType.ART)
                         .build();
-
+                
+                UserLike userLike = UserLike.builder()
+                        .user(user)
+                        .likedId(i).build();
+                
+                user.getUserLikes().add(userLike);
+                
                 userInfos.add(user);
             }
-
+            
             userRepository.saveAll(userInfos);
 
             // when
