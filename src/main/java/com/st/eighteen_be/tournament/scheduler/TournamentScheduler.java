@@ -1,6 +1,6 @@
 package com.st.eighteen_be.tournament.scheduler;
 
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import com.st.eighteen_be.tournament.service.TournamentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TournamentScheduler {
     private final TournamentService tournamentService;
-    private final RedisTemplate<String, RandomUser> redisTemplate;
+    private final RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
 
     @Async
     @Scheduled(cron = "0 0  9 ? * MON")
@@ -41,7 +41,7 @@ public class TournamentScheduler {
     // 일단 방식은 회원 총 카운트중에 특정 회원번호
     @Async
     @Scheduled(cron = "0 0  0 * * ?")
-    public void pickRandomUser() {
-        tournamentService.saveRandomUser();
+    public void pickMostLikedUserToRedis() {
+        tournamentService.saveMostLikedUsersToRedis();
     }
 }

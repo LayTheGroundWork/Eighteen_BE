@@ -20,12 +20,12 @@ import java.util.Objects;
  * -----------------------------------------------------------
  * 24. 8. 28.        ipeac       최초 생성
  */
-@RedisHash("randomUser")
+@RedisHash("mostLikedUser")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-public class RandomUser {
+public class MostLikedUserRedisHash {
     @Id
     private String uid;
 
@@ -37,8 +37,8 @@ public class RandomUser {
 
     private String profileImageUrl;
 
-    public static RandomUser of(String userId, String profileImageUrl, String category) {
-        return RandomUser.builder()
+    public static MostLikedUserRedisHash of(String userId, String profileImageUrl, String category) {
+        return MostLikedUserRedisHash.builder()
                        .uid(createUid(userId, category))
                        .userId(userId)
                        .category(category)
@@ -47,7 +47,7 @@ public class RandomUser {
     }
 
     public static String createUid(String userId, String category) {
-        return "randomUser:" + userId + ":" + category;
+        return "mostLikedUser:" + userId + ":" + category;
     }
 
     public TournamentParticipantEntity from(TournamentEntity newTournament) {

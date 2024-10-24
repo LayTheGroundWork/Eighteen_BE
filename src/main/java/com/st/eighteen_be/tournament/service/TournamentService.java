@@ -8,14 +8,14 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchRespons
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
-import com.st.eighteen_be.tournament.domain.redishash.RandomUser;
-import com.st.eighteen_be.tournament.repository.RandomUserRedisRepository;
+import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
+import com.st.eighteen_be.tournament.repository.MostLikedUserRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.tournament.repository.VoteEntityRepository;
 import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
-import com.st.eighteen_be.user.dto.response.UserRandomResponseDto;
+import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.repository.UserRepository;
 import com.st.eighteen_be.user.service.UserService;
@@ -45,7 +45,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class TournamentService {
-    public static final String RANDOM_USER_KEY = "randomUser";
+    public static final String MOST_LIKED_USER_KEY = "mostLikedUser";
 
     private final UserService userService;
 
@@ -56,8 +56,8 @@ public class TournamentService {
     
     private final UserRepository userRepository;
     
-    private final RandomUserRedisRepository randomUserRedisRepository;
-    private final RedisTemplate<String, RandomUser> redisTemplate;
+    private final MostLikedUserRepository mostLikedUserRepository;
+    private final RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
     
     public List<TournamentSearchResponseDTO> search() {
         List<TournamentSearchResponseDTO> tournamentMainInfos = tournamentEntityRepository.findTournamentMainInfos();
@@ -98,15 +98,15 @@ public class TournamentService {
             TournamentEntity newTournament = createNewTournament(category, newSeason);
 
             //TODO : 스케쥴러 00시 마다 돈 내역을 토대로 redis 에서 회원을 가져온다.
-            saveRandomParticipantsFromRedis(newTournament, category);
+            saveMostLikedParticipantsFromRedis(newTournament, category);
         }
     }
 
-    private void saveRandomParticipantsFromRedis(TournamentEntity newTournament, CategoryType category) {
-        String categoryKey = String.format(RANDOM_USER_KEY + ":%s", category.getCategory());
+    private void saveMostLikedParticipantsFromRedis(TournamentEntity newTournament, CategoryType category) {
+        String categoryKey = String.format(MOST_LIKED_USER_KEY + ":%s", category.getCategory());
 
         // 레디스로 해시테이블 조회해서  참가자 목록 생성 -> 리스트로 들고와야함
-        HashOperations<String, String, RandomUser> hashOperations = redisTemplate.opsForHash();
+        HashOperations<String, String, MostLikedUserRedisHash> hashOperations = redisTemplate.opsForHash();
 
         List<TournamentParticipantEntity> participants = hashOperations.values(categoryKey).stream().map(randomUser -> randomUser.from(newTournament)).toList();
 
@@ -114,40 +114,40 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = false)
-    public Set<UserRandomResponseDto> saveRandomUser() {
+    public Set<MostLikedUserResponseDto> saveMostLikedUsersToRedis() {
         // Redis에서 기존 값을 삭제합니다.
-        deleteAlreadyExistRamdomUserFromRedis();
+        deleteAlreadyExistMostLikedUserFromRedis();
 
-        Set<UserRandomResponseDto> showedRandomUser = new HashSet<>();
+        Set<MostLikedUserResponseDto> showedMostLikedUsers = new HashSet<>();
 
         for (CategoryType category : CategoryType.values()) {
-            List<UserRandomResponseDto> pickedRandomUser = userRepository.findRandomUser(category);
+            List<MostLikedUserResponseDto> pickedMostLikedUsers = userRepository.findUsersOrderByLikeCount(category);
 
             //TODO 일단 주석처리 -> 검증이 필요한지 생각해봐야할듯.
             // validateRandomUserCount(pickedRandomUser);
 
-            putRandomUserToRedis(pickedRandomUser, category);
+            putMostLikedUserToRedis(pickedMostLikedUsers, category);
 
-            showedRandomUser.addAll(pickedRandomUser);
+            showedMostLikedUsers.addAll(pickedMostLikedUsers);
         }
 
-        return showedRandomUser;
+        return showedMostLikedUsers;
     }
 
-    private void deleteAlreadyExistRamdomUserFromRedis() {
-        randomUserRedisRepository.deleteAll();
+    private void deleteAlreadyExistMostLikedUserFromRedis() {
+        mostLikedUserRepository.deleteAll();
     }
 
-    private void putRandomUserToRedis(List<UserRandomResponseDto> pickedRandomUser, CategoryType category) {
-        String categoryKey = String.format(RANDOM_USER_KEY +":%s", category.getCategory());
+    private void putMostLikedUserToRedis(List<MostLikedUserResponseDto> pickedMostLikedUsers, CategoryType category) {
+        String categoryKey = String.format(MOST_LIKED_USER_KEY +":%s", category.getCategory());
 
-        for (UserRandomResponseDto user : pickedRandomUser) {
-            RandomUser randomUser = user.toRandomUser(categoryKey);
-            redisTemplate.opsForHash().put(categoryKey, randomUser.getUserId(), randomUser);
+        for (MostLikedUserResponseDto user : pickedMostLikedUsers) {
+            MostLikedUserRedisHash mostLikedUserRedisHash = user.toMostLikedHash(categoryKey);
+            redisTemplate.opsForHash().put(categoryKey, mostLikedUserRedisHash.getUserId(), mostLikedUserRedisHash);
         }
     }
 
-    private static void validateRandomUserCount(List<UserRandomResponseDto> randomUser) {
+    private static void validateRandomUserCount(List<MostLikedUserResponseDto> randomUser) {
         if(randomUser.size() != 32) {
             throw new BadRequestException(ErrorCode.NOT_ENOUGH_USER);
         }

@@ -116,13 +116,13 @@ public class TournamentApiController {
         return ApiResp.success(HttpStatus.OK, "토너먼트 종료 완료");
     }
 
-    @Operation(summary = "메모리에 강제로 랜덤 유저를 올립니다.", description = "메모리에 강제로 랜덤 유저를 올립니다.")
+    @Operation(summary = "메모리에 강제로 카테고리별로 좋아요가 가장 많은 유저를 올립니다.", description = "메모리에 강제로 카테고리별로 좋아요가 가장 많은 유저를 올립니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
     })
-    @PutMapping("/v1/api/tournament/force-pick-random-user-to-redis")
-    public ApiResp<Object> pickRandomUser() {
-        tournamentScheduler.pickRandomUser();
+    @PutMapping("/v1/api/tournament/force-pick-most-liked-user-to-redis")
+    public ApiResp<Object> pickMostLikedUserToRedis() {
+        tournamentScheduler.pickMostLikedUserToRedis();
 
         return ApiResp.success(HttpStatus.OK, "랜덤 유저 선정 완료");
     }
