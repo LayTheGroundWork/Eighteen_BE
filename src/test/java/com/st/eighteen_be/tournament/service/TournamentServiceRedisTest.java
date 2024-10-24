@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 
 
@@ -83,7 +84,7 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
             mostLikedUserResponseDtos.add(MostLikedUserResponseDto.of("userId" + i, "http://test.com"));
         }
         
-        given(userRepository.findUsersOrderByLikeCount(any())).willReturn(mostLikedUserResponseDtos);
+        given(userRepository.findRandomUsers(any(),anyInt())).willReturn(mostLikedUserResponseDtos);
 
         //when
         tournamentService.saveMostLikedUsersToRedis();
