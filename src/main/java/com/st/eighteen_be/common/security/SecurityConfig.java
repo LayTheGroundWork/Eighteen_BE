@@ -6,7 +6,6 @@ import com.st.eighteen_be.jwt.JwtAccessDeniedHandler;
 import com.st.eighteen_be.jwt.JwtAuthenticationEntryPoint;
 import com.st.eighteen_be.jwt.JwtAuthenticationFilter;
 import com.st.eighteen_be.jwt.JwtTokenProvider;
-import java.io.PrintWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +29,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
+
+import java.io.PrintWriter;
 
 @Slf4j
 @Configuration
@@ -66,7 +67,7 @@ public class SecurityConfig {
             "/v1/api/tournament/force-start",
             "/v1/api/tournament/force-end",
             "/v1/api/tournament/search",
-            "/v1/api/tournament/force-pick-random-user-to-redis",
+            "/v1/api/tournament/force-pick-most-liked-user-to-redis",
             "/v1/api/tournament/winner/*",
             "/v1/api/file/upload",
             "/v1/api/tournament/force-start",
