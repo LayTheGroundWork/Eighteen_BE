@@ -45,6 +45,10 @@ GET {{url}}/v1/api/tournament/all
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
+
+> {%
+    client.global.set("category", "ART");
+%}
 ### 해당 카테고리의 토너먼트 이번주 참여자 조회
-GET {{url}}/v1/api/tournament/participant/most-liked-user?category=ETC
+GET {{url}}/v1/api/tournament/participant/{{category}}/this-week
 Content-Type: application/json
