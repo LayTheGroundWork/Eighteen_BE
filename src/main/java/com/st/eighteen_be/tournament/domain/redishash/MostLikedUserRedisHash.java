@@ -60,4 +60,11 @@ public class MostLikedUserRedisHash {
                 .score(0)
                 .build();
     }
+    
+    public ThisWeekTournamentParticipantResponseDTO toResponseDTO() {
+        return ThisWeekTournamentParticipantResponseDTO.builder()
+                .userId(userId)
+                .profileImageUrl(profileImageUrl)
+                .build();
+    }
 }
