@@ -3,6 +3,7 @@ package com.st.eighteen_be.tournament.repository.querydsl;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.repository.querydsl
@@ -17,4 +18,7 @@ import java.util.List;
  */
 public interface TournamentRepositoryCustom {
     List<TournamentSearchResponseDTO> findTournamentMainInfos();
+    
+    Optional<Object> findTopByOrderByTournamentNoDesc();
+    
 }
