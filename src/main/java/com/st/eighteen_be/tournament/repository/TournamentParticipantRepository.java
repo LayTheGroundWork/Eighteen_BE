@@ -10,6 +10,4 @@ import java.util.List;
 public interface TournamentParticipantRepository extends JpaRepository<TournamentParticipantEntity, Long>, TournamentParticipantRepositoryCustom {
 
     List<TournamentParticipantEntity> findByTournament(TournamentEntity tournament);
-    
-    List<TournamentParticipantEntity> findAllByTournamentTournamentNo(Long tournamentNo);
 }
