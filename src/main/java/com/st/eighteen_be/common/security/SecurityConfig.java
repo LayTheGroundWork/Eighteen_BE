@@ -69,6 +69,7 @@ public class SecurityConfig {
             "/v1/api/tournament/search",
             "/v1/api/tournament/force-pick-most-liked-user-to-redis",
             "/v1/api/tournament/winner/*",
+            "/v1/api/tournament/final/result",
             "/v1/api/file/upload",
             "/v1/api/tournament/participant/**",
             "/swagger-ui/**",
