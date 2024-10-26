@@ -9,16 +9,12 @@ import com.st.eighteen_be.tournament.domain.dto.request.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
-import com.st.eighteen_be.tournament.domain.redishash.QThisWeekTournamentParticipantResponseDTO;
-import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
-import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.st.eighteen_be.tournament.domain.entity.QTournamentEntity.tournamentEntity;
@@ -119,19 +115,5 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
         }
         
         return tournamentParticipantEntity.userId.eq(voteeId);
-    }
-    
-    @Override
-    public List<ThisWeekTournamentParticipantResponseDTO> findAllByCategory(CategoryType category) {
-        // 해당 카테고리의 토너먼트에 대해 참가자 정보를 조회합니다.
-        return qf.from(tournamentParticipantEntity)
-                       .select(new QThisWeekTournamentParticipantResponseDTO(
-                               tournamentParticipantEntity.userId,
-                               tournamentParticipantEntity.userImageUrl
-                       ))
-                       .leftJoin(tournamentParticipantEntity.tournament, tournamentEntity)
-                       .on(tournamentParticipantEntity.tournament.tournamentNo.eq(tournamentEntity.tournamentNo))
-                       .where(tournamentEntity.category.eq(category))
-                       .fetch();
     }
 }

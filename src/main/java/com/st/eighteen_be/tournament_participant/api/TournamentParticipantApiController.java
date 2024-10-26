@@ -3,7 +3,6 @@ package com.st.eighteen_be.tournament_participant.api;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament_participant.service.TournamentParticipantService;
-import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +37,7 @@ public class TournamentParticipantApiController {
             description = "이번주 토너먼트 참가자 조회")
     @ApiResponse(responseCode = "200", description = "OK")
     @GetMapping("/most-liked-user")
-    public ApiResp<List<ThisWeekTournamentParticipantResponseDTO>> showParticipantEachCategory(@RequestParam("category") String category) {
-        return ApiResp.success(HttpStatus.OK, tournamentParticipantService.showParticipantEachCategory(CategoryType.valueOf(category)));
+    public ApiResp<List<ThisWeekTournamentParticipantResponseDTO>> showParticipantEachCategory(@RequestParam("tournamet-no") Long tournamentNo) {
+        return ApiResp.success(HttpStatus.OK, tournamentParticipantService.showParticipantEachCategory(tournamentNo));
     }
 }

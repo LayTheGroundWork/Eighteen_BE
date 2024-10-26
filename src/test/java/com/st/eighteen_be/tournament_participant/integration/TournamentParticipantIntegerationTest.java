@@ -67,7 +67,7 @@ public class TournamentParticipantIntegerationTest {
         em.persist(tournamentParticipantEntity);
         
         // when
-        List<ThisWeekTournamentParticipantResponseDTO> participants = tournamentParticipantService.showParticipantEachCategory(CategoryType.ART);
+        List<ThisWeekTournamentParticipantResponseDTO> participants = tournamentParticipantService.showParticipantEachCategory(tournamentEntity.getTournamentNo());
         
         // then
         assertThat(participants.size()).isEqualTo(1);

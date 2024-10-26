@@ -1,8 +1,9 @@
 package com.st.eighteen_be.tournament_participant.service;
 
+import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
-import com.st.eighteen_be.user.enums.CategoryType;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,10 @@ import java.util.List;
 public class TournamentParticipantService {
     private final TournamentParticipantRepository tournamentParticipantRepository;
     
-    public List<ThisWeekTournamentParticipantResponseDTO> showParticipantEachCategory(CategoryType category) {
-        return tournamentParticipantRepository.findAllByCategory(category);
+    public List<ThisWeekTournamentParticipantResponseDTO> showParticipantEachCategory(@NonNull Long tournamentNo) {
+        return tournamentParticipantRepository.findAllByTournamentTournamentNo(tournamentNo)
+                       .stream()
+                       .map(TournamentParticipantEntity::toThisWeekTournamentParticipantResponseDTO)
+                       .toList();
     }
 }
