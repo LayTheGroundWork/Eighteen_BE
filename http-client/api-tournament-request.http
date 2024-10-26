@@ -45,3 +45,7 @@ PUT {{url}}/v1/api/tournament/force-pick-most-liked-user-to-redis
 GET {{url}}/v1/api/tournament/all
 Content-Type: application/json
 Authorization: Bearer {{token}}
+
+### 해당 카테고리의 토너먼트 이번주 참여자 조회
+GET {{url}}/v1/api/tournament/participant/most-liked-user?category=ETC
+Content-Type: application/json
