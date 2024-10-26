@@ -9,16 +9,21 @@ import com.st.eighteen_be.tournament.domain.dto.request.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
+import com.st.eighteen_be.tournament.domain.redishash.QThisWeekTournamentParticipantResponseDTO;
+import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
+import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.st.eighteen_be.tournament.domain.entity.QTournamentEntity.tournamentEntity;
 import static com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity.tournamentParticipantEntity;
+import static com.st.eighteen_be.user.domain.QUserInfo.userInfo;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.repository.querydsl
@@ -103,6 +108,26 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
         
         em.flush();
         em.clear();
+    }
+    
+    @Override
+    public List<ThisWeekTournamentParticipantResponseDTO> showParticipantForThisWeek(CategoryType category) {
+        //토너먼트 최대 no 가져온다.
+        Long maxTournamentNo = qf.from(tournamentEntity)
+                .select(tournamentEntity.tournamentNo.max())
+                .where(tournamentEntity.category.eq(category))
+                .fetchOne();
+        
+        return qf.from(tournamentParticipantEntity)
+                .leftJoin(userInfo).on(userInfo.uniqueId.eq(tournamentParticipantEntity.userId))
+                .select(new QThisWeekTournamentParticipantResponseDTO(
+                        tournamentParticipantEntity.userId,
+                        tournamentParticipantEntity.userImageUrl,
+                        userInfo.nickName,
+                        userInfo.schoolData.schoolName,
+                        userInfo.birthDay
+                )).where(tournamentParticipantEntity.tournament.tournamentNo.eq(maxTournamentNo))
+                .fetch();
     }
     
     private static BooleanExpression eqTournamentNo(Long tournamentNo) {

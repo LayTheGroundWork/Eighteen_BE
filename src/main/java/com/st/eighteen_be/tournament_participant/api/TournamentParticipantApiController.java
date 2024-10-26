@@ -3,12 +3,15 @@ package com.st.eighteen_be.tournament_participant.api;
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament_participant.service.TournamentParticipantService;
+import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.endpoint.web.PathMappedEndpoints;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,8 +38,8 @@ public class TournamentParticipantApiController {
     @Operation(summary = "이번주 토너먼트 참가자 조회",
             description = "이번주 토너먼트 참가자 조회")
     @ApiResponse(responseCode = "200", description = "OK")
-    @GetMapping("/most-liked-user")
-    public ApiResp<List<ThisWeekTournamentParticipantResponseDTO>> showParticipantNowTournament() {
-        return ApiResp.success(HttpStatus.OK, tournamentParticipantService.showParticipantNowTournament());
+    @GetMapping("/{category}/this-week")
+    public ApiResp<List<ThisWeekTournamentParticipantResponseDTO>> showParticipantNowTournament(@PathVariable("category") String category) {
+        return ApiResp.success(HttpStatus.OK, tournamentParticipantService.showParticipantNowTournament(CategoryType.of(category)));
     }
 }

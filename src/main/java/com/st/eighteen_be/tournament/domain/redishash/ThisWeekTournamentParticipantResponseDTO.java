@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * DTO for {@link MostLikedUserRedisHash}
@@ -18,7 +19,19 @@ public record ThisWeekTournamentParticipantResponseDTO(
         String userId,
         @NotNull(message = "category must not be null")
         @Schema(description = "카테고리", example = "ETC")
-        String profileImageUrl
+        String profileImageUrl,
+        
+        @NotNull(message = "userName must not be null")
+        @Schema(description = "유저 이름", example = "장원영")
+        String userName,
+        
+        @NotNull(message = "userSchool must not be null")
+        @Schema(description = "유저 학교", example = "한국대학교")
+        String userSchool,
+        
+        @NotNull(message = "userBirth must not be null")
+        @Schema(description = "유저 생년월일", example = "1999-01-01")
+        LocalDate userBirth
 ) implements Serializable {
         
         @QueryProjection
