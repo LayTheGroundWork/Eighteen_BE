@@ -1,5 +1,6 @@
 package com.st.eighteen_be.tournament.domain.redishash;
 
+import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -19,4 +20,8 @@ public record ThisWeekTournamentParticipantResponseDTO(
         @Schema(description = "카테고리", example = "ETC")
         String profileImageUrl
 ) implements Serializable {
+        
+        @QueryProjection
+        public ThisWeekTournamentParticipantResponseDTO {
+        }
 }

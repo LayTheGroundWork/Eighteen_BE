@@ -1,8 +1,7 @@
 package com.st.eighteen_be.tournament_participant.service;
 
-import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
-import com.st.eighteen_be.tournament.repository.MostLikedUserRepository;
+import com.st.eighteen_be.tournament.repository.TournamentParticipantRepository;
 import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TournamentParticipantService {
-    private final MostLikedUserRepository mostLikedUserRepository;
+    private final TournamentParticipantRepository tournamentParticipantRepository;
     
     public List<ThisWeekTournamentParticipantResponseDTO> showParticipantEachCategory(CategoryType category) {
-        return mostLikedUserRepository.findAllByCategory(category.getCategory())
-                       .stream().map(MostLikedUserRedisHash::toResponseDTO)
-                       .toList();
+        return tournamentParticipantRepository.findAllByCategory(category);
     }
 }
