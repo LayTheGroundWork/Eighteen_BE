@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "TOURNAMENT")
+@Table(name = "TOURNAMENT", indexes = {
+        @Index(name = "IDX_CATEGORY", columnList = "CATEGORY")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class TournamentEntity extends BaseEntity {
