@@ -3,6 +3,7 @@ package com.st.eighteen_be.user.service;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfilePageResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.dto.response.UserQuestionResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
@@ -12,8 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,26 +42,21 @@ public class UserDtoService {
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
-    public UserProfileResponseDto findUserProfileByUniqueId(String uniqueId, String accessToken) {
-        UserInfo userInfo = userService.findByUniqueId(uniqueId);
+    public UserProfilePageResponseDto getUserProfilePage(Pageable pageable){
+        Page<UserInfo> users = userService.findPageBy(pageable);
 
-        return new UserProfileResponseDto(userInfo, likeService.getLikedUserId(accessToken,userInfo.getId()));
-    }
-
-    public List<UserProfileResponseDto> getUserProfilePage(Pageable pageable){
-        Slice<UserInfo> users = userService.findPageBy(pageable);
         List<UserProfileResponseDto> responseDtoList = users.stream()
                 .map(user -> toUserProfileResponseDto(user,Collections.emptySet()))
                 .collect(Collectors.toList());
 
         Collections.shuffle(responseDtoList);
 
-        return responseDtoList;
+        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithLikes(String accessToken, Pageable pageable) {
-        Slice<UserInfo> users = userService.findPageBy(pageable);
-        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
+    public UserProfilePageResponseDto getUserProfilesWithLikes(String uniqueId, Pageable pageable) {
+        Page<UserInfo> users = userService.findPageBy(pageable);
+        Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
 
         List<UserProfileResponseDto> responseDtoList = users.stream()
                 .map(user -> toUserProfileResponseDto(user,likedUserIds))
@@ -68,12 +64,11 @@ public class UserDtoService {
 
         Collections.shuffle(responseDtoList);
 
-        return responseDtoList;
+        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithCategory(String category, Pageable pageable){
-        Slice<UserInfo> users = userService.findAllByCategory(
-                CategoryType.of(category),pageable);
+    public UserProfilePageResponseDto getUserProfilesWithCategory(CategoryType category, Pageable pageable){
+        Page<UserInfo> users = userService.findAllByCategory(category,pageable);
 
         List<UserProfileResponseDto> responseDtoList = users.stream()
                 .map(user -> toUserProfileResponseDto(user,Collections.emptySet()))
@@ -81,14 +76,14 @@ public class UserDtoService {
 
         Collections.shuffle(responseDtoList);
 
-        return responseDtoList;
+        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
 
     }
 
-    public List<UserProfileResponseDto> getUserProfilesWithLikeStatusAndCategory(String accessToken, String category,
+    public UserProfilePageResponseDto getUserProfilesWithLikeStatusAndCategory(String uniqueId, CategoryType category,
                                                                                  Pageable pageable){
-        Slice<UserInfo> users = userService.findAllByCategory(CategoryType.of(category),pageable);
-        Set<String> likedUserIds = likeService.getLikedUserIds(accessToken);
+        Page<UserInfo> users = userService.findAllByCategory(category,pageable);
+        Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
 
         List<UserProfileResponseDto> responseDtoList = users.stream()
                 .map(user -> toUserProfileResponseDto(user,likedUserIds))
@@ -96,7 +91,7 @@ public class UserDtoService {
 
         Collections.shuffle(responseDtoList);
 
-        return responseDtoList;
+        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
     }
 
     private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {

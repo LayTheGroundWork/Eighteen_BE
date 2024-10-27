@@ -4,18 +4,17 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import io.lettuce.core.dynamic.annotation.Param;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 
-    Slice<UserInfo> findPageBy(Pageable pageable);
+    Page<UserInfo> findPageBy(Pageable pageable);
 
     Optional<UserInfo> findByUniqueId(String uniqueId);
 
@@ -33,7 +32,7 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
     List<MostLikedUserResponseDto> findRandomUsers(@Param("category") CategoryType category, int limit);
 
     @Query("SELECT u FROM UserInfo u where u.category=:category")
-    Slice<UserInfo> findAllByCategory(@Param("category") CategoryType category, Pageable pageable);
+    Page<UserInfo> findAllByCategory(@Param("category") CategoryType category, Pageable pageable);
     
     @Query("""
             SELECT new com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto(UI.uniqueId, UMD.imageKey) \

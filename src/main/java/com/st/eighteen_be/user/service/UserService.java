@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,11 +66,11 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Slice<UserInfo> findAllByCategory(CategoryType category, Pageable pageable){
+    public Page<UserInfo> findAllByCategory(CategoryType category, Pageable pageable){
         return userRepository.findAllByCategory(category,pageable);
     }
 
-    public Slice<UserInfo> findPageBy(Pageable pageable){
+    public Page<UserInfo> findPageBy(Pageable pageable){
         return userRepository.findPageBy(pageable);
     }
 
