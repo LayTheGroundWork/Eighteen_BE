@@ -120,13 +120,16 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
         
         return qf.from(tournamentParticipantEntity)
                 .leftJoin(userInfo).on(userInfo.uniqueId.eq(tournamentParticipantEntity.userId))
-                .select(new QThisWeekTournamentParticipantResponseDTO(
-                        tournamentParticipantEntity.userId,
-                        tournamentParticipantEntity.userImageUrl,
-                        userInfo.nickName,
-                        userInfo.schoolData.schoolName,
-                        userInfo.birthDay
-                )).where(tournamentParticipantEntity.tournament.tournamentNo.eq(maxTournamentNo))
+                .select(
+                        new QThisWeekTournamentParticipantResponseDTO(
+                                tournamentParticipantEntity.tournament.tournamentNo,
+                                tournamentParticipantEntity.userId,
+                                tournamentParticipantEntity.userImageUrl,
+                                userInfo.nickName,
+                                userInfo.schoolData.schoolName,
+                                userInfo.birthDay
+                        )
+                ).where(tournamentParticipantEntity.tournament.tournamentNo.eq(maxTournamentNo))
                 .fetch();
     }
     
