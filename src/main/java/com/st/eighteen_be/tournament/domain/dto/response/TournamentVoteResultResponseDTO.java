@@ -29,26 +29,18 @@ public class TournamentVoteResultResponseDTO {
     @Schema(description = "랭크", example = "1")
     private Long rank;
 
-    @Schema(description = "투표 수", example = "10")
-    private Long voteCount;
+    @Schema(description = "점수", example = "10")
+    private Long score;
 
     @Schema(description = "프로필 이미지 URL", example = "https://picsum.photos/200")
     private String profileImageUrl;
 
     @Builder
     @QueryProjection
-    public TournamentVoteResultResponseDTO(String rankerId, Long voteCount, String profileImageUrl, String rankerNickName) {
+    public TournamentVoteResultResponseDTO(String rankerId, Long score, String profileImageUrl, String rankerNickName) {
         this.rankerId = rankerId;
-        this.voteCount = voteCount;
+        this.score = score;
         this.profileImageUrl = profileImageUrl;
         this.rankerNickName = rankerNickName;
-    }
-
-    public static TournamentVoteResultResponseDTO of(String rankerId, Long voteCount, String rankerNickName) {
-        return TournamentVoteResultResponseDTO.builder()
-                .rankerId(rankerId)
-                .rankerNickName("강서구 페더러")
-                .voteCount(voteCount)
-                .build();
     }
 }

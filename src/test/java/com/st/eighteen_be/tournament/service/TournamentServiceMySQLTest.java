@@ -377,19 +377,19 @@ class TournamentServiceMySQLTest {
                     softly -> {
                         softly.assertThat(actual.get(0).getRankerId()).isEqualTo("user2");
                         softly.assertThat(actual.get(0).getRank()).isEqualTo(1);
-                        softly.assertThat(actual.get(0).getVoteCount()).isEqualTo(3);
+                        softly.assertThat(actual.get(0).getScore()).isEqualTo(3);
                         softly.assertThat(actual.get(0).getRankerNickName()).isEqualTo("name2");
                         //softly.assertThat(actual.get(0).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
                         
                         softly.assertThat(actual.get(1).getRankerId()).isEqualTo("user1");
                         softly.assertThat(actual.get(1).getRank()).isEqualTo(2);
-                        softly.assertThat(actual.get(1).getVoteCount()).isEqualTo(2);
+                        softly.assertThat(actual.get(1).getScore()).isEqualTo(2);
                         softly.assertThat(actual.get(1).getRankerNickName()).isEqualTo("name1");
                         //softly.assertThat(actual.get(1).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
                         
                         softly.assertThat(actual.get(2).getRankerId()).isEqualTo("user3");
                         softly.assertThat(actual.get(2).getRank()).isEqualTo(3);
-                        softly.assertThat(actual.get(2).getVoteCount()).isEqualTo(0);
+                        softly.assertThat(actual.get(2).getScore()).isEqualTo(0);
                         softly.assertThat(actual.get(2).getRankerNickName()).isEqualTo("name3");
                     }
             );
