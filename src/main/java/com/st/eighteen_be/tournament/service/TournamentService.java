@@ -238,7 +238,9 @@ public class TournamentService {
      */
     private void addWinner(TournamentEntity endedTournament) {
         // 종료된 토너먼트의 우승자 카운트 DB 저장
+        // 0점인 경우는 우승자로 선정하지 않음
         Optional<TournamentParticipantEntity> winner = tournamentParticipantEntityRepository.findByTournament(endedTournament).stream()
+                .filter(TournamentParticipantEntity::isNotZeroScore)
                 .max(Comparator.comparing(TournamentParticipantEntity::getScore));
         
         winner.ifPresent(participantEntity -> {

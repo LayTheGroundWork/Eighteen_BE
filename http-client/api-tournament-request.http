@@ -34,7 +34,7 @@ Authorization: Bearer {{token}}
 }
 
 ### 토너먼트 결과 조회
-GET {{url}}/v1/api/tournament/final/result?tournamentNo=6
+GET {{url}}/v1/api/tournament/final/result?tournamentNo=18
 Content-Type: application/json
 
 ### 토너먼트 32인 강제 레디스에 올리기

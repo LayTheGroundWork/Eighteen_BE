@@ -44,6 +44,10 @@ public class TournamentParticipantEntity extends BaseEntity {
     @Column(name = "SCORE")
     private long score = 0;
     
+    public boolean isNotZeroScore() {
+        return score != 0;
+    }
+    
     public static TournamentParticipantEntity of(String userId) {
         return TournamentParticipantEntity.builder()
                 .userId(userId)

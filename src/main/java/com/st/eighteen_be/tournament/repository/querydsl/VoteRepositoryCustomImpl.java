@@ -24,16 +24,16 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
 
         QTournamentVoteResultResponseDTO dto = new QTournamentVoteResultResponseDTO(
                 tournamentParticipantEntity.userId,
-                tournamentParticipantEntity.score,
-                userMediaData.imageKey,
-                userInfo.nickName
+                tournamentParticipantEntity.score.coalesce(0L).as("score"),
+                userMediaData.imageKey.coalesce("default").as("imageKey"),
+                userInfo.nickName.coalesce("닉네임").as("nickName")
                 );
 
         //토너먼트 참여자에 대한 썸네일 이미지등도 가져와야 한다.
         return qf.select(dto)
-                .from(voteEntity)
-
-                .leftJoin(tournamentParticipantEntity)
+                .from(tournamentParticipantEntity)
+                
+                .leftJoin(voteEntity)
                 .on(onVoteParticipantNo())
 
                 .leftJoin(userInfo)
@@ -43,8 +43,8 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
                 .on(onUserMediaDataId())
 
                 .where(eqTournamentNo(tournamentNo))
-
-                .groupBy(voteEntity.tournament.tournamentNo, voteEntity.participant, userMediaData.imageKey, userInfo.nickName)
+                
+                .groupBy(tournamentParticipantEntity.userId, tournamentParticipantEntity.score, userMediaData.imageKey, userInfo.nickName)
 
                 .orderBy(tournamentParticipantEntity.score.desc())
                 .fetch();
@@ -66,7 +66,7 @@ public class VoteRepositoryCustomImpl implements VoteRepositoryCustom {
         if (tournamentId == null) {
             return null;
         }
-
-        return voteEntity.tournament.tournamentNo.eq(tournamentId);
+        
+        return tournamentParticipantEntity.tournament.tournamentNo.eq(tournamentId);
     }
 }

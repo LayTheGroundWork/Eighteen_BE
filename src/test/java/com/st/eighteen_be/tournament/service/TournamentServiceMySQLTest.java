@@ -68,30 +68,30 @@ class TournamentServiceMySQLTest {
     public static final int TOURNAMENT_USER_LIMIT_COUNT = TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT;
     @PersistenceContext
     private EntityManager em;
-
+    
     private TournamentService tournamentService;
-
+    
     @Autowired
     private TournamentEntityRepository tournamentEntityRepository;
-
+    
     @Autowired
     private TournamentParticipantRepository tournamentParticipantEntityRepository;
-
+    
     @Autowired
     private VoteEntityRepository voteEntityRepository;
-
+    
     @Autowired
     private UserRepository userRepository;
-
+    
     @MockBean
     private RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
-
+    
     @MockBean
     private UserService userService;
-
+    
     @MockBean
     private MostLikedUserRepository mostLikedUserRepository;
-
+    
     @Mock
     private ListOperations<String, MostLikedUserRedisHash> listOperations;
     
@@ -109,7 +109,7 @@ class TournamentServiceMySQLTest {
         given(redisTemplate.opsForList()).willReturn(listOperations);
         given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
     }
-
+    
     @Test
     @DisplayName("토너먼트를 시작합니다. 카테고리에 맞는 토너먼트 생성을 확인한다.")
     void When_startTournament_Then_createTournament() {
@@ -118,14 +118,14 @@ class TournamentServiceMySQLTest {
                 .boxed()
                 .map(i -> MostLikedUserRedisHash.of("qkrtkdwns3410", "http://test.com", "예술"))
                 .collect(Collectors.toList());
-
+        
         //hashOperations.values(categoryKey). 에 대한 모킹처리
         given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
         given(hashOperations.values(anyString())).willReturn(mostLikedUserRedisHashes);
-
+        
         // when
         tournamentService.startTournament();
-
+        
         // then
         List<TournamentEntity> actual = tournamentEntityRepository.findAll();
         
@@ -206,7 +206,7 @@ class TournamentServiceMySQLTest {
                 }
         );
     }
-
+    
     @Nested
     @DisplayName("토너먼트 시작 테스트")
     class StartTournamentTest {
@@ -215,74 +215,74 @@ class TournamentServiceMySQLTest {
         void When_startTournament_Then_createTournament() {
             // when
             tournamentService.startTournament();
-
+            
             // then
             List<TournamentEntity> foundAll = tournamentEntityRepository.findAll();
-
+            
             assertThat(foundAll)
                     .isNotEmpty()
                     .hasSize(CategoryType.values().length);
         }
-
+        
         @Test
         @DisplayName("토너먼트 시작시 토너먼트 참가자가 랜덤으로 선정되는지 확인한다.")
         void When_startTournament_Then_pickRandomUser() {
             // given
             final int savedParticipantCount = TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT;
             final int expectedCount = savedParticipantCount * CategoryType.values().length;
-
+            
             //토너먼트 참여자 선정 모킹 데이터 given
             List<MostLikedUserRedisHash> mostLikedUserRedisHashes = IntStream.range(0, savedParticipantCount)
                     .boxed()
                     .map(i -> MostLikedUserRedisHash.of("userId" + i, "http://test.com", "예술"))
                     .toList();
-
+            
             //hashOperations.values(categoryKey). 에 대한 모킹처리
             given(redisTemplate.opsForHash()).willAnswer(invocation -> hashOperations);
             given(hashOperations.values(anyString())).willReturn(mostLikedUserRedisHashes);
-
+            
             // when
             tournamentService.startTournament();
-
+            
             // then
             List<TournamentParticipantEntity> foundAll = tournamentParticipantEntityRepository.findAll();
-
+            
             assertThat(foundAll)
                     .isNotEmpty()
                     .hasSize(expectedCount);
         }
-
+        
         @Test
         @DisplayName("종료된 토너먼트가 있는 경우 시즌이 증가되어 새로운 토너먼트가 생성되는지 확인한다.")
         void When_startTournament_Then_createNewTournament() {
             // given
             List<TournamentEntity> tournamentEntities = new ArrayList<>();
-
+            
             for (CategoryType category : CategoryType.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
-                                                          .season(2)
-                                                          .status(false)
-                                                          .category(category)
-                                                          .build();
-
+                        .season(2)
+                        .status(false)
+                        .category(category)
+                        .build();
+                
                 tournamentEntities.add(gameTournament);
             }
-
+            
             tournamentEntityRepository.saveAll(tournamentEntities);
-
+            
             // when
             tournamentService.startTournament();
-
+            
             // then
             List<TournamentEntity> activeTournaments = em.createQuery(
                     "SELECT t FROM TournamentEntity t WHERE t.status = true"
                     , TournamentEntity.class
             ).getResultList();
-
+            
             assertThat(activeTournaments)
                     .isNotEmpty()
                     .hasSize(CategoryType.values().length);
-
+            
             assertSoftly(
                     softly -> {
                         for (TournamentEntity tournamentEntity : activeTournaments) {
@@ -292,7 +292,7 @@ class TournamentServiceMySQLTest {
             );
         }
     }
-
+    
     @Nested
     @DisplayName("토너먼트 종료 테스트")
     class EndTournamentTest {
@@ -301,28 +301,28 @@ class TournamentServiceMySQLTest {
         void When_endTournament_Then_changeTournamentStatus() {
             // given
             List<TournamentEntity> tournamentEntities = new ArrayList<>();
-
+            
             for (CategoryType category : CategoryType.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
-                                                          .category(category)
-                                                          .build();
-
+                        .category(category)
+                        .build();
+                
                 tournamentEntities.add(gameTournament);
             }
-
+            
             tournamentEntityRepository.saveAll(tournamentEntities);
-
+            
             // when
             tournamentService.endLastestTournaments();
-
+            
             // then
             List<TournamentEntity> foundAll = tournamentEntityRepository.findAll();
-
+            
             assertThat(foundAll)
                     .isNotEmpty()
                     .allMatch(tournamentEntity -> Objects.equals(tournamentEntity.isStatus(), Boolean.FALSE), "토너먼트 상태값이 변경되지 않았습니다.");
         }
-
+        
         @Test
         @DisplayName("토너먼트 종료시 토너먼트 투표순으로 승자를 선정한다.")
         void When_endTournament_Then_determineWinner() {
@@ -331,46 +331,48 @@ class TournamentServiceMySQLTest {
             //참여자 정보 주입하기
             for (int i = 1; i <= 3; i++) {
                 UserInfo user = UserInfo.builder()
-                                        .birthDay(LocalDate.now())
-                                        .phoneNumber("010-1234-567" + i)
-                                        .uniqueId("user" + i)
-                                        .nickName("name" + i)
+                        .birthDay(LocalDate.now())
+                        .phoneNumber("010-1234-567" + i)
+                        .uniqueId("user" + i)
+                        .nickName("name" + i)
                         .category(CategoryType.ART)
-                                        .build();
-
+                        .build();
+                
                 em.persist(user);
             }
-
+            
             TournamentEntity tournamentEntity = TournamentEntity.builder()
                     .category(CategoryType.GAME)
-                                                        .build();
-
+                    .build();
+            
             tournamentEntityRepository.save(tournamentEntity);
-
+            
             //참여자 추가하기
             List<TournamentParticipantEntity> tournamentParticipantEntities = List.of(
                     TournamentParticipantEntity.of("user1", tournamentEntity),
-                    TournamentParticipantEntity.of("user2", tournamentEntity)
+                    TournamentParticipantEntity.of("user2", tournamentEntity),
+                    // 투표되지 않은 사용자도 조회는 되어야함
+                    TournamentParticipantEntity.of("user3", tournamentEntity)
             );
-
+            
             //투표자들 추가하기
             Result result = getResult(tournamentEntity, tournamentParticipantEntities);
-
+            
             //점수 직접 추가
             ReflectionTestUtils.setField(tournamentParticipantEntities.get(0), "score", result.voter1().getVotePoint() + result.voter2().getVotePoint());
             ReflectionTestUtils.setField(tournamentParticipantEntities.get(1), "score", result.voter3().getVotePoint());
-
+            
             tournamentParticipantEntityRepository.saveAll((tournamentParticipantEntities));
-
+            
             voteEntityRepository.saveAll(List.of(result.voter1(), result.voter2(), result.voter3()));
-
+            
             // when
             List<TournamentVoteResultResponseDTO> actual = tournamentService.determineWinner(tournamentEntity.getTournamentNo());
-
+            
             // then
             assertThat(actual).isNotEmpty();
-            assertThat(actual.size()).isEqualTo(2);
-
+            assertThat(actual.size()).isEqualTo(3);
+            
             assertSoftly(
                     softly -> {
                         softly.assertThat(actual.get(0).getRankerId()).isEqualTo("user2");
@@ -378,45 +380,50 @@ class TournamentServiceMySQLTest {
                         softly.assertThat(actual.get(0).getVoteCount()).isEqualTo(3);
                         softly.assertThat(actual.get(0).getRankerNickName()).isEqualTo("name2");
                         //softly.assertThat(actual.get(0).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
-
+                        
                         softly.assertThat(actual.get(1).getRankerId()).isEqualTo("user1");
                         softly.assertThat(actual.get(1).getRank()).isEqualTo(2);
                         softly.assertThat(actual.get(1).getVoteCount()).isEqualTo(2);
                         softly.assertThat(actual.get(1).getRankerNickName()).isEqualTo("name1");
                         //softly.assertThat(actual.get(1).getProfileImageUrl()).isEqualTo("https://picsum.photos/200");
+                        
+                        softly.assertThat(actual.get(2).getRankerId()).isEqualTo("user3");
+                        softly.assertThat(actual.get(2).getRank()).isEqualTo(3);
+                        softly.assertThat(actual.get(2).getVoteCount()).isEqualTo(0);
+                        softly.assertThat(actual.get(2).getRankerNickName()).isEqualTo("name3");
                     }
             );
         }
-
+        
         private static @NotNull Result getResult(TournamentEntity tournamentEntity, List<TournamentParticipantEntity> tournamentParticipantEntities) {
             VoteEntity voter1 = VoteEntity.builder()
-                                        .tournament(tournamentEntity)
-                                        .participant(tournamentParticipantEntities.get(0))
+                    .tournament(tournamentEntity)
+                    .participant(tournamentParticipantEntities.get(0))
                     .voterId("user1")
-                                        .votePoint(1)
-                                        .build();
-
+                    .votePoint(1)
+                    .build();
+            
             VoteEntity voter2 = VoteEntity.builder()
-                                        .tournament(tournamentEntity)
-                                        .participant(tournamentParticipantEntities.get(0))
+                    .tournament(tournamentEntity)
+                    .participant(tournamentParticipantEntities.get(0))
                     .voterId("user2")
-                                        .votePoint(1)
-                                        .build();
-
+                    .votePoint(1)
+                    .build();
+            
             VoteEntity voter3 = VoteEntity.builder()
-                                        .tournament(tournamentEntity)
-                                        .participant(tournamentParticipantEntities.get(1))
+                    .tournament(tournamentEntity)
+                    .participant(tournamentParticipantEntities.get(1))
                     .voterId("user3")
-                                        .votePoint(3)
-                                        .build();
-
+                    .votePoint(3)
+                    .build();
+            
             return new Result(voter1, voter2, voter3);
         }
-
+        
         private record Result(VoteEntity voter1, VoteEntity voter2, VoteEntity voter3) {
         }
     }
-
+    
     @Nested
     @DisplayName("토너먼트 투표 테스트")
     class VoteTournamentTest {
@@ -426,30 +433,30 @@ class TournamentServiceMySQLTest {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
                     .category(CategoryType.GAME)
-                                                        .build();
-
+                    .build();
+            
             tournamentEntityRepository.save(tournamentEntity);
-
+            
             TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
-
+            
             tournamentParticipantEntityRepository.saveAll(result.participantEntities);
-
+            
             TournamentVoteRequestDTO tournamentVoteRequestDTO = TournamentVoteRequestDTO.builder()
                     .tournamentNo(tournamentEntity.getTournamentNo())
                     .participantIdsOrderByRank(result.participantEntities.stream().map(TournamentParticipantEntity::getUserId).collect(Collectors.toList()))
                     .build();
-
+            
             given(userService.findByUniqueId(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
-
+            
             // when
             tournamentService.processVote(tournamentVoteRequestDTO, "accessToken");
-
+            
             // then
             List<TournamentParticipantEntity> found = tournamentParticipantEntityRepository.findAll();
-
+            
             assertThat(found)
                     .isNotEmpty();
-
+            
             assertSoftly(softAssertions -> {
                 softAssertions.assertThat(found.get(0).getScore()).isEqualTo(4);
                 softAssertions.assertThat(found.get(1).getScore()).isEqualTo(2);
@@ -457,54 +464,54 @@ class TournamentServiceMySQLTest {
                 softAssertions.assertThat(found.get(3).getScore()).isEqualTo(1);
             });
         }
-
+        
         @Test
         @DisplayName("토너먼트 투표시 투표기록이 정상적으로 처리되는지 확인한다")
         void When_voteTournament_Then_insertVoteRecord() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
                     .category(CategoryType.GAME)
-                                                        .build();
-
+                    .build();
+            
             tournamentEntityRepository.save(tournamentEntity);
-
+            
             TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
-
+            
             tournamentParticipantEntityRepository.saveAll(result.participantEntities);
-
+            
             TournamentVoteRequestDTO tournamentVoteRequestDTO =
                     TournamentVoteRequestDTO.builder()
                             .tournamentNo(tournamentEntity.getTournamentNo())
                             .participantIdsOrderByRank(result.participantEntities.stream().map(TournamentParticipantEntity::getUserId).collect(Collectors.toList()))
                             .build();
-
-
+            
+            
             given(userService.findByUniqueId(anyString())).willReturn(UserInfo.builder().uniqueId("testUser1").build());
-
+            
             // when
             tournamentService.processVote(tournamentVoteRequestDTO, "accessToken");
-
+            
             // then
             List<VoteEntity> found = voteEntityRepository.findAll();
-
+            
             assertThat(found)
                     .isNotEmpty()
                     .hasSize(TOURNAMENT_USER_LIMIT_COUNT);
         }
-
+        
         private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult(TournamentEntity tournamentEntity) {
             List<TournamentParticipantEntity> participants = IntStream.rangeClosed(1, TOURNAMENT_USER_LIMIT_COUNT)
                     .mapToObj(i -> TournamentParticipantEntity.of("user" + i, tournamentEntity))
                     .toList();
-
+            
             return new TournamentParticipantTestResult(participants);
         }
-
+        
         private record TournamentParticipantTestResult(List<TournamentParticipantEntity> participantEntities) {
-
+        
         }
     }
-
+    
     @Nested
     @DisplayName("토너먼트 참가자 선정 테스트")
     class PickMostLikedUserRedisHashTest {
@@ -514,7 +521,7 @@ class TournamentServiceMySQLTest {
         void When_pickRandomUser_Then_throwException() {
             // given
             List<UserInfo> userInfos = new ArrayList<>();
-
+            
             for (int i = 1; i <= 2; i++) {
                 UserInfo user = UserInfo.builder()
                         .birthDay(LocalDate.now())
@@ -523,27 +530,27 @@ class TournamentServiceMySQLTest {
                         .nickName("name" + i)
                         .category(CategoryType.ART)
                         .build();
-
+                
                 userInfos.add(user);
             }
-
+            
             userRepository.saveAll(userInfos);
-
+            
             // when
             // then
             assertThatThrownBy(() -> tournamentService.saveMostLikedUsersToRedis())
                     .isInstanceOf(BadRequestException.class)
                     .hasMessageContaining("유저 수가 부족합니다");
         }
-
+        
         @Test
         @DisplayName("랜덤 유저 선정시 유저가 32명 이상인 경우 랜덤 유저를 선정한다. - Redis 테스트")
         void When_pickRandomUser_Then_returnRandomUser() {
             // given
             final int pickedUserCount = TOURNAMENT_USER_LIMIT_COUNT;
-
+            
             List<UserInfo> userInfos = new ArrayList<>();
-
+            
             for (int i = 1; i <= pickedUserCount; i++) {
                 UserInfo user = UserInfo.builder()
                         .birthDay(LocalDate.now())
@@ -564,10 +571,10 @@ class TournamentServiceMySQLTest {
             }
             
             userRepository.saveAll(userInfos);
-
+            
             // when
             Set<MostLikedUserResponseDto> actual = tournamentService.saveMostLikedUsersToRedis();
-
+            
             // then
             assertThat(actual)
                     .isNotEmpty()
