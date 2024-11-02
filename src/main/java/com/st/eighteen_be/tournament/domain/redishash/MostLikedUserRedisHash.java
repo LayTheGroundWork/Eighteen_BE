@@ -1,5 +1,6 @@
 package com.st.eighteen_be.tournament.domain.redishash;
 
+import com.st.eighteen_be.tournament.constants.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import lombok.*;
@@ -20,7 +21,7 @@ import java.util.Objects;
  * -----------------------------------------------------------
  * 24. 8. 28.        ipeac       최초 생성
  */
-@RedisHash("mostLikedUser")
+@RedisHash(TournamentConstants.MOST_LIKED_USER_KEY)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,7 +48,7 @@ public class MostLikedUserRedisHash {
     }
 
     public static String createUid(String userId, String category) {
-        return "mostLikedUser:" + userId + ":" + category;
+        return TournamentConstants.MOST_LIKED_USER_KEY + ":" + userId + ":" + category;
     }
 
     public TournamentParticipantEntity from(TournamentEntity newTournament) {

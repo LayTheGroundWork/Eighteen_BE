@@ -52,8 +52,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class TournamentService {
-    public static final String MOST_LIKED_USER_KEY = "mostLikedUser";
-    
     private final UserService userService;
 
     private final TournamentEntityRepository tournamentEntityRepository;
@@ -110,7 +108,7 @@ public class TournamentService {
     }
 
     private void saveMostLikedParticipantsFromRedis(TournamentEntity newTournament, CategoryType category) {
-        String categoryKey = String.format(MOST_LIKED_USER_KEY + ":%s", category.getCategory());
+        String categoryKey = String.format(TournamentConstants.MOST_LIKED_USER_KEY + ":%s", category.getCategory());
 
         // 레디스로 해시테이블 조회해서  참가자 목록 생성 -> 리스트로 들고와야함
         HashOperations<String, String, MostLikedUserRedisHash> hashOperations = redisTemplate.opsForHash();
@@ -183,7 +181,7 @@ public class TournamentService {
     }
 
     private void putMostLikedUserToRedis(List<MostLikedUserResponseDto> pickedMostLikedUsers, CategoryType category) {
-        String categoryKey = String.format(MOST_LIKED_USER_KEY +":%s", category.getCategory());
+        String categoryKey = String.format(TournamentConstants.MOST_LIKED_USER_KEY +":%s", category.getCategory());
 
         for (MostLikedUserResponseDto user : pickedMostLikedUsers) {
             MostLikedUserRedisHash mostLikedUserRedisHash = user.toMostLikedHash(categoryKey);

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.st.eighteen_be.tournament.service.TournamentService.MOST_LIKED_USER_KEY;
+import static com.st.eighteen_be.tournament.constants.TournamentConstants.MOST_LIKED_USER_KEY;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.repository.redis_template
