@@ -43,6 +43,7 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
             WHERE UL.createdDate BETWEEN :start AND :end \
             AND UI.category = :category \
             GROUP BY UI.id, UMD.imageKey \
-            ORDER BY COUNT(UL.id) DESC""")
-    List<MostLikedUserResponseDto> findUsersByCategoryOrderByLastweekLikeCount(@Param("category") CategoryType category, LocalDateTime start, LocalDateTime end);
+            ORDER BY COUNT(UL.id) DESC \
+            LIMIT 16""")
+    List<MostLikedUserResponseDto> findUsersByCategoryOrderByLastweekLikeCountLimit16(@Param("category") CategoryType category, LocalDateTime start, LocalDateTime end);
 }

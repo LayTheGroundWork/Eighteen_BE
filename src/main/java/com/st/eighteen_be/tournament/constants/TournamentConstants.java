@@ -1,4 +1,4 @@
-package com.st.eighteen_be.tournament.domain.dto.request;
+package com.st.eighteen_be.tournament.constants;
 
 /**
  * packageName    : com.st.eighteen_be.tournament.domain.dto.request
@@ -13,4 +13,5 @@ package com.st.eighteen_be.tournament.domain.dto.request;
  */
 public class TournamentConstants {
     public static final int[] VOTE_POINT = {4, 2, 1, 1};
+    public static final int TOURNAMENT_LIMIT_USER_COUNT = 16;
 }

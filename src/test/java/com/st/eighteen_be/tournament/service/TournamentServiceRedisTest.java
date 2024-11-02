@@ -2,6 +2,7 @@ package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
 import com.st.eighteen_be.common.extension.RedisTestContainerExtenstion;
+import com.st.eighteen_be.tournament.constants.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import com.st.eighteen_be.tournament.repository.MostLikedUserRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
@@ -43,7 +44,7 @@ import static org.mockito.BDDMockito.given;
 public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
 
     public static final String RANDOM_USER = "mostLikedUser";
-
+    
     @Autowired
     private RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
 
@@ -80,7 +81,7 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
     void When_saveRandomUser_Then_saveMostLikedUsersToRedis() {
         //given
         List<MostLikedUserResponseDto> mostLikedUserResponseDtos = new ArrayList<>();
-        for (int i = 1; i <= 32; i++) {
+        for (int i = 1; i <= TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT; i++) {
             mostLikedUserResponseDtos.add(MostLikedUserResponseDto.of("userId" + i, "http://test.com"));
         }
         
@@ -90,11 +91,11 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
         tournamentService.saveMostLikedUsersToRedis();
 
         //then
-        //userRandomResponseDtos 32개가 redis 에 저장되었는지 확인
+        // userRandomResponseDtos 16개가 redis 에 저장되었는지 확인
         redisTemplate.opsForHash().entries(RANDOM_USER).forEach((k, v) -> {
             MostLikedUserRedisHash mostLikedUserRedisHash = (MostLikedUserRedisHash) v;
-
-            //randomUser userId는  userId1 ~ 32 사이의 값이어야 함
+            
+            // randomUser userId는  userId1 ~ 16 사이의 값이어야 함
             assertThat(mostLikedUserRedisHash.getUserId()).isEqualTo(k);
             assertThat(mostLikedUserRedisHash.getProfileImageUrl()).isEqualTo("http://test.com");
         });

@@ -2,6 +2,7 @@ package com.st.eighteen_be.tournament.service;
 
 import com.st.eighteen_be.common.annotation.ServiceWithMySQLTest;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
+import com.st.eighteen_be.tournament.constants.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
@@ -64,6 +65,7 @@ import static org.mockito.BDDMockito.given;
 @ServiceWithMySQLTest
 @ExtendWith(MockitoExtension.class)
 class TournamentServiceMySQLTest {
+    public static final int TOURNAMENT_USER_LIMIT_COUNT = TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT;
     @PersistenceContext
     private EntityManager em;
 
@@ -226,7 +228,7 @@ class TournamentServiceMySQLTest {
         @DisplayName("토너먼트 시작시 토너먼트 참가자가 랜덤으로 선정되는지 확인한다.")
         void When_startTournament_Then_pickRandomUser() {
             // given
-            final int savedParticipantCount = 32;
+            final int savedParticipantCount = TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT;
             final int expectedCount = savedParticipantCount * CategoryType.values().length;
 
             //토너먼트 참여자 선정 모킹 데이터 given
@@ -487,11 +489,11 @@ class TournamentServiceMySQLTest {
 
             assertThat(found)
                     .isNotEmpty()
-                    .hasSize(32);
+                    .hasSize(TOURNAMENT_USER_LIMIT_COUNT);
         }
 
         private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult(TournamentEntity tournamentEntity) {
-            List<TournamentParticipantEntity> participants = IntStream.rangeClosed(1, 32)
+            List<TournamentParticipantEntity> participants = IntStream.rangeClosed(1, TOURNAMENT_USER_LIMIT_COUNT)
                     .mapToObj(i -> TournamentParticipantEntity.of("user" + i, tournamentEntity))
                     .toList();
 
@@ -538,7 +540,7 @@ class TournamentServiceMySQLTest {
         @DisplayName("랜덤 유저 선정시 유저가 32명 이상인 경우 랜덤 유저를 선정한다. - Redis 테스트")
         void When_pickRandomUser_Then_returnRandomUser() {
             // given
-            final int pickedUserCount = 32;
+            final int pickedUserCount = TOURNAMENT_USER_LIMIT_COUNT;
 
             List<UserInfo> userInfos = new ArrayList<>();
 

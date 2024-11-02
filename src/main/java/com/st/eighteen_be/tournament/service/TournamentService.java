@@ -3,6 +3,7 @@ package com.st.eighteen_be.tournament.service;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
+import com.st.eighteen_be.tournament.constants.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
@@ -22,6 +23,7 @@ import com.st.eighteen_be.user.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -51,7 +53,7 @@ import java.util.*;
 @Slf4j
 public class TournamentService {
     public static final String MOST_LIKED_USER_KEY = "mostLikedUser";
-
+    
     private final UserService userService;
 
     private final TournamentEntityRepository tournamentEntityRepository;
@@ -126,7 +128,7 @@ public class TournamentService {
         Set<MostLikedUserResponseDto> showedMostLikedUsers = new HashSet<>();
 
         for (CategoryType category : CategoryType.values()) {
-            //저번주의 데이터에 대해 좋아요 순으로 32명을 뽑는다 32명이 안찰수도 있다.
+            //저번주의 데이터에 대해 좋아요 순으로 16명을 뽑는다 16명이 안찰수도 있다.
             //현재 날짜 기준으로 저번주 월요일 설정값을 매개변수로 넣고 저번주 일요일을 매개변수로 넣어준다.
             LocalDateTime lastweekMonday = LocalDate.now()
                     .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
@@ -137,23 +139,45 @@ public class TournamentService {
                     .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
                     .atTime(LocalTime.MAX);
             
-            List<MostLikedUserResponseDto> selectedUsers = userRepository.findUsersByCategoryOrderByLastweekLikeCount(category, lastweekMonday, lastweekSunday);
+            //16명 제한으로 좋아요순으로 호출한다.
+            List<MostLikedUserResponseDto> selectedUsers = userRepository.findUsersByCategoryOrderByLastweekLikeCountLimit16(category, lastweekMonday, lastweekSunday);
             
-            //좋아요 있는 유저의 경우 랜덤으로 넣는다 (32 - 좋아요 있는 유저)
-            final int leftUserCount = 32 - selectedUsers.size();
-            List<MostLikedUserResponseDto> pickedMostLikedUsers = userRepository.findRandomUsers(category, leftUserCount);
-
+            //16명 초과하는 경우 16명으로 제한함
+            selectedUsers = subtractOverSixteenUsers(selectedUsers);
+            
+            //좋아요 있는 유저의 경우 랜덤으로 넣는다 (16 - 좋아요 있는 유저)
+            fillLeftUsersByRandom(category, selectedUsers);
+            
             //TODO 일단 주석처리 -> 검증이 필요한지 생각해봐야할듯.
             // validateRandomUserCount(pickedRandomUser);
 
-            putMostLikedUserToRedis(pickedMostLikedUsers, category);
+            //레디스에 토너먼트 후보 유저를 올린다.
+            putMostLikedUserToRedis(selectedUsers, category);
 
-            showedMostLikedUsers.addAll(pickedMostLikedUsers);
+            showedMostLikedUsers.addAll(selectedUsers);
         }
 
         return showedMostLikedUsers;
     }
-
+    
+    private void fillLeftUsersByRandom(CategoryType category, List<MostLikedUserResponseDto> selectedUsers) {
+        final int leftUserCount = TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT - selectedUsers.size();
+        if (leftUserCount > 0) {
+            List<MostLikedUserResponseDto> pickedMostLikedUsers = userRepository.findRandomUsers(category, leftUserCount);
+            selectedUsers.addAll(pickedMostLikedUsers);
+        }
+    }
+    
+    @NotNull
+    private static List<MostLikedUserResponseDto> subtractOverSixteenUsers(List<MostLikedUserResponseDto> selectedUsers) {
+        //selectUsers 가 16명을 초과하는 경우 16명으로 제한함
+        if (selectedUsers.size() > TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT) {
+            selectedUsers = selectedUsers.subList(0, TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT);
+        }
+        
+        return selectedUsers;
+    }
+    
     private void deleteAlreadyExistMostLikedUserFromRedis() {
         mostLikedUserRepository.deleteAll();
     }
@@ -168,7 +192,7 @@ public class TournamentService {
     }
 
     private static void validateRandomUserCount(List<MostLikedUserResponseDto> randomUser) {
-        if(randomUser.size() != 32) {
+        if(randomUser.size() != TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT) {
             throw new BadRequestException(ErrorCode.NOT_ENOUGH_USER);
         }
     }
