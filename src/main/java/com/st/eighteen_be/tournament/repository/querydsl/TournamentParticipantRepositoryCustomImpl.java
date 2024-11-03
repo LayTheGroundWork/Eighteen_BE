@@ -16,6 +16,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -113,10 +114,7 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
     @Override
     public List<ThisWeekTournamentParticipantResponseDTO> showParticipantForThisWeek(CategoryType category) {
         //토너먼트 최대 no 가져온다.
-        Long maxTournamentNo = qf.from(tournamentEntity)
-                .select(tournamentEntity.tournamentNo.max())
-                .where(tournamentEntity.category.eq(category))
-                .fetchOne();
+        Long maxTournamentNo = Optional.ofNullable(getMaxTournamentNo(category)).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT));
         
         return qf.from(tournamentParticipantEntity)
                 .leftJoin(userInfo).on(userInfo.uniqueId.eq(tournamentParticipantEntity.userId))
@@ -131,6 +129,15 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
                         )
                 ).where(tournamentParticipantEntity.tournament.tournamentNo.eq(maxTournamentNo))
                 .fetch();
+    }
+    
+    @Nullable
+    @Override
+    public Long getMaxTournamentNo(CategoryType category) {
+        return qf.from(tournamentEntity)
+                .select(tournamentEntity.tournamentNo.max())
+                .where(tournamentEntity.category.eq(category))
+                .fetchOne();
     }
     
     private static BooleanExpression eqTournamentNo(Long tournamentNo) {

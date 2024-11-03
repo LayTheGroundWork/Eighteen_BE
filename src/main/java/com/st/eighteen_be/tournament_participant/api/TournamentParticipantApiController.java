@@ -1,8 +1,10 @@
 package com.st.eighteen_be.tournament_participant.api;
 
 import com.st.eighteen_be.common.response.ApiResp;
+import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament_participant.service.TournamentParticipantService;
+import com.st.eighteen_be.user.domain.CustomUserDetails;
 import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,8 +42,13 @@ public class TournamentParticipantApiController {
     @GetMapping("/v1/api/tournament/participant/{category}/this-week")
     public ApiResp<List<ThisWeekTournamentParticipantResponseDTO>> showParticipantNowTournament(
             @Parameter(description = "카테고리", required = true)
-            @PathVariable("category") CategoryType category
+            @PathVariable("category") CategoryType category,
+            
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return ApiResp.success(HttpStatus.OK, tournamentParticipantService.showParticipantNowTournament(category));
+        SecurityUtil.checkUser(userDetails);
+        
+        return ApiResp.success(HttpStatus.OK, tournamentParticipantService.showParticipantNowTournament(category, userDetails.getUniqueId()));
     }
 }

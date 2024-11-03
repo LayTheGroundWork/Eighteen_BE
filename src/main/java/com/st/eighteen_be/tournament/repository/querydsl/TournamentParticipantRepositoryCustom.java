@@ -3,6 +3,7 @@ package com.st.eighteen_be.tournament.repository.querydsl;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.user.enums.CategoryType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface TournamentParticipantRepositoryCustom {
     void insertVoteRecord(TournamentVoteRequestDTO voteRequestDTOs, String loginedUserId);
     
     List<ThisWeekTournamentParticipantResponseDTO> showParticipantForThisWeek(CategoryType category);
+    
+    @Nullable Long getMaxTournamentNo(CategoryType category);
 }

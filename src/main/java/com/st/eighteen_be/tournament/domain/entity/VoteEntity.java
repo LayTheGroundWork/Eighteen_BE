@@ -13,6 +13,8 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Table(name = "VOTE", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"TOURNAMENT_NO", "PARTICIPANT_NO", "VOTER_ID"})
+}, indexes = {
+        @Index(name = "idx_voter_id", columnList = "VOTER_ID")
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
@@ -22,20 +24,20 @@ public class VoteEntity extends BaseEntity {
     @Comment("투표고유번호")
     @Column(name = "VOTE_NO")
     private Long voteNo;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TOURNAMENT_NO", nullable = false)
     private TournamentEntity tournament;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARTICIPANT_NO", nullable = false)
     private TournamentParticipantEntity participant;
-
+    
     @Comment("투표자 유저 아이디")
     @Size(max = 50)
     @Column(name = "VOTER_ID", nullable = false)
     private String voterId;
-
+    
     @Comment("투표 점수")
     @Column(name = "VOTE_POINT")
     private Integer votePoint;
