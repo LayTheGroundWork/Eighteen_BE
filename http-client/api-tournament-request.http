@@ -51,5 +51,6 @@ Authorization: Bearer {{token}}
     client.global.set("category", "ART");
 %}
 ### 해당 카테고리의 토너먼트 이번주 참여자 조회
-GET {{url}}/v1/api/tournament/participant/{{category}}/this-week
+GET {{url}}/v1/api/tournament/participant/ETC/this-week
 Content-Type: application/json
+Authorization: Bearer {{token}}
