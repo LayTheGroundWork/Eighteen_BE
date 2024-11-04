@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,11 @@ public class UserDtoService {
 
     public UserProfilePageResponseDto getUserProfilesWithLikes(String uniqueId, Pageable pageable) {
         Page<UserInfo> users = userService.findPageBy(pageable);
+        return getUserProfilePageResponseDto(uniqueId, users);
+    }
+
+    @NotNull
+    private UserProfilePageResponseDto getUserProfilePageResponseDto(String uniqueId, Page<UserInfo> users) {
         Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
 
         List<UserProfileResponseDto> responseDtoList = users.stream()
@@ -83,15 +89,7 @@ public class UserDtoService {
     public UserProfilePageResponseDto getUserProfilesWithLikeStatusAndCategory(String uniqueId, CategoryType category,
                                                                                  Pageable pageable){
         Page<UserInfo> users = userService.findAllByCategory(category,pageable);
-        Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
-
-        List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user,likedUserIds))
-                .collect(Collectors.toList());
-
-        Collections.shuffle(responseDtoList);
-
-        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
+        return getUserProfilePageResponseDto(uniqueId, users);
     }
 
     private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {
