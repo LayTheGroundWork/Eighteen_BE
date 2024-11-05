@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserProfilePageResponseDto {
 
-    private List<UserProfileResponseDto> profileDto;
+    private List<UserProfileResponseDto> users;
     private Integer totalPage;
 
     @Builder
     public UserProfilePageResponseDto(List<UserProfileResponseDto> profileDto, Integer totalPage) {
-        this.profileDto = profileDto;
+        this.users = profileDto;
         this.totalPage = totalPage;
     }
 }
