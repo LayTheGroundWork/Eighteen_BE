@@ -28,6 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper = new ObjectMapper(); // 클래스 변수로 선언
 
+    private static final String[] IGNORED_PATHS = {"/v1/api/user/reissue"};
+
     // 실제 필터링 로직은 doFilterInternal 에 들어감
     // JWT 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
     @Override
@@ -35,11 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws IOException, ServletException {
 
+        String requestUri = request.getRequestURI();
+        if (shouldIgnore(requestUri)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 1. Request Header 에서 토큰을 꺼냄ㅕ
         String accessToken = request.getHeader("Authorization");
         String jwt = jwtTokenProvider.resolveAccessToken(accessToken);
-
-        if(StringUtils.hasText(jwt)){
+        
+        if(StringUtils.hasText(jwt) && !request.getRequestURI().contains("/reissued")){
             // 2. validateToken 으로 토큰 유효성 검사
             // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
             try {
@@ -56,6 +64,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean shouldIgnore(String requestURI) {
+        for (String path : IGNORED_PATHS) {
+            if (requestURI.startsWith(path)) {
+                return true; // 무시할 API입니다.
+            }
+        }
+        return false;
     }
 
     private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode){

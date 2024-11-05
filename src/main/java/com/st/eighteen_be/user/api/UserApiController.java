@@ -10,12 +10,14 @@ import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
-import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfilePageResponseDto;
+import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.service.AuthService;
 import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserDtoService;
 import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,6 +67,7 @@ public class UserApiController {
     private final AuthService authService;
 
     @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
+    @PreAuthorize("permitAll()")
     @GetMapping("/v1/api/user/duplication-check/{unique-id}")
     public ApiResp<Boolean> duplicationCheck(@PathVariable("unique-id") String uniqueId){
         return ApiResp.success(HttpStatus.OK, authService.isDuplicationUniqueId(uniqueId));
@@ -85,6 +89,7 @@ public class UserApiController {
     }
 
     @Operation(summary = "로그인", description = "로그인")
+
     @PostMapping("/v1/api/user/sign-in")
     public ApiResp<String> signIn(@Valid @RequestParam("phoneNumber")
                                            @Schema(example = "01012345679") String phoneNumber,
@@ -109,8 +114,8 @@ public class UserApiController {
     @Operation(summary = "토큰 재발급", description = "토큰 재발급")
     @PostMapping("/v1/api/user/reissue")
     public ApiResp<String> reissue(@RequestHeader(AUTHORIZATION_HEADER) String accessToken,
-                                        @RequestHeader(REFRESH_HEADER) String refreshToken,
-                                        HttpServletResponse response) {
+                                   @RequestHeader(REFRESH_HEADER) String refreshToken,
+                                   HttpServletResponse response) {
 
         JwtTokenDto jwtTokenDto = authService.reissue(accessToken, refreshToken);
 
@@ -143,7 +148,7 @@ public class UserApiController {
     @Operation(summary = "[GUEST]회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
     @GetMapping("/v1/api/guest/find-all")
-    public ApiResp<List<UserProfileResponseDto>> findAll(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+    public ApiResp<UserProfilePageResponseDto> findAll(@PageableDefault(page = 0, size = 10) Pageable pageable) {
 
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilePage(pageable));
     }
@@ -151,7 +156,7 @@ public class UserApiController {
     @Operation(summary = "[USER]회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
     @GetMapping("/v1/api/user/find-all")
-    public ApiResp<List<UserProfileResponseDto>> findAll(@AuthenticationPrincipal UserDetails userDetails,
+    public ApiResp<UserProfilePageResponseDto> findAll(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PageableDefault(page = 0, size = 10) Pageable pageable){
 
         return ApiResp.success(HttpStatus.OK, userDtoService.
@@ -161,7 +166,8 @@ public class UserApiController {
     @Operation(summary = "[GUEST] 카테고리에 맞는 회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
     @GetMapping("/v1/api/guest/find-all-by-category/{category}")
-    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@PathVariable("category") String category,
+    public ApiResp<UserProfilePageResponseDto> findAllByCategory(@Parameter(description = "카테고리", required = true)
+                                                                       @PathVariable("category") CategoryType category,
                                                                    @PageableDefault(page = 0, size = 10) Pageable pageable){
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithCategory(category,pageable));
     }
@@ -169,14 +175,15 @@ public class UserApiController {
     @Operation(summary = "[USER] 카테고리에 맞는 회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
     @GetMapping("/v1/api/user/find-all-by-category/{category}")
-    public ApiResp<List<UserProfileResponseDto>> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
+    public ApiResp<UserProfilePageResponseDto> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
                                                                    @PageableDefault(page = 0, size = 10) Pageable pageable,
-                                                                   @PathVariable("category") String category) {
+                                                                   @Parameter(description = "카테고리", required = true)
+                                                                       @PathVariable("category") CategoryType category) {
         return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilesWithLikeStatusAndCategory(
                 userDetails.getUsername(),category,pageable));
     }
 
-    // Test API
+    // Test API //
     @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")
     @GetMapping("/v1/api/user/like/force-start")
     public ApiResp<String> likeInfoBackupTest(){
