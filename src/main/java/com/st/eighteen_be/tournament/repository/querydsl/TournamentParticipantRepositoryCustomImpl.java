@@ -120,7 +120,6 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
                 .leftJoin(userInfo).on(userInfo.uniqueId.eq(tournamentParticipantEntity.userId))
                 .select(
                         new QThisWeekTournamentParticipantResponseDTO(
-                                tournamentParticipantEntity.tournament.tournamentNo,
                                 tournamentParticipantEntity.userId,
                                 tournamentParticipantEntity.userImageUrl,
                                 userInfo.nickName,

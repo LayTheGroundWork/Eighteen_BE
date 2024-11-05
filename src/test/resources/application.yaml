@@ -50,3 +50,4 @@ decorator:
 logging:
   level:
     org.springframework.data.mongodb.core: debug
+    org.hibernate.orm.jdbc.bind: trace

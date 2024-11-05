@@ -197,6 +197,7 @@ class TournamentServiceMySQLTest {
                     for (TournamentSearchResponseDTO tournamentSearchResponseDTO : actual) {
                         if (Objects.equals(tournamentSearchResponseDTO.getCategory(), CategoryType.ART.getCategory())) {
                             softly.assertThat(tournamentSearchResponseDTO.getWinner()).hasSize(2);
+                            softly.assertThat(tournamentSearchResponseDTO.getThisWeekTournamentNo()).isNotNull();
                             continue;
                         }
                         

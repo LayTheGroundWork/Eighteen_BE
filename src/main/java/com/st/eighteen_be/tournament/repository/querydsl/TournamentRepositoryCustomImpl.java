@@ -8,7 +8,6 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchRespons
 import com.st.eighteen_be.tournament.domain.entity.QTournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.QTournamentParticipantEntity;
 import com.st.eighteen_be.tournament_winner.domain.QTournamentWinnerEntity;
-import com.st.eighteen_be.user.enums.CategoryType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -51,16 +50,5 @@ public class TournamentRepositoryCustomImpl implements TournamentRepositoryCusto
                                         )
                                 ))
                         ));
-    }
-    
-    @Override
-    public Long findTournamentNoByCategory(CategoryType category) {
-        QTournamentEntity tournament = QTournamentEntity.tournamentEntity;
-        
-        return qf
-                .select(tournament.tournamentNo.max())
-                .from(tournament)
-                .where(tournament.category.eq(category))
-                .fetchOne();
     }
 }

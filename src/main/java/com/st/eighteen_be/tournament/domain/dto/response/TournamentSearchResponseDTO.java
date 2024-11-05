@@ -30,6 +30,9 @@ public class TournamentSearchResponseDTO {
     @Schema(description = "토너먼트 종류", example = "ART")
     private String category;
     
+    @Schema(description = "이번주 토너먼트 번호", example = "1")
+    private Long thisWeekTournamentNo;
+    
     @Builder.Default
     @ArraySchema(schema = @Schema(description = "토너먼트 우승자 응답 DTO", example = "[{\"tournamentNo\":1,\"round\":1,\"profileImageUrl\":\"https://picsum.photos/200\"}]"))
     private List<TournamentWinnerResponseDTO> winner = new ArrayList<>();

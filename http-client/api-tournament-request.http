@@ -25,7 +25,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "tournamentNo": 30,
+  "tournamentNo": 24,
   "participantIdsOrderByRank": [
     "tester22",
     "tester21",

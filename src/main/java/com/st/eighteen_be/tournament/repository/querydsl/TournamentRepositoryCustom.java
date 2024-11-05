@@ -1,7 +1,6 @@
 package com.st.eighteen_be.tournament.repository.querydsl;
 
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchResponseDTO;
-import com.st.eighteen_be.user.enums.CategoryType;
 
 import java.util.List;
 
@@ -18,6 +17,4 @@ import java.util.List;
  */
 public interface TournamentRepositoryCustom {
     List<TournamentSearchResponseDTO> findTournamentMainInfos();
-    
-    Long findTournamentNoByCategory(CategoryType category);
 }

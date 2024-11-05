@@ -70,7 +70,18 @@ public class TournamentService {
         //없는 카테고리의 경우에는 우승자는 빈값으로 주고으로 데이터를 주려고함 -- 굳이 쿼리 한방으로 처리하지않아도 된다.
         addEmptyWinnerCategories(tournamentMainInfos);
         
+        //토너먼트 카테고리별 max id 조회 후 삽입처리한다.
+        setMaxTournamentNumberIn(tournamentMainInfos);
+        
         return tournamentMainInfos;
+    }
+    
+    private void setMaxTournamentNumberIn(List<TournamentSearchResponseDTO> tournamentMainInfos) {
+        for (TournamentSearchResponseDTO tournamentMainInfo : tournamentMainInfos) {
+            Long maxTournamentNo = tournamentParticipantEntityRepository.getMaxTournamentNo(CategoryType.of(tournamentMainInfo.getCategory()));
+            
+            tournamentMainInfo.setThisWeekTournamentNo(maxTournamentNo);
+        }
     }
     
     private static void addEmptyWinnerCategories(List<TournamentSearchResponseDTO> tournamentMainInfos) {

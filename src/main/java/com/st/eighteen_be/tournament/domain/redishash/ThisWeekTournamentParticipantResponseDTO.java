@@ -14,10 +14,6 @@ import java.time.LocalDate;
 @Builder
 @Schema(description = "이번주 토너먼트 참가자 응답 DTO")
 public record ThisWeekTournamentParticipantResponseDTO(
-        @NotNull(message = "thisWeekTournamentNo must not be null")
-        @Schema(description = "이번주 토너먼트 번호", example = "1")
-        Long thisWeekTournamentNo,
-        
         @NotNull(message = "userId must not be null")
         @Schema(description = "유저 아이디", example = "tester29")
         String userId,
