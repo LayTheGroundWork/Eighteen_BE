@@ -42,19 +42,19 @@ public enum ErrorCode {
     EXISTS_USER(HttpStatus.CONFLICT, "계정이 존재합니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원 정보가 존재하지 않습니다."),
     AUTHENTICATION_NUMBER_MISMATCH(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다"),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized..."),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden..."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Spring security unauthorized"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "Spring security forbidden"),
 
     // jwt
     TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
 
     // jwt: filter 에서 response 로 보낼 시 한글은 ?로 표기되어 영어로 작성
     TOKEN_IS_EMPTY(HttpStatus.NOT_FOUND, "Token Is Empty"),
-    UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "Unauthorized Token.."),
+    UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "Unauthorized Token"),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Expired Token"),
     INVALID_TOKEN(HttpStatus.NOT_FOUND, "Invalid Token"),
     UNSUPPORTED_TOKEN(HttpStatus.NOT_FOUND, "Unsupported Token"),
-    FORBIDDEN_TOKEN(HttpStatus.FORBIDDEN, "Forbidden Token.."),
+    FORBIDDEN_TOKEN(HttpStatus.FORBIDDEN, "Forbidden Token"),
 
     //profile
     NOT_FOUND_PROFILE(HttpStatus.NOT_FOUND, "해당하는 프로필을 찾을 수 없습니다.");

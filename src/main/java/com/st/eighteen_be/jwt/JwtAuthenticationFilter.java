@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = request.getHeader("Authorization");
         String jwt = jwtTokenProvider.resolveAccessToken(accessToken);
         
-        if(StringUtils.hasText(jwt) && !request.getRequestURI().contains("/reissued")){
+        if(StringUtils.hasText(jwt) && !request.getRequestURI().contains("/reissue")){
             // 2. validateToken 으로 토큰 유효성 검사
             // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
             try {
