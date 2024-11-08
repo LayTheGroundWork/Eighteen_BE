@@ -2,6 +2,7 @@ package com.st.eighteen_be.config.advice;
 
 import com.st.eighteen_be.common.exception.base_exceptions.CustomeRuntimeException;
 import com.st.eighteen_be.common.response.ApiResp;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomAdvice {
     
     @ExceptionHandler(CustomeRuntimeException.class)
-    public final ApiResp<Object> notFoundExceptionHandler(CustomeRuntimeException e) {
-        return ApiResp.fail(e.getErrorCode());
+    public final ResponseEntity<ApiResp<Object>> handleException(CustomeRuntimeException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ApiResp.fail(e.getErrorCode()));
     }
 }
