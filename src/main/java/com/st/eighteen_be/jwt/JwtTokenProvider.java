@@ -41,10 +41,10 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.testAccessTokenExpireTime}")
+    @Value("${jwt.accessTokenExpireTime}")
     private long accessTokenExpireTime;
 
-    @Value("${jwt.testRefreshTokenExpireTime}")
+    @Value("${jwt.refreshTokenExpireTime}")
     private long refreshTokenExpireTime;
 
     private static final String TOKEN_TYPE = "Bearer";
