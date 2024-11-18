@@ -1,7 +1,9 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.domain.UserQuestion;
+import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfilePageResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
@@ -34,6 +36,18 @@ public class UserDtoService {
         int likeCount = likeService.countLikes(userInfo.getId());
 
         return getUserDetailsResponseDto(userInfo, likeCount);
+    }
+
+    public String delete(String uniqueId) {
+        return  userService.delete(uniqueId);
+    }
+
+    public void addLike(String uniqueId, Integer likedId) {
+        likeService.addLike(uniqueId, likedId);
+    }
+
+    public void cancelLike(String uniqueId, Integer likedId) {
+        likeService.cancelLike(uniqueId, likedId);
     }
 
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
@@ -112,5 +126,22 @@ public class UserDtoService {
                 likedUserIds != null && likedUserIds.contains(String.valueOf(user.getId()));
 
         return new UserProfileResponseDto(user, isLiked);
+    }
+
+    public void myPageUpdate(String uniqueId, MyPageRequestDto requestDto) {
+        UserInfo userInfo = userService.findByUniqueId(uniqueId);
+        userInfo.myPageUpdate(requestDto);
+    }
+
+    public void profileDelete(String uniqueId, String imageKey) {
+        UserInfo userInfo = userService.findByUniqueId(uniqueId);
+        List<UserMediaData> mediaDataList = userInfo.getMediaDataList();
+
+        for (UserMediaData mediaData : mediaDataList) {
+            if (mediaData.getImageKey().equals(imageKey)) {
+                mediaDataList.remove(mediaData);
+                s3Service.delete(imageKey, uniqueId);
+            }
+        }
     }
 }

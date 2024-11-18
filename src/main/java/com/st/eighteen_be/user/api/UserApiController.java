@@ -1,46 +1,32 @@
 package com.st.eighteen_be.user.api;
 
-import static com.st.eighteen_be.jwt.JwtTokenProvider.AUTHORIZATION_HEADER;
-import static com.st.eighteen_be.jwt.JwtTokenProvider.BEARER_PREFIX_A;
-import static com.st.eighteen_be.jwt.JwtTokenProvider.REFRESH_HEADER;
-
-import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.response.ApiResp;
-import com.st.eighteen_be.common.security.SecurityUtil;
 import com.st.eighteen_be.jwt.JwtTokenDto;
 import com.st.eighteen_be.user.dto.request.SignUpRequestDto;
 import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfilePageResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.service.AuthService;
-import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserDtoService;
-import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static com.st.eighteen_be.jwt.JwtTokenProvider.*;
 
 /**
  * packageName    : com.st.eighteen_be.member.api
@@ -61,10 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class UserApiController {
 
-    private final UserService userService;
-    private final LikeService likeService;
-    private final UserDtoService userDtoService;
     private final AuthService authService;
+    private final UserDtoService userDtoService;
 
     @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
     @PreAuthorize("permitAll()")
@@ -128,14 +112,14 @@ public class UserApiController {
     @Operation(summary = "회원 좋아요", description = "회원 좋아요 누르기")
     @PostMapping("/v1/api/user/like")
     public ApiResp<String> like(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Integer likedId){
-        likeService.addLike(userDetails.getUsername(),likedId);
+        userDtoService.addLike(userDetails.getUsername(),likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 추가 완료");
     }
 
     @Operation(summary = "회원 좋아요 취소", description = "회원 좋아요 취소하기")
     @PostMapping("/v1/api/user/like-cancel")
     public ApiResp<String> cancelLike(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Integer likedId){
-        likeService.cancelLike(userDetails.getUsername(),likedId);
+        userDtoService.cancelLike(userDetails.getUsername(),likedId);
         return ApiResp.success(HttpStatus.OK, likedId + "-> 좋아요 취소 완료");
     }
 
@@ -183,43 +167,10 @@ public class UserApiController {
                 userDetails.getUsername(),category,pageable));
     }
 
-    // Test API //
-    @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")
-    @GetMapping("/v1/api/user/like/force-start")
-    public ApiResp<String> likeInfoBackupTest(){
-        likeService.backupLikeCountToMySQL();
-        likeService.backupUserLikeDataToMySQL();
-
-        return ApiResp.success(HttpStatus.OK, "좋아요 정보 백업 완료");
-    }
-
-    @Operation(summary = "백업된 좋아요 정보 보기", description = "백업된 좋아요 정보 보기")
-    @GetMapping("/v1/api/user/like/view-backup-data/{userId}")
-    public ApiResp<Integer> viewBackupData(@PathVariable("userId") Integer userId){
-        return ApiResp.success(HttpStatus.OK, userService.findById(userId).getLikeCount());
-    }
-
-    @Operation(summary = "헤더에 토큰 확인", description = "헤더에 토큰 확인")
-    @GetMapping("/token/test")
-    public ApiResp<String> test(@RequestHeader HttpHeaders httpHeaders) {
-        String accessToken = httpHeaders.getFirst(AUTHORIZATION_HEADER);
-        String refreshToken = httpHeaders.getFirst(REFRESH_HEADER);
-
-        // 로그 추가
-        log.info("Authorization Header: {}", accessToken);
-        log.info("Refresh Header: {}", refreshToken);
-
-        if (accessToken == null || accessToken.isEmpty()) {
-            return ApiResp.fail(ErrorCode.INVALID_TOKEN);
-        }
-        return ApiResp.success(HttpStatus.OK,
-                SecurityUtil.getCurrentUsername() + "/" + accessToken + "/" + refreshToken);
-    }
-
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 api 수행 시 헤더에서 token 삭제해야함")
     @DeleteMapping("/v1/api/user/delete")
     public ApiResp<String> deleteUser(@AuthenticationPrincipal UserDetails userDetails){
         return ApiResp.success(HttpStatus.OK,
-                "delete Success: "+ userService.delete(userDetails.getUsername()));
+                "delete Success: "+ userDtoService.delete(userDetails.getUsername()));
     }
 }
