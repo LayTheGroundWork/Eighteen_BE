@@ -4,13 +4,14 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import io.lettuce.core.dynamic.annotation.Param;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 
@@ -28,6 +29,7 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
             LEFT JOIN UserMediaData AS UMD ON UI.id = UMD.user.id \
              WHERE UI.tournamentJoin =  true \
              AND UI.category = :category \
+             AND UMD.imageKey IS NOT NULL \
              ORDER BY UI.likeCount desc LIMIT :limit""")
     List<MostLikedUserResponseDto> findRandomUsers(@Param("category") CategoryType category, int limit);
 
@@ -41,8 +43,9 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
             LEFT JOIN UserMediaData AS UMD ON UI.id = UMD.user.id \
             WHERE UL.createdDate BETWEEN :start AND :end \
             AND UI.category = :category \
+            AND UMD.imageKey IS NOT NULL \
             GROUP BY UI.id, UMD.imageKey \
             ORDER BY COUNT(UL.id) DESC \
             LIMIT 16""")
-    List<MostLikedUserResponseDto> findUsersByCategoryOrderByLastweekLikeCountLimit16(@Param("category") CategoryType category, LocalDateTime start, LocalDateTime end);
+    List<MostLikedUserResponseDto> findUsersByCategoryOrderByLastweekLikeCountLimit16(@Param("category") CategoryType category,@Param("start") LocalDateTime start,@Param("end") LocalDateTime end);
 }

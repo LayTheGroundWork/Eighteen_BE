@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ### 로그인 편의
 ### 로그인
-POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000001
+POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000002
 Content-Type: application/json
 
 > {%
