@@ -18,6 +18,7 @@ import com.st.eighteen_be.tournament_winner.domain.TournamentWinnerEntity;
 import com.st.eighteen_be.tournament_winner.repository.TournamentWinnerRepository;
 import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserLike;
+import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.repository.UserRepository;
@@ -565,6 +566,12 @@ class TournamentServiceMySQLTest {
                 UserLike userLike = UserLike.builder()
                         .user(user)
                         .likedId(i).build();
+                
+                UserMediaData userMediaData = UserMediaData.builder()
+                        .imageKey("https://picsum.photos/200")
+                        .build();
+                
+                userMediaData.setUser(user);
                 
                 user.getUserLikes().add(userLike);
                 
