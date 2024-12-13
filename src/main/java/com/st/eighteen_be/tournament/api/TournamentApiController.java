@@ -42,7 +42,7 @@ public class TournamentApiController {
     private final TournamentService tournamentService;
     private final TournamentScheduler tournamentScheduler;
 
-    @Operation(summary = "토너먼트 검색", description = "토너먼트 메인 페이지에서 카테고리별로 우승자목록을 반환한다.")
+    @Operation(summary = "메인화면 > 카테고리별 마지막 우승자목록 반환", description = "토너먼트 메인 페이지에서 카테고리별로 우승자목록을 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = ApiResp.class), mediaType = MediaType.APPLICATION_JSON_VALUE))
