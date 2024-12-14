@@ -501,6 +501,38 @@ class TournamentServiceMySQLTest {
                     .hasSize(TOURNAMENT_USER_LIMIT_COUNT);
         }
         
+        @Test
+        @DisplayName("이미 투표한 토너먼트에 재투표하는 경우 BadRequestException 예외를 발생시킨다.")
+        void When_voteTournament_Then_throwBadRequestException() {
+            final String testUser1 = "testUser1";
+            
+            // given
+            TournamentEntity tournamentEntity = TournamentEntity.builder()
+                    .category(CategoryType.GAME)
+                    .build();
+            
+            tournamentEntityRepository.save(tournamentEntity);
+            
+            TournamentParticipantTestResult result = getTournamentParticipantTestResult(tournamentEntity);
+            
+            tournamentParticipantEntityRepository.saveAll(result.participantEntities);
+            
+            TournamentVoteRequestDTO tournamentVoteRequestDTO =
+                    TournamentVoteRequestDTO.builder()
+                            .tournamentNo(tournamentEntity.getTournamentNo())
+                            .participantIdsOrderByRank(result.participantEntities.stream().map(TournamentParticipantEntity::getUserId).collect(Collectors.toList()))
+                            .build();
+            
+            given(userService.findByUniqueId(anyString())).willReturn(UserInfo.builder().uniqueId(testUser1).build());
+            
+            //when
+            tournamentService.processVote(tournamentVoteRequestDTO, testUser1);
+            
+            // then
+            assertThatThrownBy(() -> tournamentService.processVote(tournamentVoteRequestDTO, testUser1))
+                    .isInstanceOf(BadRequestException.class);
+        }
+        
         private static @NotNull TournamentParticipantTestResult getTournamentParticipantTestResult(TournamentEntity tournamentEntity) {
             List<TournamentParticipantEntity> participants = IntStream.rangeClosed(1, TOURNAMENT_USER_LIMIT_COUNT)
                     .mapToObj(i -> TournamentParticipantEntity.of("user" + i, tournamentEntity))

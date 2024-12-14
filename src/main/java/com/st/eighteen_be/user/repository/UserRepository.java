@@ -43,6 +43,7 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
             LEFT JOIN UserMediaData AS UMD ON UI.id = UMD.user.id \
             WHERE UL.createdDate BETWEEN :start AND :end \
             AND UI.category = :category \
+            AND UI.tournamentJoin = true \
             AND UMD.imageKey IS NOT NULL \
             GROUP BY UI.id, UMD.imageKey \
             ORDER BY COUNT(UL.id) DESC \

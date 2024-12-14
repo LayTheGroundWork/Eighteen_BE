@@ -33,6 +33,9 @@ public enum ErrorCode {
     NOT_FOUND_VOTE_RESULT(HttpStatus.NOT_FOUND, "해당하는 투표 결과를 찾을 수 없습니다."),
     NOT_ENOUGH_USER(HttpStatus.BAD_REQUEST, "유저 수가 부족합니다."),
     ALREADY_PARTICIPATED(HttpStatus.BAD_REQUEST, "이미 참가한 토너먼트입니다."),
+    
+    //vote
+    ALREADY_VOTED(HttpStatus.BAD_REQUEST, "이미 투표한 토너먼트입니다."),
 
     //common
     NOT_NULL(HttpStatus.BAD_REQUEST, "필수 값이 누락되었습니다."),
