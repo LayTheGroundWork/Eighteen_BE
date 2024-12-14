@@ -59,16 +59,16 @@ public class TournamentParticipantIntegerationTest {
     @WithCustomMockUser
     void When_SearchThisWeekTournamentParticipant_Then_ReturnThisWeekTournamentParticipant() {
         // given
-        //토너먼트 생성 - 참가자 채워넣기
+        // 토너먼트 생성 - 참가자 채워넣기
         TournamentEntity tournamentEntity = TournamentEntity.createTournamentEntity(CategoryType.ART, 1);
         em.persist(tournamentEntity);
         
-        //토너먼트 참가자 넣기
+        // 토너먼트 참가자 넣기
         TournamentParticipantEntity tournamentParticipantEntity = TournamentParticipantEntity.builder()
-                .tournament(tournamentEntity)
-                .userId("tester1")
-                .userImageUrl("http://test.com")
-                .build();
+                                                                          .tournament(tournamentEntity)
+                                                                          .userId("tester1")
+                                                                          .userImageUrl("http://test.com")
+                                                                          .build();
         
         em.persist(tournamentParticipantEntity);
         
@@ -86,27 +86,27 @@ public class TournamentParticipantIntegerationTest {
     @WithCustomMockUser
     void When_SearchThisWeekTournamentParticipant_Then_ThrowBadRequestException() {
         // given
-        //토너먼트 생성 - 참가자 채워넣기
+        // 토너먼트 생성 - 참가자 채워넣기
         TournamentEntity tournamentEntity = TournamentEntity.createTournamentEntity(CategoryType.ART, 1);
         em.persist(tournamentEntity);
         
-        //토너먼트 참가자 넣기
+        // 토너먼트 참가자 넣기
         TournamentParticipantEntity tournamentParticipantEntity = TournamentParticipantEntity.builder()
-                .tournament(tournamentEntity)
-                .userId("tester1")
-                .userImageUrl("http://test.com")
-                .build();
+                                                                          .tournament(tournamentEntity)
+                                                                          .userId("tester1")
+                                                                          .userImageUrl("http://test.com")
+                                                                          .build();
         
         em.persist(tournamentParticipantEntity);
         
-        //투표내역에 강제로 기입
+        // 투표내역에 강제로 기입
         //@AB_D
         VoteEntity voteEntity = VoteEntity.builder()
-                .tournament(tournamentEntity)
-                .participant(tournamentParticipantEntity)
-                .voterId(SecurityContextHolder.getContext().getAuthentication().getName())
-                .votePoint(1)
-                .build();
+                                        .tournament(tournamentEntity)
+                                        .participant(tournamentParticipantEntity)
+                                        .voterId(SecurityContextHolder.getContext().getAuthentication().getName())
+                                        .votePoint(1)
+                                        .build();
         
         em.persist(voteEntity);
         

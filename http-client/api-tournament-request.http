@@ -18,14 +18,13 @@ POST {{url}}/v1/api/tournament/force-end
 ### 토너먼트 검색
 GET {{url}}/v1/api/tournament/search
 Content-Type: application/json
-
 ### 토너먼트 투표
 POST {{url}}/v1/api/tournament/final/vote
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "tournamentNo": 24,
+  "tournamentNo": 6,
   "participantIdsOrderByRank": [
     "tester22",
     "tester21",

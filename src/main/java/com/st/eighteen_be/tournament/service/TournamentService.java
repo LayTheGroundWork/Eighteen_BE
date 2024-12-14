@@ -281,9 +281,14 @@ public class TournamentService {
     @Transactional(readOnly = false)
     public void processVote(TournamentVoteRequestDTO voteRequestDTO, String uniqueId) {
         log.info("processVote start");
-
+        
         UserInfo loginedUser = userService.findByUniqueId(uniqueId);
-
+        
+        //VoteEntity 에서  {"TOURNAMENT_NO", "PARTICIPANT_NO", "VOTER_ID"} 가 Unique 해야함 -> 중복 투표 방지
+        if (voteEntityRepository.existsByTournament_TournamentNoAndVoterId(voteRequestDTO.getTournamentNo(), loginedUser.getUniqueId())) {
+            throw new BadRequestException(ErrorCode.ALREADY_VOTED);
+        }
+        
         tournamentParticipantEntityRepository.updateVotePoints(voteRequestDTO, loginedUser.getUniqueId());
         tournamentParticipantEntityRepository.insertVoteRecord(voteRequestDTO, loginedUser.getUniqueId());
     }

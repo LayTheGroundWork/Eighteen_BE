@@ -1,0 +1,53 @@
+### api 통합테스트  - 토너먼트 생성 및 투표 과정까지
+
+### 로그인 편의
+### 로그인
+POST {{url}}/v1/api/user/sign-in?phoneNumber=01000000001
+Content-Type: application/json
+
+> {%
+    const authHeader = response.headers.valueOf("Authorization").split("Bearer-")[1]
+    // local token 에 세팅
+    client.global.set("token", authHeader);
+%}
+
+### 토너먼트 16인 강제 레디스에 올리기
+PUT {{url}}/v1/api/tournament/force-pick-most-liked-user-to-redis
+
+### 토너먼트 강제 시작
+POST {{url}}/v1/api/tournament/force-start
+
+### 토너먼트 검색
+GET {{url}}/v1/api/tournament/search
+Content-Type: application/json
+
+> {%
+    //응답에서 data 안의 값에서 category = 기타 의 thisWeekTournamentNo 값을 가져와서 global 변수에 저장
+    const thisWeekTournamentNo = response.body.data.find(t => t.category === "기타").thisWeekTournamentNo;
+
+    //thisWeekTournamentNo 은 null 일수없음
+    if (!thisWeekTournamentNo) {
+        throw new Error("thisWeekTournamentNo is null");
+    }
+
+    client.global.set("thisWeekTournamentNo", thisWeekTournamentNo);
+%}
+
+### 토너먼트 투표
+POST {{url}}/v1/api/tournament/final/vote
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tournamentNo": {{thisWeekTournamentNo}},
+    "participantIdsOrderByRank": [
+        "tester22",
+        "tester21",
+        "tester20",
+        "tester19"
+    ]
+}
+
+> {%
+    client.assert(response.status === 200, response.body.message);
+%}

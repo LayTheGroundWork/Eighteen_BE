@@ -76,37 +76,38 @@ public class TournamentIntegrationTest {
         @BeforeEach
         void setUp() {
             FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
-                    .objectIntrospector(new FailoverIntrospector(
-                            Arrays.asList(
-                                    FieldReflectionArbitraryIntrospector.INSTANCE,
-                                    BeanArbitraryIntrospector.INSTANCE,
-                                    BuilderArbitraryIntrospector.INSTANCE
-                            )
-                    ))
-                    .defaultNotNull(true)
-                    .build();
+                                                  .objectIntrospector(new FailoverIntrospector(
+                                                          Arrays.asList(
+                                                                  FieldReflectionArbitraryIntrospector.INSTANCE,
+                                                                  BeanArbitraryIntrospector.INSTANCE,
+                                                                  BuilderArbitraryIntrospector.INSTANCE
+                                                          )
+                                                  ))
+                                                  .defaultNotNull(true)
+                                                  .build();
             
-            //토너먼트 참가자들을 생성한다.
+            // 토너먼트 참가자들을 생성한다. ( 참여자들은 전부 토너먼트 참여하는 것으로 생각한다 )
             for (int i = 0; i < 16; i++) {
                 final UserInfo userinfo = fixtureMonkey.giveMeBuilder(UserInfo.class)
-                        .setNull("id")
-                        .setNull("mbti")
-                        .set("nickName", Arbitraries.strings().ascii().ofLength(50)) // 고정 길이 ASCII 문자열
-                        .set("uniqueId", "tester1" + (i + 1))
-                        .set("introduction", Arbitraries.strings().ascii().ofLength(100)) // 고정 길이 소개
-                        .setNotNull("birthDay")
-                        .set("phoneNumber", "0100000000" + (i + 1))
-                        .set("mediaDataList", List.of())
-                        .set("userLikes", List.of())
-                        .set("roles", Set.of())
-                        .set("userQuestions", List.of())
-                        .set("category", CategoryType.ETC)
-                        .sample();
+                                                  .setNull("id")
+                                                  .setNull("mbti")
+                                                  .set("nickName", Arbitraries.strings().ascii().ofLength(50)) // 고정 길이 ASCII 문자열
+                                                  .set("uniqueId", "tester1" + (i + 1))
+                                                  .set("introduction", Arbitraries.strings().ascii().ofLength(100)) // 고정 길이 소개
+                                                  .setNotNull("birthDay")
+                                                  .set("phoneNumber", "0100000000" + (i + 1))
+                                                  .set("mediaDataList", List.of())
+                                                  .set("userLikes", List.of())
+                                                  .set("roles", Set.of())
+                                                  .set("tournamentJoin", true)
+                                                  .set("userQuestions", List.of())
+                                                  .set("category", CategoryType.ETC)
+                                                  .sample();
                 
                 final UserMediaData userMediaData = fixtureMonkey.giveMeBuilder(UserMediaData.class)
-                        .setNull("id")
-                        .set("imageKey", "https://my-image-bucket.s3.us-west-2.amazonaws.com/images/profile-picture.jpg")
-                        .sample();
+                                                            .setNull("id")
+                                                            .set("imageKey", "https://my-image-bucket.s3.us-west-2.amazonaws.com/images/profile-picture.jpg")
+                                                            .sample();
                 
                 UserLike.addLikedId(userinfo, 1);
                 
@@ -115,27 +116,28 @@ public class TournamentIntegrationTest {
                 userInfos.add(userinfo);
             }
             
-            //프로필 이미지 null 인 사용자 생성
+            // 프로필 이미지 null 인 사용자 생성
             for (int i = 0; i < 16; i++) {
                 final UserInfo userinfo = fixtureMonkey.giveMeBuilder(UserInfo.class)
-                        .setNull("id")
-                        .setNull("mbti")
-                        .set("nickName", Arbitraries.strings().ascii().ofLength(50)) // 고정 길이 ASCII 문자열
-                        .set("uniqueId", "tester2" + (i + 1))
-                        .set("introduction", Arbitraries.strings().ascii().ofLength(100)) // 고정 길이 소개
-                        .setNotNull("birthDay")
-                        .set("phoneNumber", "0100000001" + (i + 1))
-                        .set("mediaDataList", List.of())
-                        .set("userLikes", List.of())
-                        .set("roles", Set.of())
-                        .set("userQuestions", List.of())
-                        .set("category", CategoryType.ETC)
-                        .sample();
+                                                  .setNull("id")
+                                                  .setNull("mbti")
+                                                  .set("nickName", Arbitraries.strings().ascii().ofLength(50)) // 고정 길이 ASCII 문자열
+                                                  .set("uniqueId", "tester2" + (i + 1))
+                                                  .set("introduction", Arbitraries.strings().ascii().ofLength(100)) // 고정 길이 소개
+                                                  .setNotNull("birthDay")
+                                                  .set("phoneNumber", "0100000001" + (i + 1))
+                                                  .set("mediaDataList", List.of())
+                                                  .set("userLikes", List.of())
+                                                  .set("tournamentJoin", true)
+                                                  .set("roles", Set.of())
+                                                  .set("userQuestions", List.of())
+                                                  .set("category", CategoryType.ETC)
+                                                  .sample();
                 
                 final UserMediaData userMediaData = fixtureMonkey.giveMeBuilder(UserMediaData.class)
-                        .setNull("id")
-                        .setNull("imageKey")
-                        .sample();
+                                                            .setNull("id")
+                                                            .setNull("imageKey")
+                                                            .sample();
                 
                 UserLike.addLikedId(userinfo, 1);
                 

@@ -12,4 +12,6 @@ public interface VoteEntityRepository extends JpaRepository<VoteEntity, Long>, V
     boolean existsByTournamentCategoryAndVoterId(@NotNull CategoryType tournament_category, @Size(max = 50) String voterId);
     
     boolean existsByTournamentAndVoterId(@NotNull TournamentEntity tournament, @Size(max = 50) String voterId);
+    
+    boolean existsByTournament_TournamentNoAndVoterId(@NotNull Long tournamentNo, @Size(max = 50) String voterId);
 }
