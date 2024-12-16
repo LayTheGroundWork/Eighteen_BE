@@ -4,7 +4,7 @@ import com.st.eighteen_be.user.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * packageName    : com.st.eighteen_be.user.scheduler
@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
  */
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Component
 public class LikeInfoScheduler {
 
     private final LikeService likeService;
