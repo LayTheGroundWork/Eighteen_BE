@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
+
 @Slf4j
 @Getter
 @NoArgsConstructor
@@ -17,6 +19,7 @@ public class UserProfileResponseDto {
     private String uniqueId;
     private String location;
     private String schoolName;
+    private LocalDate birthDay;
     private boolean likeStatus; // 좋아요 여부 필드 추가
 
     @Builder
@@ -27,6 +30,7 @@ public class UserProfileResponseDto {
         this.uniqueId = entity.getUniqueId();
         this.location = entity.getSchoolData().getSchoolLocation();
         this.schoolName = entity.getSchoolData().getSchoolName();
+        this.birthDay = entity.getBirthDay();
         this.likeStatus = likeStatus; // 좋아요 여부 초기화
     }
 }
