@@ -39,6 +39,7 @@ services:
     image: "mysql:8.0.36"
     container_name: eighteen-be-mysql
     restart: always
+    network_mode: host
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -47,14 +48,10 @@ services:
       # 문자 인코딩 설정
       MYSQL_CHARSET: 'utf8mb4'
       MYSQL_COLLATION: 'utf8mb4_unicode_ci'
-    command: --lower_case_table_names=1  --character-set-server=utf8mb4
+    command: --lower_case_table_names=1  --character-set-server=utf8mb4 --port=3307
     volumes:
       - mysql-data:/var/lib/mysql
       - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
-    ports:
-      - "3307:3306"
-    networks:
-      - app-tier
 
   mongodb:
     image: mongo:7.0.8
