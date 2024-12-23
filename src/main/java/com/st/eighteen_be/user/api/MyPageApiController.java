@@ -12,39 +12,39 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Tag(name = "마이페이지 API", description = "마이페이지 API")
+@Tag(name = "마이 페이지 API", description = "마이 페이지 API")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/v1/api/my-page")
 public class MyPageApiController {
 
     private final MyPageService myPageService;
 
-    @Operation(summary = "myPage 보기", description = "myPage 보기")
-    @GetMapping("/v1/api/my-page")
-    public ApiResp<UserDetailsResponseDto> view(@AuthenticationPrincipal UserDetails userDetails){
+    @Operation(summary = "myPage 보기", description = "myPage 조회")
+    @GetMapping
+    public ApiResp<UserDetailsResponseDto> view(@AuthenticationPrincipal UserDetails userDetails) {
         return ApiResp.success(HttpStatus.OK, myPageService.view(userDetails.getUsername()));
     }
 
     @Operation(summary = "myPage 수정", description = "myPage 수정")
-    @PostMapping("/v1/api/my-page/update")
+    @PutMapping
     public ApiResp<String> update(@AuthenticationPrincipal UserDetails userDetails,
                                   @RequestBody MyPageRequestDto request) {
-        myPageService.update(userDetails.getUsername(),request);
+        myPageService.update(userDetails.getUsername(), request);
 
-        return ApiResp.success(HttpStatus.OK, "수정되었습니다.");
+        return ApiResp.success(HttpStatus.OK, "수정 완료.");
     }
 
-    @Operation(summary = "대표 이미지 수정", description = "대표 이미지 수정")
-    @PostMapping("/v1/api/my-page/main-image-upadte")
-    public ApiResp<String> mainImageUpdate(@AuthenticationPrincipal UserDetails userDetails,
-                                           @RequestBody UserMediaData userMediaData){
-        myPageService.thumbnailUpdate(userDetails.getUsername(), userMediaData);
-        return ApiResp.success(HttpStatus.OK, "대표이미지 설정 완료");
+    @Operation(summary = "프로필 이미지 또는 동영상 삭제", description = "프로필 이미지 또는 동영상 삭제")
+    @DeleteMapping
+    public ApiResp<String> delete(@AuthenticationPrincipal UserDetails userDetails,
+                                  @RequestBody String imageKey) {
+        myPageService.profileDelete(userDetails.getUsername(), imageKey);
+        return ApiResp.success(HttpStatus.OK, "삭제 완료.");
     }
+
+
 }
