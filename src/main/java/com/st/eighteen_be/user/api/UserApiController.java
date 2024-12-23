@@ -47,7 +47,6 @@ import static com.st.eighteen_be.jwt.JwtTokenProvider.*;
 @Tag(name = "유저 API", description = "유저 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
 public class UserApiController {
     
     private final AuthService authService;
