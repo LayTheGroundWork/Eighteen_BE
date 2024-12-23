@@ -39,7 +39,8 @@ services:
     image: "mysql:8.0.36"
     container_name: eighteen-be-mysql
     restart: always
-    network_mode: host
+    ports:
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -56,6 +57,8 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+        - app-tier
 
   mongodb:
     image: mongo:7.0.8
