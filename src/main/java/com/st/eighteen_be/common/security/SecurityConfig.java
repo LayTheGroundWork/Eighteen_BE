@@ -64,6 +64,7 @@ public class SecurityConfig {
             "/v1/api/user/reissue",
             "/v1/api/user/sign-up",
             "/v1/api/user/sign-in",
+            "/v1/api/user/search/*",
             "/v1/api/tournament/force-start",
             "/v1/api/tournament/force-end",
             "/v1/api/tournament/search",

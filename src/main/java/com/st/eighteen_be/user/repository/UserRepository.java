@@ -50,5 +50,5 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
             LIMIT 16""")
     List<MostLikedUserResponseDto> findUsersByCategoryOrderByLastweekLikeCountLimit16(@Param("category") CategoryType category, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     
-    List<UserInfo> findAllByLastModifiedDateAfter(@Param("lastModifiedDate") LocalDateTime lastModifiedDate);
+    List<UserInfo> findAllByCreatedDateAfterOrLastModifiedDateAfter(@Param("createdDate") LocalDateTime createdDate, @Param("lastModifiedDate") LocalDateTime lastModifiedDate);
 }

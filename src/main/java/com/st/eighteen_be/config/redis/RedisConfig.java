@@ -1,17 +1,21 @@
 package com.st.eighteen_be.config.redis;
 
 import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
+import com.st.eighteen_be.user.redishash.UserSearchInfoHash;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -72,6 +76,17 @@ public class RedisConfig {
         template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return template;
+    }
+    
+    @Bean
+    public ReactiveRedisTemplate<String, UserSearchInfoHash> reactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
+        RedisSerializationContext<String, UserSearchInfoHash> serializationContext = RedisSerializationContext
+                .<String, UserSearchInfoHash>newSerializationContext(new StringRedisSerializer())
+                .hashKey(new StringRedisSerializer())
+                .hashValue(new GenericJackson2JsonRedisSerializer())
+                .build();
+        
+        return new ReactiveRedisTemplate<>(connectionFactory, serializationContext);
     }
 
 //    @PostConstruct

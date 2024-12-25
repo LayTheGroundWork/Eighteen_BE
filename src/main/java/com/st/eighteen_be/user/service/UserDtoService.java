@@ -9,10 +9,6 @@ import com.st.eighteen_be.user.dto.response.UserProfilePageResponseDto;
 import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
 import com.st.eighteen_be.user.dto.response.UserQuestionResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -21,122 +17,127 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class UserDtoService {
-
+    
     private final UserService userService;
     private final LikeService likeService;
     private final S3Service s3Service;
-
+    
     public UserDetailsResponseDto findById(Integer userId) {
         UserInfo userInfo = userService.findById(userId);
         int likeCount = likeService.countLikes(userInfo.getId());
-
+        
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
-
+    
     public String delete(String uniqueId) {
-        return  userService.delete(uniqueId);
+        return userService.delete(uniqueId);
     }
-
+    
     public void addLike(String uniqueId, Integer likedId) {
         likeService.addLike(uniqueId, likedId);
     }
-
+    
     public void cancelLike(String uniqueId, Integer likedId) {
         likeService.cancelLike(uniqueId, likedId);
     }
-
+    
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
         int likeCount = likeService.countLikes(userInfo.getId());
-
+        
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
-
-    public UserProfilePageResponseDto getUserProfilePage(Pageable pageable){
+    
+    public UserProfilePageResponseDto getUserProfilePage(Pageable pageable) {
         Page<UserInfo> users = userService.findPageBy(pageable);
-
+        
         List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user,Collections.emptySet()))
+                .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
                 .collect(Collectors.toList());
-
+        
         Collections.shuffle(responseDtoList);
-
-        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
+        
+        return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
     }
-
+    
     public UserProfilePageResponseDto getUserProfilesWithLikes(String uniqueId, Pageable pageable) {
         Page<UserInfo> users = userService.findPageBy(pageable);
         return getUserProfilePageResponseDto(uniqueId, users);
     }
-
+    
     @NotNull
     private UserProfilePageResponseDto getUserProfilePageResponseDto(String uniqueId, Page<UserInfo> users) {
         Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
-
+        
         List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user,likedUserIds))
+                .map(user -> toUserProfileResponseDto(user, likedUserIds))
                 .collect(Collectors.toList());
-
+        
         Collections.shuffle(responseDtoList);
-
-        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
+        
+        return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
     }
-
-    public UserProfilePageResponseDto getUserProfilesWithCategory(CategoryType category, Pageable pageable){
-        Page<UserInfo> users = userService.findAllByCategory(category,pageable);
-
+    
+    public UserProfilePageResponseDto getUserProfilesWithCategory(CategoryType category, Pageable pageable) {
+        Page<UserInfo> users = userService.findAllByCategory(category, pageable);
+        
         List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user,Collections.emptySet()))
+                .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
                 .collect(Collectors.toList());
-
+        
         Collections.shuffle(responseDtoList);
-
-        return new UserProfilePageResponseDto(responseDtoList,users.getTotalPages());
-
+        
+        return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
+        
     }
-
+    
     public UserProfilePageResponseDto getUserProfilesWithLikeStatusAndCategory(String uniqueId, CategoryType category,
-                                                                                 Pageable pageable){
-        Page<UserInfo> users = userService.findAllByCategory(category,pageable);
+                                                                               Pageable pageable) {
+        Page<UserInfo> users = userService.findAllByCategory(category, pageable);
         return getUserProfilePageResponseDto(uniqueId, users);
     }
-
+    
     private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {
         List<String> images = getImages(userInfo);
         List<UserQuestion> questions = userInfo.getUserQuestions();
-
+        
         List<UserQuestionResponseDto> responseDtoList = questions.stream()
                 .map(UserQuestionResponseDto::new)
                 .toList();
-
-        return new UserDetailsResponseDto(userInfo,likeCount,images,responseDtoList);
+        
+        return new UserDetailsResponseDto(userInfo, likeCount, images, responseDtoList);
     }
-
+    
     private List<String> getImages(UserInfo userInfo) {
         return s3Service.getPreSignedURLsForFolder(userInfo.getUniqueId());
     }
-
+    
     private UserProfileResponseDto toUserProfileResponseDto(UserInfo user, Set<String> likedUserIds) {
         boolean isLiked =
                 likedUserIds != null && likedUserIds.contains(String.valueOf(user.getId()));
-
+        
         return new UserProfileResponseDto(user, isLiked);
     }
-
+    
     public void myPageUpdate(String uniqueId, MyPageRequestDto requestDto) {
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
         userInfo.myPageUpdate(requestDto);
     }
-
+    
     public void profileDelete(String uniqueId, String imageKey) {
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
         List<UserMediaData> mediaDataList = userInfo.getMediaDataList();
-
+        
         for (UserMediaData mediaData : mediaDataList) {
             if (mediaData.getImageKey().equals(imageKey)) {
                 mediaDataList.remove(mediaData);
