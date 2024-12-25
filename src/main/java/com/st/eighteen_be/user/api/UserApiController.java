@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -180,7 +180,9 @@ public class UserApiController {
     
     @Operation(summary = "메인 화면 사용자(아이디/닉네임) 조회", description = "메인 화면 사용자(아이디/닉네임) 조회")
     @GetMapping("/v1/api/user/search/{search-word}")
-    public ApiResp<Flux<UserSearchInfoResponseDto>> searchUser(@PathVariable("search-word") String searchKey) {
-        return ApiResp.success(HttpStatus.OK, userService.findAllUserSearchInfo(searchKey));
+    public Mono<ApiResp<List<UserSearchInfoResponseDto>>> searchUser(@PathVariable("search-word") String searchKey) {
+        return userService.findAllUserSearchInfo(searchKey)
+                       .collectList()
+                       .map(dto -> ApiResp.success(HttpStatus.OK, dto));
     }
 }

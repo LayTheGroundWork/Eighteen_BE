@@ -1,6 +1,7 @@
 package com.st.eighteen_be.user.service;
 
 import com.st.eighteen_be.user.domain.UserInfo;
+import com.st.eighteen_be.user.dto.response.UserSearchInfoResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.redishash.UserSearchInfoHash;
 import com.st.eighteen_be.user.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDate;
 
@@ -38,6 +40,8 @@ public class UserServiceTest {
     
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
     
     @Nested
     @Transactional
@@ -113,6 +117,16 @@ public class UserServiceTest {
             assertThat(foundUser.getThumbnailUrl()).isEqualTo("thumbnail_testKey2");
             assertThat(foundUser.getNickName()).isEqualTo(madeUser.getNickName());
             assertThat(foundUser.getUniqueId()).isEqualTo(madeUser.getUniqueId());
+        }
+        
+        @Test
+        void test1() {
+            //given
+            
+            //when
+            final Flux<UserSearchInfoResponseDto> test1 = userService.findAllUserSearchInfo("test");
+            //then
+            assertThat(test1).isNotNull();
         }
     }
 }

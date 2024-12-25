@@ -67,6 +67,6 @@ Authorization: Bearer {{token}}
 }
 
 ### 회원 닉네임/고유 조회
-@search-word = test
+@search-word = tester1
 GET {{url}}/v1/api/user/search/{{search-word}}
 Content-Type: application/json
