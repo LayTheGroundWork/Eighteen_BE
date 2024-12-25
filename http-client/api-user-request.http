@@ -29,7 +29,7 @@
     request.variables.set("clients", datas);
 %}
 
-POST {{url}}/v1/api/user/sign-up?profileImageKeys=["testKey"]
+POST {{url}}/v1/api/user/sign-up?profileImageKeys=["https://picsum.photos/200/300"]
 Content-Type: application/json
 
 {
@@ -65,3 +65,8 @@ Authorization: Bearer {{token}}
     "page": 0,
     "size": 50
 }
+
+### 회원 닉네임/고유 조회
+@search-word = test
+GET {{url}}/v1/api/user/search/{{search-word}}
+Content-Type: application/json

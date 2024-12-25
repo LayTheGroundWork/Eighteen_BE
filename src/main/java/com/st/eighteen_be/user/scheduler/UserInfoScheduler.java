@@ -29,7 +29,7 @@ public class UserInfoScheduler {
         // 1분 전에 업데이트된 내역이 있는지 확인하여 업데이트
         userService.updateUserInfoToRedis();
         
-        log.info("like count update complete");
+        log.info("updateUserInfoToRedis() is called");
     }
     
 }
