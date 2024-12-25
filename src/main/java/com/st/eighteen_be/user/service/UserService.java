@@ -14,15 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -31,7 +31,9 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final UserSearchInfoRedisRepository userSearchInfoRedisRepository;
+    private final RedisTemplate<String, UserSearchInfoHash> redisTemplate;
     private final ReactiveRedisTemplate<String, UserSearchInfoHash> reactiveRedisTemplate;
+    private final ReactiveRedisTemplate<String, String> reactiveStringRedisTemplate;
     
     @Transactional
     public void save(UserInfo userInfo) {
@@ -122,12 +124,23 @@ public class UserService {
             return Flux.empty();
         }
         
-        //searchkey는  uniqueId 혹은 nickName reactiveRedisTemplate
-        return reactiveRedisTemplate.opsForHash()
-                .values("userSearchInfo").log()
-                .cast(UserSearchInfoHash.class)
-                .log()
-                .filter(user -> user.getUniqueId().startsWith(searchKey) || user.getNickName().startsWith(searchKey))
-                .map(UserSearchInfoHash::toResponseDto);
+        // 여러 패턴 검색
+        String[] patterns = {
+                MessageFormat.format("userSearchInfo:uniqueId:{0}*", searchKey),
+                MessageFormat.format("userSearchInfo:nickName:{0}*", searchKey)
+        };
+        
+        // 각 패턴으로 SCAN 수행 후 결과 합치기
+        return Flux.fromArray(patterns)
+                       .flatMap(pattern -> reactiveRedisTemplate.scan(
+                               ScanOptions.scanOptions().match(pattern).build()
+                       ))
+                       .flatMap(key -> reactiveStringRedisTemplate.opsForSet().members(key)) // Set의 멤버 가져오기
+                       .flatMap(hashKey -> reactiveRedisTemplate.opsForHash()
+                                                   .entries(hashKey) // 해시 데이터 조회
+                                                   .collectMap(Map.Entry::getKey, Map.Entry::getValue)
+                                                   .map(UserSearchInfoHash::fromMap)
+                       )
+                       .map(UserSearchInfoHash::toResponseDto);
     }
 }

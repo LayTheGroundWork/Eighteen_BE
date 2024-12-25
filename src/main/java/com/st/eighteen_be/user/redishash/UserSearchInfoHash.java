@@ -1,14 +1,14 @@
 package com.st.eighteen_be.user.redishash;
 
 import com.st.eighteen_be.user.dto.response.UserSearchInfoResponseDto;
-import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * packageName    : com.st.eighteen_be.user.redishash
@@ -24,30 +24,24 @@ import java.io.Serializable;
 @RedisHash("userSearchInfo")
 @Getter
 public class UserSearchInfoHash implements Serializable {
-    private static final String USER_SEARCH_INFO_PREFIX = "userSearchInfo:";
-    
     @Id
-    private final String id;
+    private String uniqueId;
+    
+    private String thumbnailUrl;
     
     @Indexed
-    private final String uniqueId;
-    
-    private final String thumbnailUrl;
-    
-    @Indexed
-    private final String nickName;
+    private String nickName;
     
     @Builder
     public UserSearchInfoHash(String uniqueId, String thumbnailUrl, String nickName) {
-        this.id = makeId(uniqueId);
         this.uniqueId = uniqueId;
         this.thumbnailUrl = thumbnailUrl;
         this.nickName = nickName;
     }
     
-    @NotNull
-    private static String makeId(String uniqueId) {
-        return USER_SEARCH_INFO_PREFIX + uniqueId;
+    public boolean matchesSearchKey(String searchKey) {
+        return (uniqueId != null && uniqueId.startsWith(searchKey)) ||
+                       (nickName != null && nickName.startsWith(searchKey));
     }
     
     public static UserSearchInfoHash of(String uniqueId, String thumbnailUrl, String nickName) {
@@ -64,5 +58,13 @@ public class UserSearchInfoHash implements Serializable {
                 .thumbnailUrl(thumbnailUrl)
                 .nickName(nickName)
                 .build();
+    }
+    
+    public static UserSearchInfoHash fromMap(Map<Object, Object> objectObjectMap) {
+        return UserSearchInfoHash.builder()
+                       .uniqueId((String) objectObjectMap.get("uniqueId"))
+                       .thumbnailUrl((String) objectObjectMap.get("thumbnailUrl"))
+                       .nickName((String) objectObjectMap.get("nickName"))
+                       .build();
     }
 }

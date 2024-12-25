@@ -1,7 +1,5 @@
 package com.st.eighteen_be.config.redis;
 
-import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
-import com.st.eighteen_be.user.redishash.UserSearchInfoHash;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -42,18 +40,6 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-
-        GenericToStringSerializer<Object> genericToStringSerializer = new GenericToStringSerializer<>(Object.class);
-        redisTemplate.setValueSerializer(genericToStringSerializer);
-
-        return redisTemplate;
-    }
-
-    @Bean
     public StringRedisTemplate stringRedisTemplate() {
         final StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
         stringRedisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -64,27 +50,27 @@ public class RedisConfig {
 
         return stringRedisTemplate;
     }
-
+    
     @Bean
-    public RedisTemplate<String, MostLikedUserRedisHash> randomUserRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, MostLikedUserRedisHash> template = new RedisTemplate<>();
-
+    public <T> RedisTemplate<String, T> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, T> template = new RedisTemplate<>();
+        
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-
+        
         return template;
     }
     
     @Bean
-    public ReactiveRedisTemplate<String, UserSearchInfoHash> reactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
-        RedisSerializationContext<String, UserSearchInfoHash> serializationContext = RedisSerializationContext
-                .<String, UserSearchInfoHash>newSerializationContext(new StringRedisSerializer())
-                .hashKey(new StringRedisSerializer())
-                .hashValue(new GenericJackson2JsonRedisSerializer())
-                .build();
+    public <T> ReactiveRedisTemplate<String, T> reactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
+        RedisSerializationContext<String, T> serializationContext = RedisSerializationContext
+                                                                            .<String, T>newSerializationContext(new StringRedisSerializer())
+                                                                            .hashKey(new StringRedisSerializer())
+                                                                            .hashValue(new GenericJackson2JsonRedisSerializer())
+                                                                            .build();
         
         return new ReactiveRedisTemplate<>(connectionFactory, serializationContext);
     }
