@@ -60,11 +60,10 @@ public class UserSearchInfoHash implements Serializable {
                 .build();
     }
     
-    public static UserSearchInfoHash fromMap(Map<Object, Object> objectObjectMap) {
+    public static UserSearchInfoHash fromMap(Map<Object, Object> objectEntry) {
         return UserSearchInfoHash.builder()
-                       .uniqueId((String) objectObjectMap.get("uniqueId"))
-                       .thumbnailUrl((String) objectObjectMap.get("thumbnailUrl"))
-                       .nickName((String) objectObjectMap.get("nickName"))
-                       .build();
+                .uniqueId((String) objectEntry.get("uniqueId"))
+                .thumbnailUrl((String) objectEntry.get("thumbnailUrl"))
+                .build();
     }
 }

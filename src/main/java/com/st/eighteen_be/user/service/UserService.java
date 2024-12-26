@@ -15,10 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -32,9 +32,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserSearchInfoRedisRepository userSearchInfoRedisRepository;
     private final RedisTemplate<String, UserSearchInfoHash> redisTemplate;
-    private final ReactiveRedisTemplate<String, UserSearchInfoHash> reactiveRedisTemplate;
-    private final ReactiveRedisTemplate<String, String> reactiveStringRedisTemplate;
     
+    private final ReactiveRedisTemplate<String, String> reactiveStringRedisTemplate;
+    private final ReactiveRedisTemplate<String, Map<String, Object>> reactiveHashRedisTemplate;
     @Transactional
     public void save(UserInfo userInfo) {
         userRepository.save(userInfo);
@@ -124,23 +124,26 @@ public class UserService {
             return Flux.empty();
         }
         
-        // 여러 패턴 검색
-        String[] patterns = {
-                MessageFormat.format("userSearchInfo:uniqueId:{0}*", searchKey),
-                MessageFormat.format("userSearchInfo:nickName:{0}*", searchKey)
-        };
+        // 패턴 생성
+        String nickNamePattern = MessageFormat.format("userSearchInfo:uniqueId:{0}*", searchKey);
+        String uniqueIdPattern = MessageFormat.format("userSearchInfo:{0}*", searchKey);
         
-        // 각 패턴으로 SCAN 수행 후 결과 합치기
-        return Flux.fromArray(patterns)
-                       .flatMap(pattern -> reactiveRedisTemplate.scan(
-                               ScanOptions.scanOptions().match(pattern).build()
-                       ))
-                       .flatMap(key -> reactiveStringRedisTemplate.opsForSet().members(key)) // Set의 멤버 가져오기
-                       .flatMap(hashKey -> reactiveRedisTemplate.opsForHash()
-                                                   .entries(hashKey) // 해시 데이터 조회
-                                                   .collectMap(Map.Entry::getKey, Map.Entry::getValue)
-                                                   .map(UserSearchInfoHash::fromMap)
-                       )
-                       .map(UserSearchInfoHash::toResponseDto);
+        // 닉네임으로 검색
+        final Mono<Map<Object, Object>> nickNameSearchFlux = reactiveStringRedisTemplate.opsForSet()
+                .members(nickNamePattern)
+                .flatMap(setValue -> reactiveHashRedisTemplate.opsForHash()
+                        .entries(setValue)
+                )
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue);
+        
+        // 아이디로 검색
+        final Mono<Map<Object, Object>> uniqueIdSearchFlux = reactiveHashRedisTemplate.opsForHash()
+                .entries(uniqueIdPattern)
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue);
+        
+        // Flux 합치기 및 변환
+        return Flux.merge(nickNameSearchFlux, uniqueIdSearchFlux)
+                .map(UserSearchInfoHash::fromMap)
+                .map(UserSearchInfoHash::toResponseDto);
     }
 }
