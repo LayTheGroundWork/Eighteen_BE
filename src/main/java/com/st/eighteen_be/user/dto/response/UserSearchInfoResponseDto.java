@@ -13,4 +13,12 @@ public class UserSearchInfoResponseDto {
     String uniqueId;
     String thumbnailUrl;
     String nickName;
+    
+    public static UserSearchInfoResponseDto from(UserSearchInfoHash userSearchInfoHash) {
+        return UserSearchInfoResponseDto.builder()
+                .uniqueId(userSearchInfoHash.getUniqueId())
+                .thumbnailUrl(userSearchInfoHash.getThumbnailUrl())
+                .nickName(userSearchInfoHash.getNickName())
+                .build();
+    }
 }

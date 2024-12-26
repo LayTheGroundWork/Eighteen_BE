@@ -39,11 +39,6 @@ public class UserSearchInfoHash implements Serializable {
         this.nickName = nickName;
     }
     
-    public boolean matchesSearchKey(String searchKey) {
-        return (uniqueId != null && uniqueId.startsWith(searchKey)) ||
-                       (nickName != null && nickName.startsWith(searchKey));
-    }
-    
     public static UserSearchInfoHash of(String uniqueId, String thumbnailUrl, String nickName) {
         return UserSearchInfoHash.builder()
                 .uniqueId(uniqueId)
@@ -60,7 +55,7 @@ public class UserSearchInfoHash implements Serializable {
                 .build();
     }
     
-    public static UserSearchInfoHash fromMap(Map<Object, Object> objectEntry) {
+    public static UserSearchInfoHash fromMap(Map<String, Object> objectEntry) {
         return UserSearchInfoHash.builder()
                 .uniqueId((String) objectEntry.get("uniqueId"))
                 .thumbnailUrl((String) objectEntry.get("thumbnailUrl"))
