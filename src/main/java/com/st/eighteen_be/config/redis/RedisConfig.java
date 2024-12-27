@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -70,14 +70,24 @@ public class RedisConfig {
     }
     
     @Bean
-    public <T> ReactiveRedisTemplate<String, T> reactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
-        RedisSerializationContext<String, T> serializationContext = RedisSerializationContext
-                                                                            .<String, T>newSerializationContext(new StringRedisSerializer())
-                                                                            .hashKey(new StringRedisSerializer())
-                                                                            .hashValue(genericJackson2JsonRedisSerializer())
-                                                                            .build();
+    public ReactiveStringRedisTemplate reactiveStringRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
+        RedisSerializationContext.RedisSerializationContextBuilder<String, String> builder =
+                RedisSerializationContext.newSerializationContext(new StringRedisSerializer());
         
-        return new ReactiveRedisTemplate<>(connectionFactory, serializationContext);
+        // keySerializer
+        builder.key(new StringRedisSerializer());
+        // valueSerializer
+        builder.value(new StringRedisSerializer());
+        // hashKeySerializer
+        builder.hashKey(new StringRedisSerializer());
+        // hashValueSerializer
+        builder.hashValue(new StringRedisSerializer());
+        
+        // 3) 빌더 build
+        RedisSerializationContext<String, String> serializationContext = builder.build();
+        
+        // 4) ReactiveStringRedisTemplate 생성
+        return new ReactiveStringRedisTemplate(connectionFactory, serializationContext);
     }
     
     @Bean

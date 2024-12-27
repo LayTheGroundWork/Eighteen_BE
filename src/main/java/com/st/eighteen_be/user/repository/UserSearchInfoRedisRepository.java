@@ -6,7 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * packageName    : com.st.eighteen_be.user.repository
@@ -22,6 +21,4 @@ import java.util.Optional;
 @Repository
 public interface UserSearchInfoRedisRepository extends CrudRepository<UserSearchInfoHash, String> {
     @NotNull List<UserSearchInfoHash> findAll();
-    
-    Optional<UserSearchInfoHash> findTopByUniqueId(String uniqueId);
 }
