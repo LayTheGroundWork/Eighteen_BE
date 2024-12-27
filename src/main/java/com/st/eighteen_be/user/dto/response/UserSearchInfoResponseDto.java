@@ -1,8 +1,11 @@
 package com.st.eighteen_be.user.dto.response;
 
 import com.st.eighteen_be.user.redishash.UserSearchInfoHash;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Map;
 
 /**
  * DTO for {@link UserSearchInfoHash}
@@ -14,11 +17,11 @@ public class UserSearchInfoResponseDto {
     String thumbnailUrl;
     String nickName;
     
-    public static UserSearchInfoResponseDto from(UserSearchInfoHash userSearchInfoHash) {
+    public static @NotNull UserSearchInfoResponseDto from(@NotNull Map<Object, Object> userSearchInfoHash) {
         return UserSearchInfoResponseDto.builder()
-                .uniqueId(userSearchInfoHash.getUniqueId())
-                .thumbnailUrl(userSearchInfoHash.getThumbnailUrl())
-                .nickName(userSearchInfoHash.getNickName())
+                .uniqueId(userSearchInfoHash.get("uniqueId").toString())
+                .thumbnailUrl(userSearchInfoHash.get("thumbnailUrl").toString())
+                .nickName(userSearchInfoHash.get("nickName").toString())
                 .build();
     }
 }

@@ -13,9 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.hash.Jackson2HashMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -32,9 +31,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserSearchInfoRedisRepository userSearchInfoRedisRepository;
     
-    private final ReactiveRedisTemplate<String, String> reactiveStringRedisTemplate;
-    private final ReactiveRedisTemplate<String, Map<String, Object>> reactiveHashRedisTemplate;
-    private final ReactiveRedisTemplate<String, UserSearchInfoHash> reactiveUserSearchInfoRedisTemplate;
+    private final ReactiveStringRedisTemplate reactiveStringRedisTemplate;
+    
     @Transactional
     public void save(UserInfo userInfo) {
         userRepository.save(userInfo);
@@ -129,33 +127,26 @@ public class UserService {
         String uniqueIdPattern = MessageFormat.format("userSearchInfo:{0}*", searchKey);
         
         // 닉네임으로 검색
-        // 닉네임으로 검색 (Set의 값들 가져오기)
         final Flux<String> nickNameValues = reactiveStringRedisTemplate.scan(
                 ScanOptions.scanOptions().match(nickNamePattern).build()
-        ).flatMap(key -> reactiveStringRedisTemplate.opsForSet().members(key)); // 키로부터 Set의 값 가져오기
+        ).flatMap(key -> reactiveStringRedisTemplate.opsForSet().members(key))
+                .map(value -> MessageFormat.format("userSearchInfo:{0}", value));
         
         // 아이디로 검색
-        final Flux<String> idKey = reactiveHashRedisTemplate.scan(
+        final Flux<String> idKey = reactiveStringRedisTemplate.scan(
                 ScanOptions.scanOptions().match(uniqueIdPattern).build()
         ).filter(key -> !key.endsWith(":idx"));
         
-        //닉네임과 아이디간의 중복 키 제거
-        final Flux<String> keyFlux = Flux.concat(nickNameValues, idKey).distinct();
+        //닉네임과 아이디간의 중복 키 제거 -- 10개로 조회 제한 -- 내림차순
+        final Flux<String> keyFlux = Flux.concat(nickNameValues, idKey).sort().distinct().take(10);
         
-        
-/*        final Mono<Map<Object, Object>> uniqueIdSearchFlux = log1
-                .flatMap(reactiveHashRedisTemplate.opsForHash()::entries)
-                .collectMap(Map.Entry::getKey, Map.Entry::getValue);*/
-        
-        Jackson2HashMapper hashMapper = new Jackson2HashMapper(false);
-        
-        //members 값을 다 받은 다음에 출력
-        keyFlux
-                .map(key -> reactiveUserSearchInfoRedisTemplate.opsForHash()
-                        .entries(key)
-                ).collectList().subscribe(System.out::println);
-        
-        
-        return Flux.empty();
+        // DTO로 매핑
+        return keyFlux
+                .flatMap(key ->
+                        reactiveStringRedisTemplate.opsForHash()
+                                .entries(key) // HashMap 형태로 데이터를 가져옴
+                                .collectMap(Map.Entry::getKey, Map.Entry::getValue) // 필터링된 데이터를 Map으로 변환
+                )
+                .map(UserSearchInfoResponseDto::from);
     }
 }

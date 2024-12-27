@@ -67,6 +67,16 @@ Authorization: Bearer {{token}}
 }
 
 ### 회원 닉네임/고유 조회
-@search-word = tester1
+@search-word = user
+< {%
+    request.variables.set("startTime", new Date().getTime());
+%}
+
 GET {{url}}/v1/api/user/search/{{search-word}}
 Content-Type: application/json
+
+> {%
+    const endTime = new Date().getTime();
+    const duration = endTime - request.variables.get("startTime");
+    console.log(`검색 : ${duration}ms`);
+%}
