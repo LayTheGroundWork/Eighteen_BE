@@ -16,10 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 /**
  * packageName    : com.st.eighteen_be.user.service
@@ -79,7 +81,7 @@ public class UserServiceTest {
             userService.updateUserInfoToRedis();
             
             // then
-            final UserSearchInfoHash foundUser = userSearchInfoRedisRepository.findTopByUniqueId(tester.getUniqueId()).get();
+            final UserSearchInfoHash foundUser = userSearchInfoRedisRepository.findById(tester.getUniqueId()).get();
             
             assertThat(foundUser.getThumbnailUrl()).isEqualTo(tester.getThumbnail());
             assertThat(foundUser.getNickName()).isEqualTo(tester.getNickName());
@@ -112,21 +114,67 @@ public class UserServiceTest {
             userService.updateUserInfoToRedis();
             
             // then
-            final UserSearchInfoHash foundUser = userSearchInfoRedisRepository.findTopByUniqueId(madeUser.getUniqueId()).get();
+            final UserSearchInfoHash foundUser = userSearchInfoRedisRepository.findById(madeUser.getUniqueId()).get();
             
             assertThat(foundUser.getThumbnailUrl()).isEqualTo("thumbnail_testKey2");
             assertThat(foundUser.getNickName()).isEqualTo(madeUser.getNickName());
             assertThat(foundUser.getUniqueId()).isEqualTo(madeUser.getUniqueId());
         }
+    }
+    
+    @Nested
+    @DisplayName("유저 정보 조회 테스트")
+    class FindUserTest {
+        @PersistenceContext
+        private EntityManager em;
+        
+        @Autowired
+        private UserSearchInfoRedisRepository userSearchInfoRedisRepository;
         
         @Test
-        void test1() {
-            //given
+        @DisplayName("유저 정보 조회 id 로 조회하기")
+        void find_user_test() {
+            // given
+            //레디스에 유저 올려놓기
+            final UserSearchInfoHash madeUser = UserSearchInfoHash.of("uniqueId_testKey", "thumbnail_testKey", "김선지해장국");
+            userSearchInfoRedisRepository.save(madeUser);
             
-            //when
-            final Flux<UserSearchInfoResponseDto> test1 = userService.findAllUserSearchInfo("test");
-            //then
-            assertThat(test1).isNotNull();
+            // when
+            final Flux<UserSearchInfoResponseDto> foundUser = userService.findAllUserSearchInfo("uniqueId");
+            
+            // then
+            StepVerifier.create(foundUser)
+                    .assertNext(user -> {
+                        assertSoftly(softly -> {
+                            softly.assertThat(user.getUniqueId()).isEqualTo(madeUser.getUniqueId());
+                            softly.assertThat(user.getNickName()).isEqualTo(madeUser.getNickName());
+                            softly.assertThat(user.getThumbnailUrl()).isEqualTo(madeUser.getThumbnailUrl());
+                        });
+                    })
+                    .verifyComplete();
+        }
+        
+        @Test
+        @DisplayName("유저 정보 조회 닉네임으로 조회하기")
+        void find_user_test2() {
+            // given
+            //레디스에 유저 올려놓기
+            final UserSearchInfoHash madeUser = UserSearchInfoHash.of("uniqueId_testKey", "thumbnail_testKey", "김선지해장국");
+            userSearchInfoRedisRepository.save(madeUser);
+            
+            // when
+            final Flux<UserSearchInfoResponseDto> foundUser = userService.findAllUserSearchInfo("김선지");
+            
+            // then
+            StepVerifier.create(foundUser)
+                    .assertNext(user -> {
+                        assertSoftly(softly -> {
+                            softly.assertThat(user.getUniqueId()).isEqualTo(madeUser.getUniqueId());
+                            softly.assertThat(user.getNickName()).isEqualTo(madeUser.getNickName());
+                            softly.assertThat(user.getThumbnailUrl()).isEqualTo(madeUser.getThumbnailUrl());
+                        });
+                    })
+                    .verifyComplete();
         }
     }
 }
