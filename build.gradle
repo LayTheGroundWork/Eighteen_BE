@@ -89,6 +89,8 @@ dependencies {
     testImplementation 'org.testcontainers:mongodb'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'com.navercorp.fixturemonkey:fixture-monkey-starter:1.0.27'
+
+    testImplementation 'io.projectreactor:reactor-test'
 }
 
 tasks.named('test') {
