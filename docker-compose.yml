@@ -53,6 +53,7 @@ services:
       --collation-server=utf8mb4_unicode_ci
       --lower_case_table_names=1
       --bind-address=0.0.0.0
+      --port=3307
     volumes:
       - mysql-data:/var/lib/mysql
       - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
