@@ -149,7 +149,6 @@ public class UserDtoService {
     /**
      * 최근 5분간 새로 생긴 회원을 redis 에 insert 하고 lastModifiedDate 가 5분 내인 회원에 대해 업데이트를 수행한다.
      */
-    @Transactional(readOnly = false)
     public void updateUserInfoToRedis() {
         // 5분 전 시간
         final LocalDateTime searchDateTime = LocalDateTime.now().minusMinutes(5);
