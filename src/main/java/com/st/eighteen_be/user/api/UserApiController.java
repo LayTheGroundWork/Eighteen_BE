@@ -10,7 +10,6 @@ import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.service.AuthService;
 import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserDtoService;
-import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,7 +52,6 @@ public class UserApiController {
     private final AuthService authService;
     private final UserDtoService userDtoService;
     private final LikeService likeService;
-    private final UserService userService;
 
     @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
     @PreAuthorize("permitAll()")
@@ -182,22 +180,8 @@ public class UserApiController {
     @Operation(summary = "메인 화면 사용자(아이디/닉네임) 조회", description = "메인 화면 사용자(아이디/닉네임) 조회")
     @GetMapping("/v1/api/user/search/{search-word}")
     public Mono<ApiResp<List<UserSearchInfoResponseDto>>> searchUser(@PathVariable("search-word") String searchKey) {
-        return userService.findAllUserSearchInfo(searchKey)
+        return userDtoService.findAllUserSearchInfo(searchKey)
                        .collectList()
                        .map(dto -> ApiResp.success(HttpStatus.OK, dto));
-    }
-
-    // Test API //
-    @Operation(summary = "좋아요 정보 백업 강제 시작", description = "좋아요 정보 백업 강제 시작")
-    @GetMapping("/v1/api/user/like/force-start")
-    public ApiResp<String> likeInfoBackupTest(){
-        likeService.backupLikeCountToMySQL();
-        likeService.backupUserLikeDataToMySQL();
-        return ApiResp.success(HttpStatus.OK, "좋아요 정보 백업 완료");
-    }
-    @Operation(summary = "백업된 좋아요 정보 보기", description = "백업된 좋아요 정보 보기")
-    @GetMapping("/v1/api/user/like/view-backup-data/{userId}")
-    public ApiResp<Integer> viewBackupData(@PathVariable("userId") Integer userId){
-        return ApiResp.success(HttpStatus.OK, userDtoService.findById(userId).getLikeCount());
     }
 }
