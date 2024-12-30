@@ -93,7 +93,6 @@ public class UserService {
                 .map(UserInfo::getLikeCount).orElse(0);
     }
 
-    @Transactional
     public List<UserInfo> findCreatedUsers(LocalDateTime searchDateTime) {
         return userRepository.findAllByCreatedDateAfterOrLastModifiedDateAfter(searchDateTime, searchDateTime);
     }
@@ -103,7 +102,7 @@ public class UserService {
      *
      * @param users : 최근 5분간 새로 생긴 회원들
      */
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = true)
     public void saveMainUserInfoInRedis(List<UserInfo> users) {
         final List<UserSearchInfoHash> beSavedUser = users.stream()
                 .map(UserInfo::toUserSearchInfoHash)
