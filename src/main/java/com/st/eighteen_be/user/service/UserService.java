@@ -32,7 +32,7 @@ public class UserService {
     private final UserSearchInfoRedisRepository userSearchInfoRedisRepository;
     
     private final ReactiveStringRedisTemplate reactiveStringRedisTemplate;
-    
+
     @Transactional
     public void save(UserInfo userInfo) {
         userRepository.save(userInfo);
@@ -75,9 +75,13 @@ public class UserService {
     public List<UserInfo> findAll() {
         return userRepository.findAll();
     }
-    
-    public Page<UserInfo> findAllByCategory(CategoryType category, Pageable pageable) {
-        return userRepository.findAllByCategory(category, pageable);
+
+    public List<UserInfo> findAllByCategory(CategoryType category) {
+        return userRepository.findAllByCategory(category);
+    }
+
+    public Page<UserInfo> findPageByCategory(CategoryType category, Pageable pageable) {
+        return userRepository.findPageByCategory(category, pageable);
     }
     
     public Page<UserInfo> findPageBy(Pageable pageable) {
