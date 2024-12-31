@@ -68,54 +68,34 @@ public class UserDtoService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfilePageResponseDto getUserProfilePage(Pageable pageable) {
-        Page<UserInfo> users = userService.findPageBy(pageable);
-
-        List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
-                .collect(Collectors.toList());
-
-        Collections.shuffle(responseDtoList);
-
-        return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
-    }
-
-    @Transactional(readOnly = true)
-    public UserProfilePageResponseDto getUserProfilesWithLikes(String uniqueId, Pageable pageable) {
-        Page<UserInfo> users = userService.findPageBy(pageable);
-        return getUserProfilePageResponseDto(uniqueId, users);
-    }
-
-    @NotNull
-    private UserProfilePageResponseDto getUserProfilePageResponseDto(String uniqueId, Page<UserInfo> users) {
-        Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
-
-        List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user, likedUserIds))
-                .collect(Collectors.toList());
-
-        Collections.shuffle(responseDtoList);
-
-        return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
-    }
-
-    @Transactional(readOnly = true)
     public UserProfilePageResponseDto getUserProfilesWithCategory(CategoryType category, Pageable pageable) {
-        Page<UserInfo> users = userService.findAllByCategory(category, pageable);
+        Page<UserInfo> users = getUsersByCategory(category, pageable);
 
-        List<UserProfileResponseDto> responseDtoList = users.stream()
-                .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
-                .collect(Collectors.toList());
-
+        List<UserProfileResponseDto> responseDtoList = getUserProfileResponseDtoList(users, Collections.emptySet());
         Collections.shuffle(responseDtoList);
-
         return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
 
     }
 
     public UserProfilePageResponseDto getUserProfilesWithLikeStatusAndCategory(String uniqueId, CategoryType category, Pageable pageable) {
-        Page<UserInfo> users = userService.findAllByCategory(category, pageable);
-        return getUserProfilePageResponseDto(uniqueId, users);
+        Page<UserInfo> users = getUsersByCategory(category, pageable);
+        Set<String> likedUserIds = likeService.getLikedUserIds(uniqueId);
+
+        List<UserProfileResponseDto> responseDtoList = getUserProfileResponseDtoList(users, likedUserIds);
+        Collections.shuffle(responseDtoList);
+        return new UserProfilePageResponseDto(responseDtoList, users.getTotalPages());
+    }
+
+    private @NotNull List<UserProfileResponseDto> getUserProfileResponseDtoList(Page<UserInfo> users, Set<String> likedUserIds) {
+        return users.stream()
+                .map(user -> toUserProfileResponseDto(user, likedUserIds))
+                .collect(Collectors.toList());
+    }
+
+    private Page<UserInfo> getUsersByCategory(CategoryType category, Pageable pageable) {
+        return category.getCategory().equals("전체")
+                ? userService.findPageBy(pageable)
+                : userService.findPageByCategory(category, pageable);
     }
 
     private List<String> getImages(UserInfo userInfo) {
