@@ -73,6 +73,8 @@ public class SecurityConfig {
             "/v1/api/tournament/final/result",
             "/v1/api/file/upload",
             "/v1/api/tournament/participant/**",
+            "/v1/api/teen/guest/famous/*",
+
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/v3/api-docs/**",

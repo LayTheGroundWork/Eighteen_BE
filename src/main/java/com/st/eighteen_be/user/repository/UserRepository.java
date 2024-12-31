@@ -34,7 +34,10 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
     List<MostLikedUserResponseDto> findRandomUsers(@Param("category") CategoryType category, int limit);
 
     @Query("SELECT u FROM UserInfo u where u.category=:category")
-    Page<UserInfo> findAllByCategory(@Param("category") CategoryType category, Pageable pageable);
+    List<UserInfo> findAllByCategory(@Param("category") CategoryType category);
+
+    @Query("SELECT u FROM UserInfo u where u.category=:category")
+    Page<UserInfo> findPageByCategory(@Param("category") CategoryType category, Pageable pageable);
     
     @Query("""
             SELECT new com.st.eighteen_be.user.dto.response.MostLikedUserResponseDto(UI.uniqueId, UMD.imageKey) \

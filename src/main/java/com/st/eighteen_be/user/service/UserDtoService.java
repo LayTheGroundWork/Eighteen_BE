@@ -89,7 +89,7 @@ public class UserDtoService {
     }
     
     public UserProfilePageResponseDto getUserProfilesWithCategory(CategoryType category, Pageable pageable) {
-        Page<UserInfo> users = userService.findAllByCategory(category, pageable);
+        Page<UserInfo> users = userService.findPageByCategory(category, pageable);
         
         List<UserProfileResponseDto> responseDtoList = users.stream()
                 .map(user -> toUserProfileResponseDto(user, Collections.emptySet()))
@@ -103,7 +103,7 @@ public class UserDtoService {
     
     public UserProfilePageResponseDto getUserProfilesWithLikeStatusAndCategory(String uniqueId, CategoryType category,
                                                                                Pageable pageable) {
-        Page<UserInfo> users = userService.findAllByCategory(category, pageable);
+        Page<UserInfo> users = userService.findPageByCategory(category, pageable);
         return getUserProfilePageResponseDto(uniqueId, users);
     }
     

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 public enum CategoryType {
+    ALL("전체","ALL"),
     BEAUTY("뷰티","BEAUTY"),
     SPORT("운동","SPORT"),
     STUDY("공부","STUDY"),
