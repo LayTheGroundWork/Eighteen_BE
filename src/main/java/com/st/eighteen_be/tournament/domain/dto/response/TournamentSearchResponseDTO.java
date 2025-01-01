@@ -1,7 +1,7 @@
 package com.st.eighteen_be.tournament.domain.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.st.eighteen_be.user.enums.CategoryType;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryType;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -38,7 +38,7 @@ public class TournamentSearchResponseDTO {
     private List<TournamentWinnerResponseDTO> winner = new ArrayList<>();
     
     @QueryProjection
-    public TournamentSearchResponseDTO(CategoryType category, List<TournamentWinnerResponseDTO> winner) {
+    public TournamentSearchResponseDTO(TournamentCategoryType category, List<TournamentWinnerResponseDTO> winner) {
         this.category = category.getCategory();
         this.winner = winner;
     }

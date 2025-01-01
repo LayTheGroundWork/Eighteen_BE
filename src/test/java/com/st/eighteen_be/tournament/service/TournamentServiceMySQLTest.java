@@ -9,6 +9,7 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultRes
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryType;
 import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import com.st.eighteen_be.tournament.repository.MostLikedUserRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
@@ -130,7 +131,7 @@ class TournamentServiceMySQLTest {
         // then
         List<TournamentEntity> actual = tournamentEntityRepository.findAll();
         
-        assertThat(actual).isNotEmpty().hasSize(CategoryType.values().length);
+        assertThat(actual).isNotEmpty().hasSize(TournamentCategoryType.values().length);
     }
     
     @Test
@@ -144,7 +145,7 @@ class TournamentServiceMySQLTest {
             TournamentEntity gameTournament = TournamentEntity.builder()
                     .season(season)
                     .status(true)
-                    .category(CategoryType.ART)
+                    .category(TournamentCategoryType.ART)
                     .build();
             
             tournamentEntities.add(gameTournament);
@@ -192,11 +193,11 @@ class TournamentServiceMySQLTest {
         assertSoftly(
                 softly -> {
                     //우승자가 없는 카테고리도 출력되어야한다.
-                    assertThat(actual).isNotEmpty().hasSize(CategoryType.values().length);
+                    assertThat(actual).isNotEmpty().hasSize(TournamentCategoryType.values().length);
                     
                     //actual 카테고리가 예술인 경우에만 winner 가 size 2개 나머지 winner 0개
                     for (TournamentSearchResponseDTO tournamentSearchResponseDTO : actual) {
-                        if (Objects.equals(tournamentSearchResponseDTO.getCategory(), CategoryType.ART.getCategory())) {
+                        if (Objects.equals(tournamentSearchResponseDTO.getCategory(), TournamentCategoryType.ART.getCategory())) {
                             softly.assertThat(tournamentSearchResponseDTO.getWinner()).hasSize(2);
                             softly.assertThat(tournamentSearchResponseDTO.getThisWeekTournamentNo()).isNotNull();
                             continue;
@@ -223,7 +224,7 @@ class TournamentServiceMySQLTest {
             
             assertThat(foundAll)
                     .isNotEmpty()
-                    .hasSize(CategoryType.values().length);
+                    .hasSize(TournamentCategoryType.values().length);
         }
         
         @Test
@@ -231,7 +232,7 @@ class TournamentServiceMySQLTest {
         void When_startTournament_Then_pickRandomUser() {
             // given
             final int savedParticipantCount = TournamentConstants.TOURNAMENT_LIMIT_USER_COUNT;
-            final int expectedCount = savedParticipantCount * CategoryType.values().length;
+            final int expectedCount = savedParticipantCount * TournamentCategoryType.values().length;
             
             //토너먼트 참여자 선정 모킹 데이터 given
             List<MostLikedUserRedisHash> mostLikedUserRedisHashes = IntStream.range(0, savedParticipantCount)
@@ -260,7 +261,7 @@ class TournamentServiceMySQLTest {
             // given
             List<TournamentEntity> tournamentEntities = new ArrayList<>();
             
-            for (CategoryType category : CategoryType.values()) {
+            for (TournamentCategoryType category : TournamentCategoryType.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
                         .season(2)
                         .status(false)
@@ -283,7 +284,7 @@ class TournamentServiceMySQLTest {
             
             assertThat(activeTournaments)
                     .isNotEmpty()
-                    .hasSize(CategoryType.values().length);
+                    .hasSize(TournamentCategoryType.values().length);
             
             assertSoftly(
                     softly -> {
@@ -304,7 +305,7 @@ class TournamentServiceMySQLTest {
             // given
             List<TournamentEntity> tournamentEntities = new ArrayList<>();
             
-            for (CategoryType category : CategoryType.values()) {
+            for (TournamentCategoryType category : TournamentCategoryType.values()) {
                 TournamentEntity gameTournament = TournamentEntity.builder()
                         .category(category)
                         .build();
@@ -344,7 +345,7 @@ class TournamentServiceMySQLTest {
             }
             
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(CategoryType.GAME)
+                    .category(TournamentCategoryType.GAME)
                     .build();
             
             tournamentEntityRepository.save(tournamentEntity);
@@ -434,7 +435,7 @@ class TournamentServiceMySQLTest {
         void When_voteTournament_Then_processVote() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(CategoryType.GAME)
+                    .category(TournamentCategoryType.GAME)
                     .build();
             
             tournamentEntityRepository.save(tournamentEntity);
@@ -472,7 +473,7 @@ class TournamentServiceMySQLTest {
         void When_voteTournament_Then_insertVoteRecord() {
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(CategoryType.GAME)
+                    .category(TournamentCategoryType.GAME)
                     .build();
             
             tournamentEntityRepository.save(tournamentEntity);
@@ -508,7 +509,7 @@ class TournamentServiceMySQLTest {
             
             // given
             TournamentEntity tournamentEntity = TournamentEntity.builder()
-                    .category(CategoryType.GAME)
+                    .category(TournamentCategoryType.GAME)
                     .build();
             
             tournamentEntityRepository.save(tournamentEntity);

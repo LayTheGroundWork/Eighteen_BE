@@ -9,9 +9,9 @@ import com.st.eighteen_be.tournament.constants.TournamentConstants;
 import com.st.eighteen_be.tournament.domain.dto.request.TournamentVoteRequestDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryType;
 import com.st.eighteen_be.tournament.domain.redishash.QThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
-import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotNull;
@@ -112,7 +112,7 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
     }
     
     @Override
-    public List<ThisWeekTournamentParticipantResponseDTO> showParticipantForThisWeek(CategoryType category) {
+    public List<ThisWeekTournamentParticipantResponseDTO> showParticipantForThisWeek(TournamentCategoryType category) {
         //토너먼트 최대 no 가져온다.
         Long maxTournamentNo = Optional.ofNullable(getMaxTournamentNo(category)).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_TOURNAMENT));
         
@@ -132,7 +132,7 @@ public class TournamentParticipantRepositoryCustomImpl implements TournamentPart
     
     @Nullable
     @Override
-    public Long getMaxTournamentNo(CategoryType category) {
+    public Long getMaxTournamentNo(TournamentCategoryType category) {
         return qf.from(tournamentEntity)
                 .select(tournamentEntity.tournamentNo.max())
                 .where(tournamentEntity.category.eq(category))

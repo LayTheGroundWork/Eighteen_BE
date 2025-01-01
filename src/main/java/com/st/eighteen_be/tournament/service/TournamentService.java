@@ -9,6 +9,7 @@ import com.st.eighteen_be.tournament.domain.dto.response.TournamentSearchRespons
 import com.st.eighteen_be.tournament.domain.dto.response.TournamentVoteResultResponseDTO;
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryType;
 import com.st.eighteen_be.tournament.domain.redishash.MostLikedUserRedisHash;
 import com.st.eighteen_be.tournament.repository.MostLikedUserRepository;
 import com.st.eighteen_be.tournament.repository.TournamentEntityRepository;
@@ -78,14 +79,14 @@ public class TournamentService {
     
     private void setMaxTournamentNumberIn(List<TournamentSearchResponseDTO> tournamentMainInfos) {
         for (TournamentSearchResponseDTO tournamentMainInfo : tournamentMainInfos) {
-            Long maxTournamentNo = tournamentParticipantEntityRepository.getMaxTournamentNo(CategoryType.of(tournamentMainInfo.getCategory()));
+            Long maxTournamentNo = tournamentParticipantEntityRepository.getMaxTournamentNo(TournamentCategoryType.of(tournamentMainInfo.getCategory()));
             
             tournamentMainInfo.setThisWeekTournamentNo(maxTournamentNo);
         }
     }
     
     private static void addEmptyWinnerCategories(List<TournamentSearchResponseDTO> tournamentMainInfos) {
-        for (CategoryType category : CategoryType.values()) {
+        for (TournamentCategoryType category : TournamentCategoryType.values()) {
             boolean isExist = tournamentMainInfos.stream()
                     .anyMatch(tournamentSearchResponseDTO -> Objects.equals(tournamentSearchResponseDTO.getCategory(), category.getCategory()));
             
@@ -106,7 +107,7 @@ public class TournamentService {
     private void findLastestTournamentsGroupByCategory() {
         log.info("findLastestTournamentsGroupByCategory start");
 
-        for (CategoryType category : CategoryType.values()) {
+        for (TournamentCategoryType category : TournamentCategoryType.values()) {
             TournamentEntity lastestTournament = tournamentEntityRepository.findFirstByCategoryOrderByCreatedDateDesc(category)
                     .orElse(null);
 
@@ -118,7 +119,7 @@ public class TournamentService {
         }
     }
 
-    private void saveMostLikedParticipantsFromRedis(TournamentEntity newTournament, CategoryType category) {
+    private void saveMostLikedParticipantsFromRedis(TournamentEntity newTournament, TournamentCategoryType category) {
         String categoryKey = String.format(TournamentConstants.MOST_LIKED_USER_KEY + ":%s", category.getCategory());
 
         // 레디스로 해시테이블 조회해서  참가자 목록 생성 -> 리스트로 들고와야함
@@ -207,7 +208,7 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = false)
-    public TournamentEntity createNewTournament(CategoryType category, int season) {
+    public TournamentEntity createNewTournament(TournamentCategoryType category, int season) {
         TournamentEntity created = TournamentEntity.createTournamentEntity(category, season);
 
         return tournamentEntityRepository.save(created);
@@ -215,7 +216,7 @@ public class TournamentService {
 
     @Transactional(readOnly = false)
     public void endLastestTournaments() {
-        for (CategoryType category : CategoryType.values()) {
+        for (TournamentCategoryType category : TournamentCategoryType.values()) {
             TournamentEntity foundTournamet = endTournamentByCategory(category);
             determineWinner(foundTournamet.getTournamentNo());
         }
@@ -227,7 +228,7 @@ public class TournamentService {
      * @param category  카테고리
      * @return 종료된 토너먼트 정보
      */
-    private TournamentEntity endTournamentByCategory(CategoryType category) {
+    private TournamentEntity endTournamentByCategory(TournamentCategoryType category) {
         log.info("endTournamentByCategory start category : {}", category.getCategory());
 
         return tournamentEntityRepository.findFirstByCategoryAndStatusIsTrueOrderByCreatedDateDesc(category)

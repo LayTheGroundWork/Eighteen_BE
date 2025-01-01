@@ -1,10 +1,5 @@
 package com.st.eighteen_be.config.redis;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -62,9 +57,9 @@ public class RedisConfig {
         
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(genericJackson2JsonRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(genericJackson2JsonRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         
         return template;
     }
@@ -89,19 +84,6 @@ public class RedisConfig {
         // 4) ReactiveStringRedisTemplate 생성
         return new ReactiveStringRedisTemplate(connectionFactory, serializationContext);
     }
-    
-    @Bean
-    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        
-        objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.deactivateDefaultTyping(); // _class 필드를 무시하도록 설정
-        
-        return new GenericJackson2JsonRedisSerializer(objectMapper);
-    }
-
 //    @PostConstruct
 //    public void init() {
 //        // Redis 설정 변경

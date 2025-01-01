@@ -5,10 +5,10 @@ import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadReq
 import com.st.eighteen_be.tournament.domain.entity.TournamentEntity;
 import com.st.eighteen_be.tournament.domain.entity.TournamentParticipantEntity;
 import com.st.eighteen_be.tournament.domain.entity.VoteEntity;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryType;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament_participant.service.TournamentParticipantService;
 import com.st.eighteen_be.user.WithCustomMockUser;
-import com.st.eighteen_be.user.enums.CategoryType;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ public class TournamentParticipantIntegerationTest {
     void When_SearchThisWeekTournamentParticipant_Then_ReturnThisWeekTournamentParticipant() {
         // given
         // 토너먼트 생성 - 참가자 채워넣기
-        TournamentEntity tournamentEntity = TournamentEntity.createTournamentEntity(CategoryType.ART, 1);
+        TournamentEntity tournamentEntity = TournamentEntity.createTournamentEntity(TournamentCategoryType.ART, 1);
         em.persist(tournamentEntity);
         
         // 토너먼트 참가자 넣기
@@ -73,7 +73,7 @@ public class TournamentParticipantIntegerationTest {
         em.persist(tournamentParticipantEntity);
         
         // when
-        List<ThisWeekTournamentParticipantResponseDTO> participants = tournamentParticipantService.showParticipantNowTournament(CategoryType.ART, SecurityContextHolder.getContext().getAuthentication().getName());
+        List<ThisWeekTournamentParticipantResponseDTO> participants = tournamentParticipantService.showParticipantNowTournament(TournamentCategoryType.ART, SecurityContextHolder.getContext().getAuthentication().getName());
         
         // then
         assertThat(participants.size()).isEqualTo(1);
@@ -87,7 +87,7 @@ public class TournamentParticipantIntegerationTest {
     void When_SearchThisWeekTournamentParticipant_Then_ThrowBadRequestException() {
         // given
         // 토너먼트 생성 - 참가자 채워넣기
-        TournamentEntity tournamentEntity = TournamentEntity.createTournamentEntity(CategoryType.ART, 1);
+        TournamentEntity tournamentEntity = TournamentEntity.createTournamentEntity(TournamentCategoryType.ART, 1);
         em.persist(tournamentEntity);
         
         // 토너먼트 참가자 넣기
@@ -112,7 +112,7 @@ public class TournamentParticipantIntegerationTest {
         
         // when
         // then
-        assertThatThrownBy(() -> tournamentParticipantService.showParticipantNowTournament(CategoryType.ART, SecurityContextHolder.getContext().getAuthentication().getName()))
+        assertThatThrownBy(() -> tournamentParticipantService.showParticipantNowTournament(TournamentCategoryType.ART, SecurityContextHolder.getContext().getAuthentication().getName()))
                 .isInstanceOf(BadRequestException.class);
     }
 }

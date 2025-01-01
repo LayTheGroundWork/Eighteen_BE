@@ -2,9 +2,9 @@ package com.st.eighteen_be.tournament_participant.api;
 
 import com.st.eighteen_be.common.response.ApiResp;
 import com.st.eighteen_be.common.security.SecurityUtil;
+import com.st.eighteen_be.tournament.domain.enums.TournamentCategoryType;
 import com.st.eighteen_be.tournament.domain.redishash.ThisWeekTournamentParticipantResponseDTO;
 import com.st.eighteen_be.tournament_participant.service.TournamentParticipantService;
-import com.st.eighteen_be.user.enums.CategoryType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +42,7 @@ public class TournamentParticipantApiController {
     @GetMapping("/v1/api/tournament/participant/{category}/this-week")
     public ApiResp<List<ThisWeekTournamentParticipantResponseDTO>> showParticipantNowTournament(
             @Parameter(description = "카테고리", required = true)
-            @PathVariable("category") CategoryType category,
+            @PathVariable("category") TournamentCategoryType category,
             
             @Parameter(hidden = true)
             @AuthenticationPrincipal UserDetails userDetails
