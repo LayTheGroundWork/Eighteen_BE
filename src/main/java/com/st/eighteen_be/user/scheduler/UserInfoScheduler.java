@@ -1,6 +1,6 @@
 package com.st.eighteen_be.user.scheduler;
 
-import com.st.eighteen_be.user.service.UserService;
+import com.st.eighteen_be.user.service.UserDtoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,13 +21,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class UserInfoScheduler {
-    private final UserService userService;
+    private final UserDtoService userDtoService;
     // 1분마다 동작
     @Scheduled(cron = "0 0/1 * * * ?")
     public void updateUserInfoToRedis() {
         //Redis 에 유저 데이터를 올린다.
         // 1분 전에 업데이트된 내역이 있는지 확인하여 업데이트
-        userService.updateUserInfoToRedis();
+        userDtoService.updateUserInfoToRedis();
         
         log.info("updateUserInfoToRedis() is called");
     }

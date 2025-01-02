@@ -43,7 +43,7 @@ public class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserService userService;
+    private UserDtoService userDtoService;
     
     @Nested
     @Transactional
@@ -78,7 +78,7 @@ public class UserServiceTest {
             em.clear();
             
             // when
-            userService.updateUserInfoToRedis();
+            userDtoService.updateUserInfoToRedis();
             
             // then
             final UserSearchInfoHash foundUser = userSearchInfoRedisRepository.findById(tester.getUniqueId()).get();
@@ -111,7 +111,7 @@ public class UserServiceTest {
             em.persist(tester);
             
             // when
-            userService.updateUserInfoToRedis();
+            userDtoService.updateUserInfoToRedis();
             
             // then
             final UserSearchInfoHash foundUser = userSearchInfoRedisRepository.findById(madeUser.getUniqueId()).get();
@@ -140,7 +140,7 @@ public class UserServiceTest {
             userSearchInfoRedisRepository.save(madeUser);
             
             // when
-            final Flux<UserSearchInfoResponseDto> foundUser = userService.findAllUserSearchInfo("uniqueId");
+            final Flux<UserSearchInfoResponseDto> foundUser = userDtoService.findAllUserSearchInfo("uniqueId");
             
             // then
             StepVerifier.create(foundUser)
@@ -163,7 +163,7 @@ public class UserServiceTest {
             userSearchInfoRedisRepository.save(madeUser);
             
             // when
-            final Flux<UserSearchInfoResponseDto> foundUser = userService.findAllUserSearchInfo("김선지");
+            final Flux<UserSearchInfoResponseDto> foundUser = userDtoService.findAllUserSearchInfo("김선지");
             
             // then
             StepVerifier.create(foundUser)

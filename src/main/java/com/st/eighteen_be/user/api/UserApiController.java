@@ -10,7 +10,6 @@ import com.st.eighteen_be.user.enums.CategoryType;
 import com.st.eighteen_be.user.service.AuthService;
 import com.st.eighteen_be.user.service.LikeService;
 import com.st.eighteen_be.user.service.UserDtoService;
-import com.st.eighteen_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,7 +52,6 @@ public class UserApiController {
     private final AuthService authService;
     private final UserDtoService userDtoService;
     private final LikeService likeService;
-    private final UserService userService;
 
     @Operation(summary = "아이디 중복 확인", description = "아이디 중복 확인")
     @PreAuthorize("permitAll()")
@@ -134,27 +132,9 @@ public class UserApiController {
         return ApiResp.success(HttpStatus.OK, userDtoService.findByUniqueId(uniqueId));
     }
 
-    @Operation(summary = "[GUEST]회원 전체 조회",
-            description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @GetMapping("/v1/api/guest/find-all")
-    public ApiResp<UserProfilePageResponseDto> findAll(@PageableDefault(page = 0, size = 10) Pageable pageable) {
-
-        return ApiResp.success(HttpStatus.OK, userDtoService.getUserProfilePage(pageable));
-    }
-
-    @Operation(summary = "[USER]회원 전체 조회",
-            description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @GetMapping("/v1/api/user/find-all")
-    public ApiResp<UserProfilePageResponseDto> findAll(@AuthenticationPrincipal UserDetails userDetails,
-                                                       @PageableDefault(page = 0, size = 10) Pageable pageable) {
-
-        return ApiResp.success(HttpStatus.OK, userDtoService.
-                getUserProfilesWithLikes(userDetails.getUsername(), pageable));
-    }
-
     @Operation(summary = "[GUEST] 카테고리에 맞는 회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수x / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @GetMapping("/v1/api/guest/find-all-by-category/{category}")
+    @GetMapping("/v1/api/guest/find-all/{category}")
     public ApiResp<UserProfilePageResponseDto> findAllByCategory(@Parameter(description = "카테고리", required = true)
                                                                  @PathVariable("category") CategoryType category,
                                                                  @PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -163,7 +143,7 @@ public class UserApiController {
 
     @Operation(summary = "[USER] 카테고리에 맞는 회원 전체 조회",
             description = "순서 랜덤하게 뿌림 / 헤더에 토큰값 필수 / 페이징 처리 / request로 page랑 size만 보내주세요")
-    @GetMapping("/v1/api/user/find-all-by-category/{category}")
+    @GetMapping("/v1/api/user/find-all/{category}")
     public ApiResp<UserProfilePageResponseDto> findAllByCategory(@AuthenticationPrincipal UserDetails userDetails,
                                                                  @PageableDefault(page = 0, size = 10) Pageable pageable,
                                                                  @Parameter(description = "카테고리", required = true)
@@ -182,7 +162,7 @@ public class UserApiController {
     @Operation(summary = "메인 화면 사용자(아이디/닉네임) 조회", description = "메인 화면 사용자(아이디/닉네임) 조회")
     @GetMapping("/v1/api/user/search/{search-word}")
     public Mono<ApiResp<List<UserSearchInfoResponseDto>>> searchUser(@PathVariable("search-word") String searchKey) {
-        return userService.findAllUserSearchInfo(searchKey)
+        return userDtoService.findAllUserSearchInfo(searchKey)
                        .collectList()
                        .map(dto -> ApiResp.success(HttpStatus.OK, dto));
     }

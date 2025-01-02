@@ -92,19 +92,9 @@ public class UserService {
         return userRepository.findById(id)
                 .map(UserInfo::getLikeCount).orElse(0);
     }
-    
-    
-    /**
-     * 최근 5분간 새로 생긴 회원을 redis 에 insert 하고 lastModifiedDate 가 5분 내인 회원에 대해 업데이트를 수행한다.
-     */
-    @Transactional(readOnly = false)
-    public void updateUserInfoToRedis() {
-        // 5분 전 시간
-        final LocalDateTime searchDateTime = LocalDateTime.now().minusMinutes(5);
-        
-        // 5분 전 시간 이후에 생성된 회원들을 조회
-        List<UserInfo> createdUsers = userRepository.findAllByCreatedDateAfterOrLastModifiedDateAfter(searchDateTime, searchDateTime);
-        this.saveMainUserInfoInRedis(createdUsers);
+
+    public List<UserInfo> findCreatedUsers(LocalDateTime searchDateTime) {
+        return userRepository.findAllByCreatedDateAfterOrLastModifiedDateAfter(searchDateTime, searchDateTime);
     }
     
     /**
