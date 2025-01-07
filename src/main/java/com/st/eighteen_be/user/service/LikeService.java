@@ -31,13 +31,11 @@ public class LikeService {
         UserInfo user = userService.findById(userId);
         String likedId = Integer.toString(user.getId());
 
-        if (Boolean.TRUE.equals(likeCountRedisTemplate.opsForSet().isMember(
-                userLikesKey,likedId))
-        ) {
+        if (Boolean.TRUE.equals(userLikesRedisTemplate.opsForSet().isMember(userLikesKey,likedId))) {
             throw new IllegalStateException("Already liked");
         }
 
-        userLikesRedisTemplate.opsForSet().add(userLikesKey, likedId);
+        userLikesRedisTemplate.opsForSet().add(userLikesKey,likedId);
         likeCountRedisTemplate.opsForValue().increment(LIKE_COUNT_PREFIX + likedId);
     }
 
@@ -46,7 +44,7 @@ public class LikeService {
         UserInfo user = userService.findById(userId);
         String likedId = Integer.toString(user.getId());
 
-        if (Boolean.FALSE.equals(likeCountRedisTemplate.opsForSet().isMember(userLikesKey, likedId))) {
+        if (Boolean.FALSE.equals(userLikesRedisTemplate.opsForSet().isMember(userLikesKey, likedId))) {
             //TODO: 레디스에 없지만 DB에는 있는지 확인하는 로직이 필요함
             throw new IllegalStateException("Not liked yet");
         }
