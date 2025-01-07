@@ -4,8 +4,17 @@ import com.st.eighteen_be.user.domain.UserInfo;
 import com.st.eighteen_be.user.domain.UserMediaData;
 import com.st.eighteen_be.user.domain.UserQuestion;
 import com.st.eighteen_be.user.dto.request.MyPageRequestDto;
-import com.st.eighteen_be.user.dto.response.*;
+import com.st.eighteen_be.user.dto.response.UserDetailsResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfilePageResponseDto;
+import com.st.eighteen_be.user.dto.response.UserProfileResponseDto;
+import com.st.eighteen_be.user.dto.response.UserQuestionResponseDto;
+import com.st.eighteen_be.user.dto.response.UserSearchInfoResponseDto;
 import com.st.eighteen_be.user.enums.CategoryType;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -14,12 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,6 +45,7 @@ public class UserDtoService {
         likeService.cancelLike(uniqueId, likedId);
     }
 
+    @Transactional(readOnly = true)
     public UserDetailsResponseDto findById(Integer userId) {
         UserInfo userInfo = userService.findById(userId);
         int likeCount = likeService.countLikes(userInfo.getId());
@@ -49,6 +53,7 @@ public class UserDtoService {
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
+    @Transactional(readOnly = true)
     public UserDetailsResponseDto findByUniqueId(String uniqueId) {
         UserInfo userInfo = userService.findByUniqueId(uniqueId);
         int likeCount = likeService.countLikes(userInfo.getId());
@@ -56,7 +61,8 @@ public class UserDtoService {
         return getUserDetailsResponseDto(userInfo, likeCount);
     }
 
-    private UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {
+    @Transactional(readOnly = true)
+    protected UserDetailsResponseDto getUserDetailsResponseDto(UserInfo userInfo, int likeCount) {
         List<String> images = getImages(userInfo);
         List<UserQuestion> questions = userInfo.getUserQuestions();
 
