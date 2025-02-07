@@ -15,4 +15,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * 24. 10. 20.        ipeac       최초 생성
  */
 public interface TournamentWinnerRepository extends JpaRepository<TournamentWinnerEntity, Long> {
+    boolean existsByUserId(String userId);
 }

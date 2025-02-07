@@ -1,5 +1,7 @@
 package com.st.eighteen_be.tournament.service;
 
+import com.st.eighteen_be.achievement.domain.Achievement;
+import com.st.eighteen_be.achievement.repository.AchievementRepository;
 import com.st.eighteen_be.common.exception.ErrorCode;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.NotFoundException;
@@ -59,6 +61,7 @@ public class TournamentService {
     private final TournamentParticipantRepository tournamentParticipantEntityRepository;
     private final TournamentWinnerRepository tournamentWinnerRepository;
     private final VoteEntityRepository voteEntityRepository;
+    private final AchievementRepository achievementRepository;
     
     private final UserRepository userRepository;
     
@@ -256,8 +259,18 @@ public class TournamentService {
                 .max(Comparator.comparing(TournamentParticipantEntity::getScore));
         
         winner.ifPresent(participantEntity -> {
+            //우승자가 첫번쨰 토너먼트 우승이면 업적 지급
+            giveAchievementToFirstWinner(participantEntity);
             tournamentWinnerRepository.save(participantEntity.toTournamentWinnerEntity(endedTournament));
         });
+    }
+    
+    private void giveAchievementToFirstWinner(TournamentParticipantEntity participantEntity) {
+        if(tournamentWinnerRepository.existsByUserId(participantEntity.getUserId())) {
+            return;
+        }
+        
+        achievementRepository.save(Achievement.builder().build());
     }
     
     @Transactional(readOnly = false)
