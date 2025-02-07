@@ -1,5 +1,6 @@
 package com.st.eighteen_be.tournament.service;
 
+import com.st.eighteen_be.achievement.repository.AchievementRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithMySQLTest;
 import com.st.eighteen_be.common.exception.sub_exceptions.data_exceptions.BadRequestException;
 import com.st.eighteen_be.tournament.constants.TournamentConstants;
@@ -85,6 +86,9 @@ class TournamentServiceMySQLTest {
     @Autowired
     private UserRepository userRepository;
     
+    @Autowired
+    private AchievementRepository achievementRepository;
+    
     @MockBean
     private RedisTemplate<String, MostLikedUserRedisHash> redisTemplate;
     
@@ -105,7 +109,7 @@ class TournamentServiceMySQLTest {
     
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, mostLikedUserRepository,
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantEntityRepository, tournamentWinnerRepository, voteEntityRepository, achievementRepository, userRepository, mostLikedUserRepository,
                 redisTemplate);
         
         given(redisTemplate.opsForList()).willReturn(listOperations);

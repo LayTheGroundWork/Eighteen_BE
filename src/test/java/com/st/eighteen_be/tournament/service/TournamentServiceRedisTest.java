@@ -1,5 +1,6 @@
 package com.st.eighteen_be.tournament.service;
 
+import com.st.eighteen_be.achievement.repository.AchievementRepository;
 import com.st.eighteen_be.common.annotation.ServiceWithRedisTest;
 import com.st.eighteen_be.common.extension.RedisTestContainerExtenstion;
 import com.st.eighteen_be.tournament.constants.TournamentConstants;
@@ -52,6 +53,9 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
 
     @MockBean
     private TournamentEntityRepository tournamentEntityRepository;
+    
+    @MockBean
+    private AchievementRepository achievementRepository;
 
     @MockBean
     private TournamentParticipantRepository tournamentParticipantRepository;
@@ -73,7 +77,7 @@ public class TournamentServiceRedisTest extends RedisTestContainerExtenstion {
 
     @BeforeEach
     void setUp() {
-        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, tournamentWinnerRepository, voteEntityRepository, userRepository, mostLikedUserRepository, redisTemplate);
+        tournamentService = new TournamentService(userService, tournamentEntityRepository, tournamentParticipantRepository, tournamentWinnerRepository, voteEntityRepository, achievementRepository, userRepository, mostLikedUserRepository, redisTemplate);
     }
 
     @Test
